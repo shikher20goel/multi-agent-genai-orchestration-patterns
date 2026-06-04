@@ -31,3 +31,4 @@ TASK 029 done: rig/faultcampaign.py Algorithm 2 sweep, contained/propagated per 
 TASK 030 implemented, awaiting human review
 TASK 031 done: stats/percentiles.py linear-interp quantiles validated vs analytic uniform/lognormal
 TASK 032 implemented, awaiting human review
+TASK 033 implemented, awaiting human review
