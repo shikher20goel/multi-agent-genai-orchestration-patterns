@@ -43,7 +43,7 @@
       ],
       "verify": "`pytest tests/test_config.py` passes: same seed -> identical RNG draw.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "005",

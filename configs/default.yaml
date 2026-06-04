@@ -1,0 +1,67 @@
+# Master configuration for the agentorch measurement rig.
+# All tunables live here; no magic numbers in code.
+
+seed: 42
+
+latency:
+  # Lognormal service-time parameters per platform/service, in seconds.
+  # mu/sigma are parameters of the underlying normal (log-space).
+  bedrock:
+    model_invoke: {mu: -0.7, sigma: 0.55}    # ~0.5s median LLM call
+    gateway: {mu: -3.0, sigma: 0.35}          # ~50ms tool-gateway hop
+    tool: {mu: -2.3, sigma: 0.45}             # ~100ms tool execution
+    memory: {mu: -4.0, sigma: 0.30}           # ~18ms memory store op
+    event_bus: {mu: -3.7, sigma: 0.30}        # ~25ms event publish
+    identity: {mu: -4.3, sigma: 0.25}         # ~14ms identity check
+    observability: {mu: -5.0, sigma: 0.25}    # ~7ms telemetry emit
+    guardrails: {mu: -3.5, sigma: 0.30}       # ~30ms guardrail scan
+  agentforce:
+    model_invoke: {mu: -0.55, sigma: 0.60}    # ~0.58s median LLM call
+    action: {mu: -2.0, sigma: 0.45}           # ~135ms Apex/flow action
+    event_bus: {mu: -3.2, sigma: 0.35}        # ~40ms platform event
+    memory: {mu: -3.6, sigma: 0.30}           # ~27ms session/context store
+    omni_channel: {mu: -2.5, sigma: 0.40}     # ~82ms Omni-Channel routing
+    guardrails: {mu: -3.4, sigma: 0.30}       # ~33ms trust-layer scan
+
+faults:
+  timeout_s: 30.0          # request deemed timed out beyond this service time
+  throttle_delay_s: 2.0    # extra delay injected by a THROTTLE fault
+  containment_threshold: 0.95  # success rate of non-traversing requests for "contained"
+
+tokens:
+  # Synthetic token-count model per scenario step (mean values; rig draws Poisson).
+  input_mean: 600
+  output_mean: 250
+
+scenarios:
+  s1:
+    retrieval_passages: 3
+  s2:
+    min_steps: 4
+    max_steps: 8
+  s3:
+    burst_factor: 5.0
+    burst_fraction: 0.2     # fraction of arrival window that is bursty
+    human_routing_fraction: 0.15
+
+patterns:
+  p1:
+    n_collaborators: 3
+  p4:
+    n_specialists: 3
+  p5:
+    tools: [search, calculator, crm_lookup]
+  p6:
+    confidence_threshold: 0.7
+  p7:
+    clusters: 2
+
+stats:
+  n_resamples: 2000
+  alpha: 0.05
+
+study:
+  rate_rps: 2.0
+  concurrency: 4
+  n_items: 200
+  smoke_n_items: 20
