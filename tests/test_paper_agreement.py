@@ -1,0 +1,259 @@
+"""Paper-agreement gate (PHASE2_SPEC §PRIMARY DELIVERABLE).
+
+Encodes the directional claims of the paper's Table 3 (synoptic
+comparison / structural consequences) and Table 4 (fit-for-purpose
+matrix) and asserts that EXECUTED results satisfy them. A module-scoped
+fixture regenerates a reduced-but-adequate study (n=300 per baseline
+condition, fixed master seed from configs/default.yaml) through the
+exact production path (`agentorch.study.run_study.run_study`), so every
+asserted number traces to the same rig that produces `results/`.
+
+The six claims asserted (verbatim from PHASE2_SPEC.md):
+
+1. P2 Sequential Pipeline p99 in S2 (multi-step) > P2 p99 in S1
+   (additive over stages).
+2. P6 HITL end-to-end latency is the HIGHEST of all patterns /
+   human-step-dominated, not the lowest.
+3. P3 Event-Driven Choreography degrades LEAST under S3 bursty load
+   relative to P1/P2 (burst absorption: p99 inflation S3 vs S1).
+4. Fault campaign shows PROPAGATION for P2 (stage fault blocks
+   downstream) and SPOF behaviour for P1 (supervisor outage) and P4
+   (blackboard/memory-store outage); CONTAINMENT (isolated/absorbed)
+   for P3, P5 (bulkhead/timeout), P7 (platform outage contained to one
+   cluster).
+5. Fault campaign exercises human_queue faults for P6 and shows
+   correctness isolation.
+6. Per-condition results DIFFER across S1/S2/S3 (no identical values
+   across scenarios for the same pattern/platform).
+
+Plus the task-102 guard: every baseline condition runs below
+saturation (offered utilization < 1) with bounded queue growth.
+"""
+from __future__ import annotations
+
+import json
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from agentorch.config import load_config
+from agentorch.study.run_study import run_study
+
+N_PER_CONDITION = 300  # reduced-but-adequate study size for the gate
+PATTERNS = [f"P{i}" for i in range(1, 8)]
+PLATFORMS = ["agentforce", "bedrock"]
+SCENARIOS = ["S1", "S2", "S3"]
+
+
+@pytest.fixture(scope="module")
+def study(tmp_path_factory):
+    """Regenerate results at n=300/condition with the committed seed."""
+    out = tmp_path_factory.mktemp("paper_agreement_results")
+    cfg = load_config()
+    cfg.to_dict()["study"]["n_items"] = N_PER_CONDITION
+    manifest = run_study(cfg, out, smoke=False)
+    lat = pd.read_csv(out / "latency.csv")
+    faults = pd.read_csv(out / "faults.csv")
+    base = lat[lat["mode"] == "baseline"]
+    return {"base": base, "faults": faults, "manifest": manifest, "cfg": cfg}
+
+
+def _p(base: pd.DataFrame, pattern: str, platform: str, scenario: str,
+       q: float) -> float:
+    sel = base[(base["pattern"] == pattern) & (base["platform"] == platform)
+               & (base["scenario"] == scenario)]["latency_ms"]
+    assert len(sel) == N_PER_CONDITION, (pattern, platform, scenario, len(sel))
+    return float(np.percentile(sel.to_numpy(dtype=float), q))
+
+
+# ---------------------------------------------------------------- claim 1
+def test_claim1_pipeline_p99_additive_over_stages(study) -> None:
+    """P2 p99 in S2 (4-8 stages) exceeds P2 p99 in S1 (single stage)."""
+    base = study["base"]
+    for platform in PLATFORMS:
+        p99_s1 = _p(base, "P2", platform, "S1", 99)
+        p99_s2 = _p(base, "P2", platform, "S2", 99)
+        assert p99_s2 > p99_s1, (
+            f"P2/{platform}: S2 p99 {p99_s2:.0f} ms must exceed "
+            f"S1 p99 {p99_s1:.0f} ms (additive over stages)")
+        # Additive structure: the multi-step gap is substantial, not noise.
+        assert p99_s2 > 1.5 * p99_s1, (platform, p99_s1, p99_s2)
+
+
+# ---------------------------------------------------------------- claim 2
+def test_claim2_hitl_latency_highest_and_human_dominated(study) -> None:
+    """P6's end-to-end p99 is the highest of all patterns in every
+    (platform, scenario) condition, and its magnitude is set by the
+    configured human decision delay (tens of seconds), not machine time."""
+    base = study["base"]
+    cfg = study["cfg"]
+    hd = cfg.latency.shared.human_decision_delay
+    human_p50_ms = float(np.exp(hd["mu"])) * 1000.0
+    for platform in PLATFORMS:
+        for scenario in SCENARIOS:
+            p99_p6 = _p(base, "P6", platform, scenario, 99)
+            for pattern in PATTERNS:
+                if pattern == "P6":
+                    continue
+                p99_other = _p(base, pattern, platform, scenario, 99)
+                assert p99_p6 > p99_other, (
+                    f"P6 p99 {p99_p6:.0f} ms must exceed {pattern} "
+                    f"p99 {p99_other:.0f} ms in {platform}/{scenario}")
+            # Human-step-dominated: the tail is at least the human
+            # decision median (tens of seconds per config).
+            assert p99_p6 >= human_p50_ms, (platform, scenario, p99_p6)
+
+
+# ---------------------------------------------------------------- claim 3
+def test_claim3_choreography_absorbs_bursts_best(study) -> None:
+    """P3's p99 inflation under bursty S3 (vs its own S1 baseline) is
+    the smallest among {P1, P2, P3}: the bus absorbs bursts that a
+    supervisor or a fixed chain must queue."""
+    base = study["base"]
+    for platform in PLATFORMS:
+        inflation = {}
+        for pattern in ("P1", "P2", "P3"):
+            p99_s1 = _p(base, pattern, platform, "S1", 99)
+            p99_s3 = _p(base, pattern, platform, "S3", 99)
+            inflation[pattern] = p99_s3 / p99_s1
+        assert inflation["P3"] < inflation["P1"], (platform, inflation)
+        assert inflation["P3"] < inflation["P2"], (platform, inflation)
+
+
+# ---------------------------------------------------------------- claim 4
+def _cls(faults: pd.DataFrame, pattern: str, platform: str, component: str,
+         fault: str) -> str:
+    row = faults[(faults["pattern"] == pattern)
+                 & (faults["platform"] == platform)
+                 & (faults["component"] == component)
+                 & (faults["fault"] == fault)]
+    assert len(row) == 1, (pattern, platform, component, fault, len(row))
+    return str(row.iloc[0]["classification"])
+
+
+def test_claim4_fault_matrix_matches_table3_consequences(study) -> None:
+    """Propagation for P1 (supervisor outage = SPOF), P2 (stage fault
+    blocks downstream), P4 (store outage = SPOF); containment
+    (isolated/absorbed) for P3 (buffered redelivery), P5 (bulkhead),
+    P7 (remote-cluster outage contained to bridged work)."""
+    faults = study["faults"]
+    contained = {"isolated", "absorbed"}
+    for platform in PLATFORMS:
+        # SPOF / propagation rows.
+        assert _cls(faults, "P1", platform, "model_backend",
+                    "outage") == "propagated", f"P1 supervisor SPOF {platform}"
+        assert _cls(faults, "P2", platform, "model_backend",
+                    "outage") == "propagated", f"P2 stage fault {platform}"
+        assert _cls(faults, "P4", platform, "memory_store",
+                    "outage") == "propagated", f"P4 store SPOF {platform}"
+        # Containment rows.
+        assert _cls(faults, "P3", platform, "event_bus",
+                    "outage") == "absorbed", f"P3 bus redelivery {platform}"
+        assert _cls(faults, "P5", platform, "tool",
+                    "outage") in contained, f"P5 bulkhead {platform}"
+        assert _cls(faults, "P5", platform, "tool",
+                    "timeout") in contained, f"P5 tool timeout {platform}"
+        # P7: the remote-cluster outage cell (model_backend with the
+        # campaign's unit="remote") degrades only the bridged work.
+        assert _cls(faults, "P7", platform, "model_backend",
+                    "outage") == "isolated", f"P7 cluster containment {platform}"
+
+    # The matrix is a MIX, as Table 3's consequences require.
+    classes = set(faults["classification"].unique())
+    assert {"propagated", "isolated", "absorbed"} <= classes
+
+
+def test_claim4_faults_degrade_affected_conditions(study) -> None:
+    """Every exercised fault cell visibly degrades its condition:
+    error rate up (traversing success < 1), latency up vs baseline, or
+    output degraded (a bulkhead-isolated unit's work lost)."""
+    faults = study["faults"]
+    exercised = faults[(faults["classification"] != "not_exercised")
+                       & (faults["n_traversing"] > 0)]
+    assert len(exercised) > 0
+    for _, row in exercised.iterrows():
+        degraded = (row["traversing_success_rate"] < 1.0
+                    or row["fault_mean_latency_s"]
+                    > row["baseline_mean_latency_s"]
+                    or row["traversing_degraded_rate"] > 0.0)
+        assert degraded, (row["pattern"], row["platform"],
+                          row["component"], row["fault"])
+
+
+# ---------------------------------------------------------------- claim 5
+def test_claim5_hitl_human_queue_correctness_isolation(study) -> None:
+    """human_queue faults are exercised for P6 and show correctness
+    isolation: decisions are deferred/queued (latency up), never
+    wrongly auto-approved (success and integrity preserved)."""
+    faults = study["faults"]
+    for platform in PLATFORMS:
+        cells = faults[(faults["pattern"] == "P6")
+                       & (faults["platform"] == platform)
+                       & (faults["component"] == "human_queue")]
+        exercised = cells[cells["n_traversing"] > 0]
+        assert len(exercised) > 0, f"P6 human_queue not exercised on {platform}"
+        for _, row in exercised.iterrows():
+            # Integrity preserved: deferred decisions still succeed...
+            assert row["traversing_success_rate"] >= 0.95, row["fault"]
+            assert row["classification"] in ("absorbed", "isolated"), row["fault"]
+            # ...at the price of latency (deferral), not correctness.
+            assert (row["fault_mean_latency_s"]
+                    > row["baseline_mean_latency_s"]), row["fault"]
+
+
+# ---------------------------------------------------------------- claim 6
+def test_claim6_conditions_differ_across_scenarios(study) -> None:
+    """Independent per-condition streams (task 103): no pattern/platform
+    repeats identical latency values across scenarios."""
+    base = study["base"]
+    for platform in PLATFORMS:
+        for pattern in PATTERNS:
+            p50s = [_p(base, pattern, platform, s, 50) for s in SCENARIOS]
+            p99s = [_p(base, pattern, platform, s, 99) for s in SCENARIOS]
+            assert len(set(p50s)) == 3, (pattern, platform, p50s)
+            assert len(set(p99s)) == 3, (pattern, platform, p99s)
+
+
+# ------------------------------------------------------- task 102 guard
+def test_load_below_saturation_and_bounded_queues(study) -> None:
+    """Task 102: every baseline condition is driven below its measured
+    single-replica saturation (utilization < 1) and queue growth stays
+    bounded — p99 is not an unbounded-queue artifact."""
+    manifest = study["manifest"]
+    conds = manifest["conditions"]
+    assert len(conds) == 42
+    for key, c in conds.items():
+        assert c["offered_utilization"] < 1.0, (key, c)
+        assert c["offered_rate_rps"] < c["saturation_rate_rps"], key
+        # Bounded queue: max depth stays far below the condition size.
+        assert c["max_queue_depth"] < N_PER_CONDITION / 4, (key, c)
+
+
+def test_manifest_records_saturation_check(study, tmp_path) -> None:
+    """The per-condition saturation rate and chosen arrival rate are
+    recorded in results/manifest.json (task 102)."""
+    m = study["manifest"]
+    assert "utilization_target" in m
+    sample = m["conditions"]["P1:bedrock:S1"]
+    for field in ("mean_service_s", "saturation_rate_rps",
+                  "offered_rate_rps", "offered_utilization"):
+        assert field in sample
+    # Round-trips through JSON.
+    assert json.loads(json.dumps(m))["conditions"]
+
+
+# ----------------------------------------------- calibration sanity rails
+def test_latency_magnitudes_are_realistic(study) -> None:
+    """Task 101 rails: machine-path baselines never reach the old
+    60-190 s artifact range; HITL is tens of seconds via the human
+    delay, bounded well under 190 s."""
+    base = study["base"]
+    for platform in PLATFORMS:
+        for scenario in SCENARIOS:
+            for pattern in PATTERNS:
+                p99 = _p(base, pattern, platform, scenario, 99)
+                if pattern == "P6":
+                    assert p99 < 190_000, (pattern, platform, scenario, p99)
+                else:
+                    assert p99 < 60_000, (pattern, platform, scenario, p99)

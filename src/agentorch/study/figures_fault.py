@@ -61,7 +61,15 @@ def make_fault_matrix(faults: pd.DataFrame, out_path: Path) -> None:
                 row = sub[(sub["pattern"] == pattern)
                           & (sub["component"] == component)
                           & (sub["fault"] == fault)]
-                if row.empty or int(row.iloc[0]["n_traversing"]) == 0:
+                if row.empty:
+                    grid[i, j] = 0
+                elif "classification" in row.columns:
+                    # Task 104: the campaign emits an explicit
+                    # PROPAGATED/ISOLATED/ABSORBED/NOT_EXERCISED class.
+                    grid[i, j] = {"not_exercised": 0, "propagated": 1,
+                                  "isolated": 2, "absorbed": 3}[
+                        str(row.iloc[0]["classification"])]
+                elif int(row.iloc[0]["n_traversing"]) == 0:
                     grid[i, j] = 0
                 elif not bool(row.iloc[0]["contained"]):
                     grid[i, j] = 1

@@ -90,12 +90,16 @@ def run_study(cfg: Config, out_dir: str | Path, smoke: bool = False) -> dict:
                     "scenario": FAULT_SCENARIO.value,
                     "component": o.component.value,
                     "fault": o.fault.value,
+                    "classification": o.classification,
                     "contained": o.contained,
                     "requests_affected": o.requests_affected,
                     "n_traversing": o.n_traversing,
                     "n_non_traversing": o.n_non_traversing,
                     "non_traversing_success_rate": o.non_traversing_success_rate,
                     "traversing_success_rate": o.traversing_success_rate,
+                    "traversing_degraded_rate": o.traversing_degraded_rate,
+                    "baseline_mean_latency_s": o.baseline_mean_latency_s,
+                    "fault_mean_latency_s": o.fault_mean_latency_s,
                 })
 
     sink.to_dataframe("latency").to_csv(out / "latency.csv", index=False)

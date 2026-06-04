@@ -118,7 +118,6 @@ load:
   saturation_probe_n: 40
 
 study:
-  rate_rps: 2.0   # transitional: superseded by load.utilization_target (task 102)
   concurrency: 4
   n_items: 500
   smoke_n_items: 20
