@@ -26,3 +26,4 @@ TASK 024 done: S1 RAG QA workload (single-step, retrieval passages, deterministi
 TASK 025 done: S2 long-horizon doc-gen (4-8 sequential stages, runs through P2)
 TASK 026 done: S3 bursty incident triage (configurable burst_factor, human-routing fraction below HITL threshold)
 TASK 027 done: rig/loadgen.py open-loop Poisson loadgen, submit_ts from schedule, c-server pool; stall test proves queue grows w/ unchanged cadence
+TASK 028 done: rig/saturation.py Little's law headroom + find_saturation rate sweep; overload flagged unsustainable
