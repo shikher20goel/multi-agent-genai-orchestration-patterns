@@ -90,3 +90,6 @@ TASK 203 done: agreement suite extended — tests/fixtures/fit_agreed_cells.json
 TASK 204 done: figures/table4.csv renamed to figures/table4_supplementary.csv (supplementary per-platform quality view, docstring + docs/GRADES.md state it is NOT the fit-for-purpose matrix); run.sh generates fit_matrix.csv + table4_supplementary.csv; verify_repro manifest, RESULTS_TO_PAPER_MAP (fit_matrix.csv = Table 4), README, ARCHITECTURE_CONTRACT, SAP/governance/queue references updated
 TASK 205 done: cost figure y-axis now exactly "USD per 1k requests (configs/costs.yaml assumptions, dated)" (one unit, no cost-units/USD mix); fault-matrix figure caption + results_section one-liner state model_backend is a shared critical-path dependency (differentiation carried by event_bus/gateway/tool/memory_store/human_queue/bridge); $2/conversation sensitivity caveat added to the cost subsection and figures_cost output note, [HUMAN: confirm]
 TASK 206 implemented, awaiting human review
+TASK 207 implemented, awaiting human review
+TASK 207 re-flag: 11 fit-cell discrepancies (docs/FIT_DISCREPANCIES.md — P1-S1, P1-S2, P2-S1, P2-S2, P3-S1, P5-S1, P5-S3, P6-S1, P7-S1, P7-S2, P7-S3) awaiting author adjudication
+TASK 207 re-flag: $2/conversation Agentforce cost sensitivity caveat (configs/costs.yaml; manuscript cost subsection + figures_cost note) awaiting author confirmation

@@ -53,3 +53,66 @@ All 21 HUMAN-gated tasks are implemented, tested, committed on `autonomous-build
 2. Flip repo public (submission time only).
 3. Code Ocean: create capsule from `capsule/` layout (metadata.yml ready) OR Zenodo: new upload, attach release zip, CITATION.cff present; mint DOI.
 4. Paste repo URL + DOI into the two manuscript slots; only then finalize abstract/data-availability text.
+
+## Phase 3 batch — fit-matrix reconciliation (tasks 201–207)
+
+**Context.** Phase 2's per-platform A/B/C table contradicted the
+paper's Table 4 (a single platform-independent Weak/Moderate/Strong
+fit grade per pattern × scenario). Phase 3 pre-registered a fit rule
+(`docs/FIT_RULE.md`, written BEFORE first computation; no
+post-computation rule changes — Changelog empty after the initial
+entry), computed `figures/fit_matrix.csv` from the measured results,
+and compared to the paper's 21 published cells. The old table is now
+`figures/table4_supplementary.csv` and is explicitly labeled NOT the
+fit-for-purpose matrix.
+
+### Decision 1 — 11 discrepant fit cells [HUMAN]
+
+10 of 21 published cells reproduce (pinned in
+`tests/fixtures/fit_agreed_cells.json` and asserted by the agreement
+suite). The 11 that do not are recorded with measured numbers and an
+honest calibration-vs-refinement read in `docs/FIT_DISCREPANCIES.md`:
+
+- **Evidence-based refinement candidates (3):** P1-S1
+  (Moderate→Weak: 5-invocation fan-out is worst-group on both
+  throughput proxy and cost), P3-S1 (Moderate→Weak: per-event-hop
+  latency/cost price), P7-S2 (Moderate→Weak: per-step bridge cost
+  amplification, the paper's own stated mechanism, measured as
+  worst-group).
+- **Calibration/construct issues (8):** P1-S2, P2-S1, P2-S2, P5-S1,
+  P5-S3, P6-S1, P7-S1, P7-S3 — in each, the rig's pre-registered
+  stressed property (latency/cost growth, p99 inflation) does not
+  capture the axis the paper's cell rationale names (order-match/
+  completion, fault containment, conditional cross-platform reach,
+  parallel dispatch/cost attributability, closed-loop human
+  throttling, adaptive-decomposition payoff, multi-stage S1 chain).
+  The orthogonal claims (e.g. P5 bulkhead ISOLATED, P7 remote-cluster
+  outage ISOLATED, P1/P2 best S2 completion) ARE separately confirmed
+  by the fault campaign and the Phase-2 agreement suite.
+
+**Decision needed:** per cell, either (a) keep the paper grade and
+treat the rig result as a documented calibration limitation, (b)
+revise the paper cell to the computed grade (refinement), or (c)
+direct a scenario/rig recalibration (e.g. closed-loop human queue for
+P6-S1, multi-stage S1 for P2) and recompute. The computed grades stay
+as computed until you decide; nothing was forced.
+
+### Decision 2 — $2/conversation cost sensitivity caveat [HUMAN: confirm]
+
+The cost results note (manuscript draft + figures_cost output note)
+now states that the Agentforce-vs-Bedrock absolute cost gap (~two
+orders of magnitude) is dominated by the $2/conversation Agentforce
+pricing assumption in `configs/costs.yaml`, with only the
+within-platform pattern ordering robust to it. **Decision needed:**
+confirm the caveat wording and the underlying $2/conversation
+decomposition (links to Batch 1).
+
+### Also in this batch
+
+- Task 206 manuscript update (fit_matrix.csv as Table 4,
+  table4_supplementary.csv as supplementary, numbers re-traced) —
+  awaiting review like the rest of Batch 9.
+- The pre-registered rule itself (`docs/FIT_RULE.md`: stressed
+  properties, pooling, upgrade-only capability gate, capability
+  flags with structural justifications) is reviewable; any change you
+  direct goes through its §Changelog.
