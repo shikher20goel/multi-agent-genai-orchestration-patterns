@@ -1,1 +1,2 @@
 Session start. No tasks complete yet.
+TASK 001 done: pyproject (setuptools src layout, extras dev), .gitignore (results/, figures/), agentorch.__version__
