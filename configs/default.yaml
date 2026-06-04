@@ -27,6 +27,13 @@ faults:
   timeout_s: 30.0          # request deemed timed out beyond this service time
   throttle_delay_s: 2.0    # extra delay injected by a THROTTLE fault
   containment_threshold: 0.95  # success rate of non-traversing requests for "contained"
+  campaign:
+    # Algorithm 2 sweep: every (component, fault_type) cell below.
+    components: [model_backend, gateway, tool, event_bus, memory_store, human_queue]
+    fault_types: [timeout, error, throttle, outage]
+    probability: 0.5       # per-boundary-call fault firing probability when armed
+    n_requests: 40         # requests per campaign cell (full study)
+    smoke_n_requests: 8    # requests per cell under --smoke
 
 tokens:
   # Synthetic token-count model per scenario step (mean values; rig draws Poisson).

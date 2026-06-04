@@ -338,7 +338,7 @@
    ],
    "verify": "`pytest tests/test_faultcampaign.py` passes; records contained/propagated correctly.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "030",
