@@ -38,3 +38,4 @@ TASK 036 done: study/run_study.py 42-condition baseline + 336-cell fault campaig
 FULL STUDY RUN: n=500 per baseline condition (42 conds), fault campaign 40 req/cell x 336 cells, seed=42, wall 2.6s, git c7b805d; results/ populated (34440 latency, 21000 cost, 336 fault rows)
 TASK 037 implemented, awaiting human review
 TASK 038 implemented, awaiting human review
+TASK 039 implemented, awaiting human review
