@@ -250,7 +250,7 @@
       ],
       "verify": "`pytest tests/test_p7.py` passes; cluster outage contained.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "023",
