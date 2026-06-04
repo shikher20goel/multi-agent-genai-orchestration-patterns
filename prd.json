@@ -625,7 +625,7 @@
    ],
    "verify": "capsule layout exists; metadata.yml valid YAML. Publishing left as a HUMAN step.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "054",

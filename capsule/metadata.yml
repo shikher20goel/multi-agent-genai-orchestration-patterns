@@ -1,0 +1,28 @@
+# Code Ocean-style capsule metadata (task 053).
+metadata_version: 1
+title: >-
+  AgentOrchPatterns: reproducibility capsule for "A Pattern Catalog for
+  Multi-Agent Generative AI Orchestration Across Enterprise CRM and
+  Hyperscaler Cloud Platforms"
+authors:
+  - name: Shikher Goel
+    orcid: "https://orcid.org/0009-0005-8392-0949"
+license: "Apache-2.0 [HUMAN: confirm license choice before publishing]"
+description: >-
+  Executable, deterministic measurement study backing the IEEE Access
+  submission: seven multi-agent orchestration patterns instantiated
+  against locally mocked Salesforce Agentforce 360 and Amazon
+  Bedrock/AgentCore clients; open-loop load generation, a 336-cell
+  fault-injection campaign, a cost model, and a pre-committed
+  statistics pipeline (BCa bootstrap CIs, Mann-Whitney U with effect
+  sizes, Holm correction) regenerating every table and figure of the
+  paper. No network or cloud credentials required.
+keywords:
+  - multi-agent systems
+  - generative AI
+  - orchestration patterns
+  - software architecture
+  - reproducibility
+  - fault injection
+  - Salesforce Agentforce
+  - Amazon Bedrock
