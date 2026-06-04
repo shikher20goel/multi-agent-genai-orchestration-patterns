@@ -6,3 +6,4 @@ TASK 004 done: config.py Config/load_config/get_rng (sha256 child seeds), config
 TASK 005 done: types.py with PatternId(7), ScenarioId(3), Platform, Mode, FaultType, Component
 TASK 006 done: domain.py Agent/WorkItem/WorkResult with status validation
 TASK 007 done: telemetry.py LatencyRecord/CostRecord/FaultRecord/TelemetrySink CSV roundtrip
+TASK 008 done: latency.py lognormal LatencyModel + clock.py VirtualClock; deterministic, p99>p50

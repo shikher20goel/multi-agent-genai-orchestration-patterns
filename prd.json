@@ -88,7 +88,7 @@
       ],
       "verify": "`pytest tests/test_latency.py` passes; same seed -> identical samples; p99>p50.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "009",
