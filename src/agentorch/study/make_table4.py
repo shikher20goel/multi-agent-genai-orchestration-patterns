@@ -24,11 +24,15 @@ when the corrected test rejects AND the Hodges-Lehmann shift X-Y > 0.
    B — mean cost <= 4x the cheapest;
    C — otherwise.
 
-3. reliability_grade (baseline error rate + fault containment from the
-   campaign for the same pattern/platform):
-   A — error_rate == 0 AND >= 75% of campaign cells contained;
-   B — error_rate <= 0.02 AND >= 50% of cells contained;
-   C — otherwise.
+3. reliability_grade (baseline error rate + fault campaign for the same
+   pattern/platform; a cell is "robust" when it is contained AND the
+   requests directly hit by the fault still succeed at >= 95%
+   (traversing_success_rate >= 0.95) — i.e. the pattern absorbs faults
+   rather than merely failing the hit requests). Over the exercised
+   cells (n_traversing > 0):
+   A — error_rate == 0 AND >= 50% of exercised cells robust;
+   B — error_rate <= 0.02 AND all cells contained;
+   C — otherwise (errors in baseline, or any propagated cell).
 
 4. overall_grade: the worst (max) of the three letter grades.
 
@@ -92,14 +96,19 @@ def _cost_grades(base: pd.DataFrame, cost: pd.DataFrame) -> dict[tuple, str]:
 def _reliability_grades(base: pd.DataFrame,
                         faults: pd.DataFrame) -> dict[tuple, str]:
     grades: dict[tuple, str] = {}
-    contain = faults.groupby(["pattern", "platform"])["contained"].mean()
+    exercised = faults[faults["n_traversing"] > 0].copy()
+    exercised["robust"] = (exercised["contained"]
+                           & (exercised["traversing_success_rate"] >= 0.95))
+    robust_frac = exercised.groupby(["pattern", "platform"])["robust"].mean()
+    contained_all = faults.groupby(["pattern", "platform"])["contained"].all()
     for (pattern, platform, scenario), grp in base.groupby(
             ["pattern", "platform", "scenario"]):
         err = 1.0 - grp["success"].mean()
-        frac = float(contain.get((pattern, platform), 0.0))
-        if err == 0.0 and frac >= 0.75:
+        rf = float(robust_frac.get((pattern, platform), 0.0))
+        all_contained = bool(contained_all.get((pattern, platform), False))
+        if err == 0.0 and rf >= 0.50:
             g = "A"
-        elif err <= 0.02 and frac >= 0.50:
+        elif err <= 0.02 and all_contained:
             g = "B"
         else:
             g = "C"

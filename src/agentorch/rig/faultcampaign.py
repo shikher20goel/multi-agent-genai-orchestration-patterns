@@ -4,11 +4,19 @@ For each (component, fault_type) cell in the campaign config, run a
 measurement window with the injector armed at the configured
 probability, then classify the cell:
 
-- **contained**: failures are confined to requests that actually
-  traversed the faulted component, AND the success rate of requests
-  that did NOT traverse it is at least ``faults.containment_threshold``.
+A request *traverses* the faulted component when the injected fault
+actually fired on at least one of its boundary calls to that component.
+
+- **contained**: failures are confined to requests that traversed the
+  faulted component, AND the success rate of requests that did NOT
+  traverse it is at least ``faults.containment_threshold``.
 - **propagated** otherwise (a non-traversing request failed, or the
   blast radius depressed the non-traversing success rate).
+
+Within "contained" the cell additionally reports the success rate of
+the traversing (directly hit) requests: a pattern that *absorbs* the
+fault (bulkheads, fallbacks) keeps hit requests succeeding, while a
+pattern that merely *isolates* it fails the hit requests only.
 
 One FaultRecord per cell is emitted into the sink.
 """
@@ -36,6 +44,7 @@ class CellOutcome:
     n_traversing: int
     n_non_traversing: int
     non_traversing_success_rate: float
+    traversing_success_rate: float
 
 
 def classify_cell(component: Component, fault: FaultType,
@@ -50,6 +59,10 @@ def classify_cell(component: Component, fault: FaultType,
         nt_success = 1.0 - non_trav_failures / len(non_traversing)
     else:
         nt_success = 1.0
+    if traversing:
+        t_success = 1.0 - affected / len(traversing)
+    else:
+        t_success = 1.0
     contained = non_trav_failures == 0 and nt_success >= threshold
     return CellOutcome(
         component=component,
@@ -59,6 +72,7 @@ def classify_cell(component: Component, fault: FaultType,
         n_traversing=len(traversing),
         n_non_traversing=len(non_traversing),
         non_traversing_success_rate=nt_success,
+        traversing_success_rate=t_success,
     )
 
 
@@ -77,8 +91,10 @@ def run_cell(pattern_id: PatternId, platform: Platform, scenario: ScenarioId,
 
     def service_fn(item):
         result, service_s = pattern.run(item)
-        traversed = component in ctx.components_touched
         injected = next((f for c, f in ctx.faults_seen if c is component), None)
+        # Traversal = the injected fault actually fired on this request's
+        # path through the faulted component.
+        traversed = injected is not None
         per_request.append((traversed, result.ok))
         return service_s, result.ok, injected
 

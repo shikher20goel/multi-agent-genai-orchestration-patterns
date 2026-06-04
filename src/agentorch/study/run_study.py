@@ -81,6 +81,7 @@ def run_study(cfg: Config, out_dir: str | Path, smoke: bool = False) -> dict:
                     "n_traversing": o.n_traversing,
                     "n_non_traversing": o.n_non_traversing,
                     "non_traversing_success_rate": o.non_traversing_success_rate,
+                    "traversing_success_rate": o.traversing_success_rate,
                 })
 
     sink.to_dataframe("latency").to_csv(out / "latency.csv", index=False)
