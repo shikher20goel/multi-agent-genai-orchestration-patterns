@@ -13,3 +13,4 @@ TASK 011 done: MockAgentCore invoke_agent_runtime/gateway_call(+1 hop)/memory/id
 TASK 012 done: clients/agentforce.py topics->actions pass-through chaining, run_agent_script, sessions; OmniChannel scaffolded
 TASK 013 done: publish_event->subscribers; OmniChannel.handoff routes to human queue, falls back when empty/absent
 TASK 014 implemented, awaiting human review
+TASK 015 done: patterns/base.py Pattern ABC (meta 9 keys, run->(WorkResult, service_time_s)), validate_meta
