@@ -278,7 +278,7 @@
       ],
       "verify": "`pytest tests/test_s1.py` passes.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "025",

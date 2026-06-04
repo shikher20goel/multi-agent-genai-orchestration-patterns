@@ -22,3 +22,4 @@ TASK 020 done: P5 GatewayPattern with per-tool bulkheads; fault contained on bot
 TASK 021 done: P6 HitlPattern pause/resume + immutable-style decision log; adjudication queue on Agentforce
 TASK 022 done: P7 BridgePattern with independent remote fault domain; full remote outage contained (degraded, local ok)
 TASK 023 done: patterns/registry.py REGISTRY (7 patterns) + build(); uniform smoke on both platforms
+TASK 024 done: S1 RAG QA workload (single-step, retrieval passages, deterministic)
