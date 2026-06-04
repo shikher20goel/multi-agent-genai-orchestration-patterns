@@ -1,0 +1,52 @@
+[
+  {
+    "pattern": "P1",
+    "scenario": "S3",
+    "grade": "Moderate"
+  },
+  {
+    "pattern": "P2",
+    "scenario": "S3",
+    "grade": "Weak"
+  },
+  {
+    "pattern": "P3",
+    "scenario": "S2",
+    "grade": "Moderate"
+  },
+  {
+    "pattern": "P3",
+    "scenario": "S3",
+    "grade": "Strong"
+  },
+  {
+    "pattern": "P4",
+    "scenario": "S1",
+    "grade": "Weak"
+  },
+  {
+    "pattern": "P4",
+    "scenario": "S2",
+    "grade": "Strong"
+  },
+  {
+    "pattern": "P4",
+    "scenario": "S3",
+    "grade": "Moderate"
+  },
+  {
+    "pattern": "P5",
+    "scenario": "S2",
+    "grade": "Moderate"
+  },
+  {
+    "pattern": "P6",
+    "scenario": "S2",
+    "grade": "Moderate"
+  },
+  {
+    "pattern": "P6",
+    "scenario": "S3",
+    "grade": "Strong"
+  }
+]

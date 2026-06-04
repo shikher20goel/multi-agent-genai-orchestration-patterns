@@ -37,6 +37,7 @@ Usage: ``python -m agentorch.study.make_fit_matrix
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -62,6 +63,37 @@ CAPABILITY_GATE = {
 }
 
 _GRADE_TO_STANDING = {"A": "TOP", "B": "MID", "C": "BOTTOM"}
+
+# The paper's PUBLISHED Table 4 cells (ground truth for the agreement
+# comparison of task 202/203). These are the published grades, NOT the
+# computed ones: the computed grade always comes from build_fit_matrix
+# and is never hardcoded. Source: paper PDF, Table 4 ("Fit-for-Purpose
+# Matrix"), also transcribed in PHASE3_SPEC.md.
+PAPER_TABLE4 = {
+    ("P1", "S1"): "Moderate", ("P1", "S2"): "Strong",
+    ("P1", "S3"): "Moderate",
+    ("P2", "S1"): "Weak", ("P2", "S2"): "Strong", ("P2", "S3"): "Weak",
+    ("P3", "S1"): "Moderate", ("P3", "S2"): "Moderate",
+    ("P3", "S3"): "Strong",
+    ("P4", "S1"): "Weak", ("P4", "S2"): "Strong", ("P4", "S3"): "Moderate",
+    ("P5", "S1"): "Strong", ("P5", "S2"): "Moderate",
+    ("P5", "S3"): "Strong",
+    ("P6", "S1"): "Weak", ("P6", "S2"): "Moderate", ("P6", "S3"): "Strong",
+    ("P7", "S1"): "Strong", ("P7", "S2"): "Moderate",
+    ("P7", "S3"): "Strong",
+}
+
+
+def agreed_cells(fit: pd.DataFrame) -> list[dict]:
+    """Cells where the COMPUTED fit grade reproduces the paper's
+    published Table 4 cell (task 203 fixture content)."""
+    out = []
+    for _, r in fit.iterrows():
+        key = (str(r["pattern"]), str(r["scenario"]))
+        if PAPER_TABLE4[key] == str(r["fit_grade"]):
+            out.append({"pattern": key[0], "scenario": key[1],
+                        "grade": str(r["fit_grade"])})
+    return out
 
 
 def _standings(samples: dict[str, np.ndarray], alpha: float) -> dict[str, str]:
@@ -191,12 +223,23 @@ def main(argv: list[str] | None = None) -> int:
         description="Write figures/fit_matrix.csv (paper Table 4)")
     parser.add_argument("--results", default="results/")
     parser.add_argument("--out", default="figures/fit_matrix.csv")
+    parser.add_argument(
+        "--emit-agreed", default=None, metavar="PATH",
+        help="also write the agreed-cell fixture (cells where the "
+             "computed grade reproduces the paper's Table 4) as JSON")
     args = parser.parse_args(argv)
     table = build_fit_matrix(args.results)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(out, index=False)
     print(f"wrote {out} ({len(table)} rows)")
+    if args.emit_agreed:
+        agreed = agreed_cells(table)
+        fixture = Path(args.emit_agreed)
+        fixture.parent.mkdir(parents=True, exist_ok=True)
+        fixture.write_text(json.dumps(agreed, indent=2) + "\n")
+        print(f"wrote {fixture} ({len(agreed)} agreed cells of "
+              f"{len(table)})")
     return 0
 
 

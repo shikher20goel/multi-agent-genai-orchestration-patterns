@@ -32,6 +32,7 @@ saturation (offered utilization < 1) with bounded queue growth.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -313,3 +314,60 @@ def test_table4_hitl_latency_weak_oversight_strong(table4) -> None:
                           "oversight_grade") == "A", (platform, scenario)
     others = table4[table4["pattern"] != "P6"]
     assert (others["oversight_grade"] != "A").all()
+
+
+# ------------------------------- Table 4 fit cells (Phase 3 task 203)
+FIXTURE = (Path(__file__).parent / "fixtures" / "fit_agreed_cells.json")
+AGREED_CELLS = json.loads(FIXTURE.read_text())
+
+
+@pytest.fixture(scope="module")
+def fit_matrix(study):
+    """Fit matrix computed by the pre-registered rule (docs/FIT_RULE.md)
+    from the same regenerated study results."""
+    from agentorch.study.make_fit_matrix import build_fit_matrix
+    return build_fit_matrix(study["out_dir"], cfg=study["cfg"])
+
+
+def _fit_grade(fit, pattern: str, scenario: str) -> str:
+    row = fit[(fit["pattern"] == pattern) & (fit["scenario"] == scenario)]
+    assert len(row) == 1, (pattern, scenario)
+    return str(row.iloc[0]["fit_grade"])
+
+
+def test_fit_fixture_cells_match_published_table4() -> None:
+    """The pinned agreed-cell fixture carries EXACTLY the paper's
+    published grade for each cell it pins (guards fixture drift). The
+    paper cells are published ground truth (PAPER_TABLE4); the
+    fixture's membership came from the task-202 comparison."""
+    from agentorch.study.make_fit_matrix import PAPER_TABLE4
+    assert len(AGREED_CELLS) > 0
+    for cell in AGREED_CELLS:
+        key = (cell["pattern"], cell["scenario"])
+        assert cell["grade"] == PAPER_TABLE4[key], cell
+
+
+@pytest.mark.parametrize(
+    "cell", AGREED_CELLS,
+    ids=[f"{c['pattern']}-{c['scenario']}" for c in AGREED_CELLS])
+def test_fit_matrix_reproduces_agreed_paper_cell(fit_matrix, cell) -> None:
+    """Paper Table 4 agreement gate: for every cell where the
+    pre-registered fit rule reproduced the paper (task 202), the
+    regenerated fit matrix must keep reproducing it."""
+    got = _fit_grade(fit_matrix, cell["pattern"], cell["scenario"])
+    assert got == cell["grade"], (
+        f"fit_matrix contradicts agreed paper cell "
+        f"{cell['pattern']}/{cell['scenario']}: computed {got!r}, "
+        f"paper {cell['grade']!r}")
+
+
+def test_committed_fit_matrix_consistent_with_agreed_cells() -> None:
+    """The committed figures/fit_matrix.csv (full n=500 run) must not
+    contradict any pinned agreed cell either."""
+    committed = Path(__file__).parent.parent / "figures" / "fit_matrix.csv"
+    if not committed.is_file():  # fresh clone before run.sh
+        pytest.skip("figures/fit_matrix.csv not generated yet")
+    fit = pd.read_csv(committed)
+    for cell in AGREED_CELLS:
+        got = _fit_grade(fit, cell["pattern"], cell["scenario"])
+        assert got == cell["grade"], cell

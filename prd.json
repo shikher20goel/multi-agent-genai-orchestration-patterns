@@ -906,7 +906,7 @@
       ],
       "verify": "See PHASE3_SPEC.md task 203",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "204",
