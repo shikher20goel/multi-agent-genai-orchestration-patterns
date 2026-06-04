@@ -50,3 +50,4 @@ TASK 046 implemented, awaiting human review
 TASK 047 implemented, awaiting human review
 TASK 048 done: README.md with the five mandated IEEE-reproducibility headings (Requirements/Installation/Usage/Expected Output/License)
 TASK 049 done: CITATION.cff (cff-version 1.2.0, ORCID 0009-0005-8392-0949, preferred-citation to IEEE Access submission, [USER: INSERT DOI] slot)
+TASK 050 done: pinned Dockerfile (python:3.11-slim, digest-pin comment slot, non-root) + environment/requirements.lock (pip-freeze dependency closure); fallback done-check passed (docker unavailable): pip install -r environment/requirements.lock resolves pinned

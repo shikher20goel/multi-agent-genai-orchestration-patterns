@@ -589,7 +589,7 @@
    ],
    "verify": "docker build succeeds OR pip install -r environment/requirements.lock resolves with pinned versions.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "051",
