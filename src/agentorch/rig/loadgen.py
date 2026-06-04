@@ -96,6 +96,10 @@ def run_open_loop(pattern: Pattern, items: list[WorkItem], rate_rps: float,
             fault = None
             if pattern.ctx.faults_seen:
                 fault = pattern.ctx.faults_seen[0][1]
+            if pattern.ctx.cost_model is not None:
+                from agentorch.rig.costcapture import capture_request_cost
+                capture_request_cost(pattern.ctx, sink, item.id,
+                                     pattern_id, pattern.platform)
 
         srv = int(np.argmin(server_free))
         start = max(submit, float(server_free[srv]))

@@ -28,3 +28,4 @@ TASK 026 done: S3 bursty incident triage (configurable burst_factor, human-routi
 TASK 027 done: rig/loadgen.py open-loop Poisson loadgen, submit_ts from schedule, c-server pool; stall test proves queue grows w/ unchanged cadence
 TASK 028 done: rig/saturation.py Little's law headroom + find_saturation rate sweep; overload flagged unsustainable
 TASK 029 done: rig/faultcampaign.py Algorithm 2 sweep, contained/propagated per contract, FaultRecord per cell; campaign grid in default.yaml
+TASK 030 implemented, awaiting human review

@@ -51,6 +51,8 @@ class CallContext:
     # Per-request traversal trace (fault-campaign containment analysis).
     components_touched: set = field(default_factory=set)
     faults_seen: list = field(default_factory=list)
+    # Per-request billable service-call names (cost capture, task 030).
+    services_called: list = field(default_factory=list)
 
     @classmethod
     def build(cls, cfg: Config, clock: VirtualClock | None = None,
@@ -72,6 +74,7 @@ class CallContext:
         self.tokens_out = 0
         self.components_touched = set()
         self.faults_seen = []
+        self.services_called = []
 
     def _advance(self, dt: float) -> None:
         self.clock.advance(dt)
@@ -82,6 +85,8 @@ class CallContext:
         """Fault check -> latency sample -> clock advance; returns the outcome."""
         fault = self.fault_injector.check(component)
         self.components_touched.add(component)
+        if service != "model_invoke":
+            self.services_called.append(service)
         if fault is not None:
             self.faults_seen.append((component, fault))
         faults_cfg = self.cfg.faults
