@@ -226,7 +226,7 @@
       ],
       "verify": "`pytest tests/test_p5.py` passes both platforms; bulkhead contains a tool fault.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "021",
