@@ -647,7 +647,7 @@
    ],
    "verify": "`bash demo.sh` exits 0 and prints a summary + writes a demo figure.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "056",

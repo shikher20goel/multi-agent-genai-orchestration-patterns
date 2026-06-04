@@ -55,3 +55,4 @@ TASK 051 done: run.sh master reproduction (set -euo pipefail, pip install -e ., 
 TASK 052 implemented, awaiting human review
 TASK 053 done: capsule/ Code Ocean-style layout (metadata.yml valid YAML; code/ + environment/ pointers; run script pointer; publishing explicitly left as HUMAN step in capsule/README.md)
 TASK 054 implemented, awaiting human review (LICENSE: full Apache-2.0 text, copyright 2026 Shikher Goel; awaiting human confirmation of license choice)
+TASK 055 done: demo.sh end-to-end (smoke study -> results_demo/, p99_ci.png -> figures_demo/, printed per-pattern summary table) in ~7s, exit 0

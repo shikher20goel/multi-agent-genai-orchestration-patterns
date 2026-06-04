@@ -9,3 +9,5 @@ build/
 dist/
 results/
 figures/
+results_demo/
+figures_demo/
