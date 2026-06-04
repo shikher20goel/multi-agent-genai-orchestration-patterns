@@ -300,7 +300,7 @@
       ],
       "verify": "`pytest tests/test_s3.py` passes; burst factor configurable.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "027",
