@@ -16,3 +16,4 @@ TASK 014 implemented, awaiting human review
 TASK 015 done: patterns/base.py Pattern ABC (meta 9 keys, run->(WorkResult, service_time_s)), validate_meta
 TASK 016 done: P1 SupervisorPattern (Bedrock invoke_agent fan-out; Agentforce topic actions), both platforms tested
 TASK 017 done: P2 PipelinePattern (Bedrock session chain; Agentforce Agent Script), both platforms tested
+TASK 018 done: P3 ChoreographyPattern (Bedrock bus+observability; Agentforce platform events chain), both platforms tested
