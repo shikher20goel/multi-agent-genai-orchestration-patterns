@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software artifact, please cite both the artifact
+  (this file) and the paper it accompanies (preferred-citation below).
+type: software
+title: >-
+  AgentOrchPatterns: reproducibility package for "A Pattern Catalog for
+  Multi-Agent Generative AI Orchestration Across Enterprise CRM and
+  Hyperscaler Cloud Platforms"
+abstract: >-
+  Executable reproducibility package: seven multi-agent orchestration
+  patterns instantiated against locally mocked Salesforce Agentforce
+  360 and Amazon Bedrock/AgentCore clients, with a deterministic
+  open-loop measurement rig, a 336-cell fault-injection campaign, a
+  cost model, and a pre-committed statistics pipeline regenerating all
+  tables and figures of the accompanying IEEE Access submission.
+authors:
+  - family-names: Goel
+    given-names: Shikher
+    orcid: "https://orcid.org/0009-0005-8392-0949"
+version: 0.1.0
+date-released: "2026-06-04"
+license: Apache-2.0
+repository-code: "[USER: INSERT GITHUB URL]"
+keywords:
+  - multi-agent systems
+  - generative AI
+  - orchestration patterns
+  - software architecture
+  - reproducibility
+  - Salesforce Agentforce
+  - Amazon Bedrock
+preferred-citation:
+  type: article
+  title: >-
+    A Pattern Catalog for Multi-Agent Generative AI Orchestration
+    Across Enterprise CRM and Hyperscaler Cloud Platforms
+  authors:
+    - family-names: Goel
+      given-names: Shikher
+      orcid: "https://orcid.org/0009-0005-8392-0949"
+  journal: IEEE Access
+  year: 2026
+  status: submitted
+  notes: >-
+    Submission under review at IEEE Access. DOI to be assigned on
+    acceptance: [USER: INSERT DOI]

@@ -49,3 +49,4 @@ TASK 045 implemented, awaiting human review
 TASK 046 implemented, awaiting human review
 TASK 047 implemented, awaiting human review
 TASK 048 done: README.md with the five mandated IEEE-reproducibility headings (Requirements/Installation/Usage/Expected Output/License)
+TASK 049 done: CITATION.cff (cff-version 1.2.0, ORCID 0009-0005-8392-0949, preferred-citation to IEEE Access submission, [USER: INSERT DOI] slot)

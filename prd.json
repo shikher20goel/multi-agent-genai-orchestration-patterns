@@ -578,7 +578,7 @@
    ],
    "verify": "CITATION.cff parses and cff-version == 1.2.0.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "050",
