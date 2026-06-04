@@ -3,3 +3,4 @@ TASK 001 done: pyproject (setuptools src layout, extras dev), .gitignore (result
 TASK 002 done: tests/test_smoke.py, pytest -q green (1 test)
 TASK 003 done: .github/workflows/ci.yml (checkout, py3.11, install, ruff, pytest); ruff clean
 TASK 004 done: config.py Config/load_config/get_rng (sha256 child seeds), configs/default.yaml
+TASK 005 done: types.py with PatternId(7), ScenarioId(3), Platform, Mode, FaultType, Component

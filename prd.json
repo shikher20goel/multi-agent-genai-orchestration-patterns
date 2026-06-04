@@ -54,7 +54,7 @@
       ],
       "verify": "`pytest tests/test_types.py` passes; all 7 patterns + 3 scenarios enumerated.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "006",
