@@ -100,7 +100,7 @@
       ],
       "verify": "`pytest tests/test_faults.py` passes; injecting TIMEOUT causes the documented timeout behavior.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "010",
