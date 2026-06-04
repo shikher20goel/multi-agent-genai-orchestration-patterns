@@ -112,7 +112,7 @@
       ],
       "verify": "`pytest tests/test_bedrock_mock.py` passes; signatures match documented shapes.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "011",

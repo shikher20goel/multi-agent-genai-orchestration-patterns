@@ -8,3 +8,4 @@ TASK 006 done: domain.py Agent/WorkItem/WorkResult with status validation
 TASK 007 done: telemetry.py LatencyRecord/CostRecord/FaultRecord/TelemetrySink CSV roundtrip
 TASK 008 done: latency.py lognormal LatencyModel + clock.py VirtualClock; deterministic, p99>p50
 TASK 009 done: faults.py FaultInjector arm/disarm/check + clients/context.py CallContext.boundary_call (timeout/outage/error/throttle semantics)
+TASK 010 done: clients/bedrock.py MockBedrockAgentRuntime.invoke_agent (boto3 shape), MockAgentCore + MockGuardrails scaffolded
