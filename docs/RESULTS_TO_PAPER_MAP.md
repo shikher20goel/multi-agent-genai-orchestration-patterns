@@ -20,7 +20,7 @@ itself.
 | Output | Paper element it backs | Generating command | Source |
 |---|---|---|---|
 | `results/latency.csv` | All latency/error/throughput numbers (Tables 3–4, latency figures); one row per request, `submit_ts`/`complete_ts` recorded separately (open-loop) | `python3 -m agentorch.study.run_study --out results/` | Executed rig: `agentorch.rig.loadgen` over all 42 baseline conditions + fault-mode windows |
-| `results/cost.csv` | All cost numbers (Table 3 cost/request, Table 4 cost grades, cost figure/ledger) | same run | `agentorch.rig.costcapture.capture_request_cost` with prices from `configs/costs.yaml` (HUMAN-gated assumptions) |
+| `results/cost.csv` | All cost numbers (Table 3 cost/request, Table 4 cost grades, cost figure/ledger); one CostRecord per baseline request, scenario-tagged (task 105) | same run | `agentorch.rig.costcapture.capture_request_cost` with prices from `configs/costs.yaml` (HUMAN-gated dated assumptions; USD per request) |
 | `results/faults.csv` | Fault-containment claims (Table 4 reliability grades, Fig. fault matrix, Section on isolation) | same run | `agentorch.rig.faultcampaign.run_campaign` (Algorithm 2), 336 cells = 7 patterns x 2 platforms x 6 components x 4 fault types |
 | `results/manifest.json` | Reproducibility statement (seed, config hash, n, git rev, timestamp) | same run | `agentorch.study.run_study` |
 
@@ -38,7 +38,7 @@ itself.
 | `figures/ccdf.png` | **Fig. CCDF** — per-pattern latency CCDF (log-log), one panel per platform, scenario S1 | `python3 -m agentorch.study.figures_latency --results results/ --out figures/` | `results/latency.csv` (baseline rows) |
 | `figures/p99_ci.png` | **Fig. p99** — p99 latency with 95% BCa error bars, panels per scenario, grouped by platform | same command (writes both PNGs) | `results/latency.csv` (baseline rows) |
 | `figures/cost_per_1k.png` | **Fig. cost** — cost units per 1k requests per (pattern, platform), log scale, under `configs/costs.yaml` assumptions | `python3 -m agentorch.study.figures_cost --results results/ --out figures/` | `results/cost.csv` |
-| `figures/cost_ledger.csv` | Cost appendix / per-pattern ledger backing Fig. cost and Table 3 cost column | same command (writes both outputs) | `results/cost.csv` via `agentorch.rig.costcapture.aggregate_ledger` |
+| `figures/cost_ledger.csv` | Cost appendix / scenario-resolved ledger (42 rows: pattern x platform x scenario, USD per request under `configs/costs.yaml` dated assumptions) backing Fig. cost, Table 3's cost column, and the S2>S1 / P1>P2 relative-cost claims (task 105) | same command (writes both outputs) | `results/cost.csv` via `agentorch.rig.costcapture.aggregate_ledger(by_scenario=True)` |
 | `figures/fault_matrix.png` | **Fig. fault matrix** — pattern x (component, fault) grid: absorbed / isolated / propagated / not exercised, one panel per platform | `python3 -m agentorch.study.figures_fault --results results/ --out figures/` | `results/faults.csv` |
 | `figures/decision_tree.png` | **Fig. 2** — pattern-selection decision tree over the paper's decision dimensions; leaf labels come from `REGISTRY[...].meta()` (catalog-consistent by construction) | `python3 -m agentorch.study.decision_tree --out figures/` | Pattern catalog metadata (`agentorch.patterns.registry`), no measurement data |
 
