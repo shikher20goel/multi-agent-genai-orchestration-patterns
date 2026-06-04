@@ -10,3 +10,4 @@ TASK 008 done: latency.py lognormal LatencyModel + clock.py VirtualClock; determ
 TASK 009 done: faults.py FaultInjector arm/disarm/check + clients/context.py CallContext.boundary_call (timeout/outage/error/throttle semantics)
 TASK 010 done: clients/bedrock.py MockBedrockAgentRuntime.invoke_agent (boto3 shape), MockAgentCore + MockGuardrails scaffolded
 TASK 011 done: MockAgentCore invoke_agent_runtime/gateway_call(+1 hop)/memory/identity/observability; MockGuardrails shadow logs never blocks
+TASK 012 done: clients/agentforce.py topics->actions pass-through chaining, run_agent_script, sessions; OmniChannel scaffolded

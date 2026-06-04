@@ -135,7 +135,7 @@
       ],
       "verify": "`pytest tests/test_agentforce_mock.py` passes; topic pass-through chaining works.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "013",
