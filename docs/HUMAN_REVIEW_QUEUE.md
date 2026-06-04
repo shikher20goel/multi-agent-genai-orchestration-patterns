@@ -14,8 +14,10 @@ All 21 HUMAN-gated tasks are implemented, tested, committed on `autonomous-build
 - **Decision needed:** sign off each method choice and the SAP, including: alpha=0.05; family definition (21 per condition, not a global family across all 6 conditions); and the noted caveat that all conditions share a common latency RNG stream (common random numbers — variance-reducing but conditions are correlated; SAP documents it).
 - **Default:** accept as implemented; the CRN caveat stays disclosed in the SAP and threats-to-validity.
 
-## Batch 3 — Tables and figures (tasks 037–041)
-- **What:** `figures/table3.csv` (42 rows: n=500/condition, p50/p95/p99 + BCa CIs, error rate, throughput, cost/req), `figures/table4.csv` (A/B/C fit-for-purpose grades from documented rules in `study/make_table4.py`), `figures/ccdf.png`, `p99_ci.png`, `cost_per_1k.png`, `fault_matrix.png`.
+## Batch 3 — Tables and figures (tasks 037–041; Table 4 REWRITTEN by Phase 2 task 106)
+**Phase 2 task 106 update:** Table 4 grades are now equivalence-group grades computed through the MWU/Holm machinery on per-request data (A = best Holm-significant equivalence group; C = dominated by ≥4 others; B otherwise), with latency graded on the slowest-decile tail (the p99 region), reliability on the per-request failure indicator under the fault campaign, cost on per-request USD, and a NEW oversight column derived from pattern capability metadata (P6 = A, unique). Grade function documented in `study/make_table4.py` docstring + `docs/GRADES.md`; directional paper agreement asserted in `tests/test_paper_agreement.py`. Decisions needed: confirm the grade thresholds, the tail-decile choice, and the oversight metadata rule.
+
+- **What:** `figures/table3.csv` (42 rows: n=500/condition, p50/p95/p99 + BCa CIs, error rate, throughput, cost/req), `figures/table4.csv` (A/B/C equivalence-group grades + oversight column, per `docs/GRADES.md`), `figures/ccdf.png`, `p99_ci.png`, `cost_per_1k.png`, `fault_matrix.png`.
 - **Decision needed:** verify numbers match `results/` (regenerate with `bash run.sh`; deterministic seed=42), the Table-4 grading rules are the story you want, labeling is right. Fault matrix: of 336 cells, 28 absorbed / 72 isolated / 0 propagated / rest not-exercised; "traversal" operationalized as "fault fired on the request" — confirm this matches the paper's containment definition.
 - **Default:** accept; tweak only labels/captions at manuscript time.
 

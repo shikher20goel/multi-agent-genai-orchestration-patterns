@@ -29,7 +29,7 @@ itself.
 | Output | Paper element | Generating command | Source CSV |
 |---|---|---|---|
 | `figures/table3.csv` | **Table 3** — synoptic comparison: per (pattern, platform, scenario) n, p50/p95/p99 (ms) with 95% BCa CIs, error rate, throughput (rps), cost/request | `python3 -m agentorch.study.make_table3 --results results/ --out figures/table3.csv` | `results/latency.csv`, `results/cost.csv` |
-| `figures/table4.csv` | **Table 4** — fit-for-purpose matrix: A/B/C grades for latency, cost, reliability + overall, by the explicit rules in the `make_table4.py` module docstring (Holm-corrected Mann-Whitney for latency; cost ratios; absorption-aware reliability) | `python3 -m agentorch.study.make_table4 --results results/ --out figures/table4.csv` | `results/latency.csv`, `results/cost.csv`, `results/faults.csv` |
+| `figures/table4.csv` | **Table 4** — fit-for-purpose matrix: A/B/C Holm-equivalence-group grades on tail latency (p99 region), failure-under-fault, and cost/request, plus a metadata-derived oversight column, per the grade function in the `make_table4.py` docstring and `docs/GRADES.md` | `python3 -m agentorch.study.make_table4 --results results/ --out figures/table4.csv` | `results/latency.csv`, `results/cost.csv` (fault-mode rows of latency.csv drive reliability) |
 
 ## Figures (figures/, regenerated; gitignored)
 

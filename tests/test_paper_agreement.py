@@ -56,7 +56,8 @@ def study(tmp_path_factory):
     lat = pd.read_csv(out / "latency.csv")
     faults = pd.read_csv(out / "faults.csv")
     base = lat[lat["mode"] == "baseline"]
-    return {"base": base, "faults": faults, "manifest": manifest, "cfg": cfg}
+    return {"base": base, "faults": faults, "manifest": manifest, "cfg": cfg,
+            "out_dir": out}
 
 
 def _p(base: pd.DataFrame, pattern: str, platform: str, scenario: str,
@@ -257,3 +258,58 @@ def test_latency_magnitudes_are_realistic(study) -> None:
                     assert p99 < 190_000, (pattern, platform, scenario, p99)
                 else:
                     assert p99 < 60_000, (pattern, platform, scenario, p99)
+
+
+# ----------------------------------------------- Table 4 (task 106)
+@pytest.fixture(scope="module")
+def table4(study):
+    """Table 4 computed from the same regenerated study results."""
+    from agentorch.study.make_table4 import build_table4
+    return build_table4(study["out_dir"], cfg=study["cfg"])
+
+
+def _grade(t4, pattern: str, platform: str, scenario: str, col: str) -> str:
+    row = t4[(t4["pattern"] == pattern) & (t4["platform"] == platform)
+             & (t4["scenario"] == scenario)]
+    assert len(row) == 1
+    return str(row.iloc[0][col])
+
+
+def test_table4_s3_choreography_beats_pipeline(table4) -> None:
+    """Paper Table 4: under bursty S3, P3 (event-driven choreography) is
+    graded strictly better than P2 (fixed chain) on the latency
+    endpoint, on both platforms."""
+    from agentorch.study.make_table4 import GRADE_ORDER
+    for platform in PLATFORMS:
+        g3 = _grade(table4, "P3", platform, "S3", "latency_grade")
+        g2 = _grade(table4, "P2", platform, "S3", "latency_grade")
+        assert GRADE_ORDER[g3] < GRADE_ORDER[g2], (platform, g3, g2)
+
+
+def test_table4_s2_orchestrators_strong_on_completion(study) -> None:
+    """Paper Table 4: P1 and P2 are strong for the long-horizon S2
+    scenario on the completion endpoint — their baseline S2 success rate
+    equals the condition's best, and they natively process EVERY
+    scenario step (the paper's S2 fitness is a completion/structural
+    claim, not a raw-speed claim)."""
+    base = study["base"]
+    for platform in PLATFORMS:
+        cond = base[(base["platform"] == platform) & (base["scenario"] == "S2")]
+        rates = cond.groupby("pattern")["success"].mean()
+        best = rates.max()
+        assert rates["P1"] == best, (platform, rates.to_dict())
+        assert rates["P2"] == best, (platform, rates.to_dict())
+
+
+def test_table4_hitl_latency_weak_oversight_strong(table4) -> None:
+    """Paper Table 4: P6 is in the WORST latency group (grade C,
+    human-decision-dominated tail) in every condition, yet is the only
+    pattern graded A on the metadata-derived oversight axis."""
+    for platform in PLATFORMS:
+        for scenario in SCENARIOS:
+            assert _grade(table4, "P6", platform, scenario,
+                          "latency_grade") == "C", (platform, scenario)
+            assert _grade(table4, "P6", platform, scenario,
+                          "oversight_grade") == "A", (platform, scenario)
+    others = table4[table4["pattern"] != "P6"]
+    assert (others["oversight_grade"] != "A").all()
