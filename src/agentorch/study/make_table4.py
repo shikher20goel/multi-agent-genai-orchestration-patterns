@@ -1,7 +1,18 @@
-"""Fit-for-purpose matrix — paper Table 4 (task 038; rewritten under
-Phase 2 task 106, HUMAN-gated).
+"""Supplementary per-platform quality table (task 038; rewritten under
+Phase 2 task 106, HUMAN-gated; renamed to table4_supplementary under
+Phase 3 task 204).
 
-Reads ONLY ``results/`` and writes ``figures/table4.csv`` with one row
+THIS TABLE IS NOT THE PAPER'S FIT-FOR-PURPOSE MATRIX (the paper's
+Table 4). The paper's Table 4 is the platform-independent
+Weak/Moderate/Strong matrix computed by ``make_fit_matrix.py`` ->
+``figures/fit_matrix.csv`` under the pre-registered rule of
+``docs/FIT_RULE.md``. This module instead produces a RICHER
+SUPPLEMENTARY per-platform quality view — A/B/C equivalence-group
+grades on four dimensions (latency / reliability / cost / oversight)
+per (pattern, platform, scenario).
+
+Reads ONLY ``results/`` and writes ``figures/table4_supplementary.csv``
+with one row
 per (pattern, platform, scenario) carrying letter grades on three
 measured dimensions plus a metadata-derived oversight grade and an
 overall grade. EVERY grade is COMPUTED from the calibrated study data
@@ -63,7 +74,7 @@ approximation with tie correction (scipy default), which is the
 appropriate two-sample proportion-shift test in this rank framework.
 
 Usage: ``python -m agentorch.study.make_table4 [--results results/]
-[--out figures/table4.csv]``.
+[--out figures/table4_supplementary.csv]``.
 """
 from __future__ import annotations
 
@@ -224,9 +235,9 @@ def build_table4(results_dir: str | Path, cfg=None) -> pd.DataFrame:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Write figures/table4.csv")
+    parser = argparse.ArgumentParser(description="Write figures/table4_supplementary.csv")
     parser.add_argument("--results", default="results/")
-    parser.add_argument("--out", default="figures/table4.csv")
+    parser.add_argument("--out", default="figures/table4_supplementary.csv")
     args = parser.parse_args(argv)
     table = build_table4(args.results)
     out = Path(args.out)

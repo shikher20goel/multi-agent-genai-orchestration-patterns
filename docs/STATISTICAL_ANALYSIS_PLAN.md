@@ -125,7 +125,9 @@ Re-running with the same seed must reproduce every CSV bit-for-bit
 
 - Table 3 (`figures/table3.csv`): per condition — n, p50/p95/p99 with BCa
   CIs, error rate, throughput, cost per request.
-- Table 4 (`figures/table4.csv`): fit-for-purpose grades derived from the
+- Supplementary per-platform grades (`figures/table4_supplementary.csv`; the
+  platform-independent fit matrix is `figures/fit_matrix.csv`,
+  docs/FIT_RULE.md): grades derived from the
   endpoints by the explicit rules documented in
   `src/agentorch/study/make_table4.py`.
 - Figures: CCDF and p99-with-CI latency plots, cost per 1k requests,

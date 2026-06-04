@@ -1,6 +1,15 @@
-# Table 4 grade function (Phase 2 task 106, HUMAN-gated)
+# Supplementary per-platform grade function (Phase 2 task 106, HUMAN-gated; renamed under Phase 3 task 204)
 
-`figures/table4.csv` is COMPUTED from the calibrated study results by
+**`figures/table4_supplementary.csv` is NOT the paper's fit-for-purpose
+matrix.** It is a RICHER SUPPLEMENTARY per-platform quality view —
+A/B/C equivalence-group grades on four dimensions (latency,
+reliability, cost, oversight) per (pattern, platform, scenario). The
+paper's Table 4 — the platform-independent Weak/Moderate/Strong
+fit-for-purpose matrix — is `figures/fit_matrix.csv`, computed by
+`study/make_fit_matrix.py` under the pre-registered rule of
+`docs/FIT_RULE.md`.
+
+`figures/table4_supplementary.csv` is COMPUTED from the calibrated study results by
 `src/agentorch/study/make_table4.py` through the pre-committed
 Mann-Whitney/Holm comparison machinery (`agentorch/stats/compare.py`,
 `agentorch/stats/correction.py`). No grade is hand-assigned.
@@ -52,4 +61,4 @@ failure indicators) are equivalence by definition and contribute no
 domination; ties inside MWU use scipy's tie-corrected normal
 approximation. [HUMAN: verify the grade thresholds (best group = 0
 dominators; worst group ≥ 4) and the tail-decile choice before the
-manuscript cites Table 4.]
+manuscript cites the supplementary table.]

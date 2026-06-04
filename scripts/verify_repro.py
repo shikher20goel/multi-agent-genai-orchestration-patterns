@@ -2,7 +2,7 @@
 """Clean-clone reproducibility manifest check (task 062).
 
 Verifies that after ``bash run.sh`` the figures/ directory contains
-table3.csv, table4.csv and ALL expected PNGs, and that results/ holds
+table3.csv, fit_matrix.csv (paper Table 4), table4_supplementary.csv and ALL expected PNGs, and that results/ holds
 the raw study outputs and a sane manifest. Exits 0 on success,
 non-zero with a listing of what is missing otherwise.
 
@@ -16,7 +16,8 @@ from pathlib import Path
 
 EXPECTED_FIGURES = [
     "table3.csv",
-    "table4.csv",
+    "fit_matrix.csv",
+    "table4_supplementary.csv",
     "ccdf.png",
     "p99_ci.png",
     "cost_per_1k.png",

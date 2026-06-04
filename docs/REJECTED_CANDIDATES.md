@@ -42,7 +42,7 @@ construction, or replace it.
   profile collapses onto an admitted pattern's (rows 3, 6) remains
   rejected under measurement, not only argument. [HUMAN: re-verify
   rows 3 and 6 against the regenerated `figures/table3.csv`,
-  `figures/table4.csv`, and `figures/fault_matrix.png`.]
+  `figures/table4_supplementary.csv`, and `figures/fault_matrix.png`.]
 - [HUMAN: verify rationale] applies to every row — confirm these are
   the six candidates actually weighed during catalog construction, and
   adjust names/rationales to match the author's notes before the

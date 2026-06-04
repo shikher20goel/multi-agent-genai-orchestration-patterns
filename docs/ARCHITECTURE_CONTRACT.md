@@ -25,7 +25,7 @@ Package `agentorch` lives under `src/agentorch/`. Python >=3.10 compatible (no 3
 - `stats/compare.py`: `compare(x, y) -> CompareResult(u, p, rank_biserial, hodges_lehmann)`.
 - `stats/correction.py`: `holm(pvals: list) -> rejected flags + adjusted p` (statsmodels `multipletests(method='holm')`); family = the 21 pairwise pattern comparisons per (platform, scenario) condition.
 - `study/run_study.py`: `python -m agentorch.study.run_study [--smoke] [--out results/]` runs all 7x2x3 baseline conditions + fault campaign + cost capture; writes `results/latency.csv`, `results/cost.csv`, `results/faults.csv`, `results/manifest.json` (config hash, seed, n).
-- `study/make_table3.py` / `make_table4.py`: read `results/`, write `figures/table3.csv`, `figures/table4.csv`.
+- `study/make_table3.py` / `make_table4.py` / `make_fit_matrix.py`: read `results/`, write `figures/table3.csv`, `figures/table4_supplementary.csv` (supplementary per-platform grades), `figures/fit_matrix.csv` (paper Table 4, pre-registered rule in `docs/FIT_RULE.md`).
 - `study/figures_latency.py` (ccdf.png, p99_ci.png), `figures_cost.py` (cost_per_1k.png + cost_ledger.csv), `figures_fault.py` (fault_matrix.png), `decision_tree.py` (decision_tree.png). All matplotlib Agg, read ONLY from results/.
 - `governance/hitl_example.py`: runnable; confidence gate -> human stub decision -> hash-chained append-only `AuditLog` (entries immutable; `verify_chain()`); `halt()` stops the chain.
 
