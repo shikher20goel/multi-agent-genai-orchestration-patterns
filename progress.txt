@@ -48,3 +48,4 @@ TASK 044 done: governance/hitl_example.py confidence gate -> human stub -> hash-
 TASK 045 implemented, awaiting human review
 TASK 046 implemented, awaiting human review
 TASK 047 implemented, awaiting human review
+TASK 048 done: README.md with the five mandated IEEE-reproducibility headings (Requirements/Installation/Usage/Expected Output/License)

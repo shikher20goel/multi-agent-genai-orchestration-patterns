@@ -567,7 +567,7 @@
    ],
    "verify": "README contains all five mandated headings (grep check).",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "049",

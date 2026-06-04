@@ -1,0 +1,138 @@
+# AgentOrchPatterns — Reproducibility Package
+
+Executable reproducibility package for the IEEE Access submission
+*"A Pattern Catalog for Multi-Agent Generative AI Orchestration Across
+Enterprise CRM and Hyperscaler Cloud Platforms"* (S. Goel). It turns
+the paper's prospective evaluation rig into an **executed, open,
+deterministic measurement study**: seven orchestration patterns
+(P1 Supervisor … P7 Federated Bridge) run against locally **mocked**
+Salesforce Agentforce 360 and Amazon Bedrock/AgentCore platform
+clients, under three synthetic scenarios (S1 RAG QA, S2 long-horizon
+document generation, S3 bursty incident triage), with an open-loop
+load generator, a 336-cell fault-injection campaign, a cost model, and
+a pre-committed statistics pipeline (BCa bootstrap CIs, Mann–Whitney U
+with effect sizes, Holm correction).
+
+No network access and no cloud credentials are needed or used: all
+platform behavior is mocked locally and every run is seeded and
+deterministic (same seed → identical output).
+
+Repository: [USER: INSERT GITHUB URL] · Archived artifact DOI:
+[USER: INSERT DOI]
+
+## Requirements
+
+- Python ≥ 3.10 (developed on 3.10/3.11; no 3.11-only syntax).
+- OS: Linux/macOS (any platform with a POSIX shell for `run.sh` /
+  `demo.sh`; the Python package itself is cross-platform).
+- Python packages (installed automatically in the Installation step):
+  `numpy`, `scipy`, `statsmodels`, `pandas`, `matplotlib`, `simpy`,
+  `pyyaml`; for development/testing: `pytest`, `pytest-cov`, `ruff`.
+- Pinned versions: `environment/requirements.lock` (exact versions the
+  results were produced with); a pinned `Dockerfile` is provided for a
+  containerized environment (Docker optional).
+- Hardware: any commodity machine. The full study completes in a few
+  seconds of wall time (all timing is virtual-clock based; nothing
+  sleeps). ~200 MB free disk.
+- No GPU, no network, no cloud accounts.
+
+## Installation
+
+From the repository root:
+
+```bash
+python3 -m pip install -e ".[dev]"
+```
+
+or, to reproduce with the exact pinned environment:
+
+```bash
+python3 -m pip install -r environment/requirements.lock
+python3 -m pip install -e . --no-deps
+```
+
+Optional containerized install (Docker):
+
+```bash
+docker build -t agentorch .
+```
+
+Verify the installation:
+
+```bash
+python3 -m pytest -q          # full test suite
+```
+
+## Usage
+
+Single-command full reproduction (study → tables → figures):
+
+```bash
+bash run.sh
+```
+
+Quick end-to-end demo (< 40 s; smoke study + one figure + printed
+summary table):
+
+```bash
+bash demo.sh
+```
+
+Individual steps:
+
+```bash
+python3 -m agentorch.study.run_study --out results/          # full study
+python3 -m agentorch.study.run_study --smoke --out results/  # reduced smoke study
+python3 -m agentorch.study.make_table3 --results results/ --out figures/table3.csv
+python3 -m agentorch.study.make_table4 --results results/ --out figures/table4.csv
+python3 -m agentorch.study.figures_latency --results results/ --out figures/
+python3 -m agentorch.study.figures_cost   --results results/ --out figures/
+python3 -m agentorch.study.figures_fault  --results results/ --out figures/
+python3 -m agentorch.study.decision_tree  --out figures/
+python3 governance/hitl_example.py        # runnable HITL governance demo
+```
+
+All tunables (seed, latency parameters, fault campaign grid, scenario
+shapes) live in `configs/default.yaml`; cost-model unit prices live in
+`configs/costs.yaml`. Master seed: 42.
+
+## Expected Output
+
+After `bash run.sh` completes (exit code 0):
+
+- `results/latency.csv` — one row per request across all 42 baseline
+  conditions (7 patterns × 2 platforms × 3 scenarios, n = 500 each)
+  plus fault-mode windows; `submit_ts` and `complete_ts` recorded
+  separately (open-loop, coordinated-omission correct).
+- `results/cost.csv` — per-request cost records (model invocations,
+  tokens, service calls, cost units).
+- `results/faults.csv` — one row per fault-campaign cell
+  (336 = 7 patterns × 2 platforms × 6 components × 4 fault types) with
+  contained/propagated classification.
+- `results/manifest.json` — provenance: seed, config hash, n per
+  condition, git revision, timestamp, wall time.
+- `figures/table3.csv` — synoptic comparison (paper Table 3): p50/p95/
+  p99 latency with 95% BCa CIs, error rate, throughput, cost/request.
+- `figures/table4.csv` — fit-for-purpose grades (paper Table 4).
+- `figures/ccdf.png`, `figures/p99_ci.png` — latency figures.
+- `figures/cost_per_1k.png`, `figures/cost_ledger.csv` — cost outputs.
+- `figures/fault_matrix.png` — fault-isolation matrix.
+- `figures/decision_tree.png` — pattern-selection decision tree.
+
+Determinism check: rerunning `bash run.sh` with the same
+`configs/default.yaml` reproduces identical CSV values (the manifest's
+`config_hash` and `seed` pin the run). `scripts/verify_repro.py`
+checks that the full output manifest is present.
+
+Expected demo output (`bash demo.sh`): a smoke study in
+`results_demo/`, one figure (`figures_demo/p99_ci.png`), and a printed
+per-pattern summary table on stdout.
+
+## License
+
+Apache License 2.0 — see the `LICENSE` file. Copyright 2026 Shikher
+Goel. (License choice pending final human confirmation; see
+`progress.txt`.)
+
+If you use this artifact, please cite the paper via `CITATION.cff`
+(preferred-citation; DOI slot: [USER: INSERT DOI]).
