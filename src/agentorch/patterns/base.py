@@ -94,6 +94,19 @@ class Pattern(ABC):
         return result, self.ctx.elapsed_s
 
 
+def work_steps(item: WorkItem) -> int:
+    """Scenario step count of a work item (task 105).
+
+    A multi-step item (S2 doc-gen carries 4-8 steps, S3 triage 2) is
+    intrinsically more work than a single-step item, whatever the
+    coordination topology: every pattern processes each step, so both
+    model-token volume (Bedrock token billing) and per-step platform
+    actions (Agentforce Flex-credit billing) scale with it — the
+    structural basis of the S2 > S1 relative-cost claim.
+    """
+    return max(1, int(item.payload.get("steps", 1)))
+
+
 def validate_meta(meta: dict[str, Any]) -> None:
     """Raise if `meta` does not carry exactly the nine catalog keys."""
     keys = tuple(meta.keys())

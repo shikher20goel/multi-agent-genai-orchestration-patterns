@@ -166,7 +166,8 @@ def run_open_loop(pattern: Pattern, items: list[WorkItem], rate_rps: float,
             if pattern.ctx.cost_model is not None:
                 from agentorch.rig.costcapture import capture_request_cost
                 capture_request_cost(pattern.ctx, sink, item.id,
-                                     pattern_id, pattern.platform)
+                                     pattern_id, pattern.platform,
+                                     scenario=item.scenario)
 
         complete = start + service_s
         server_free[srv] = start + blocking_s

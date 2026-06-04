@@ -15,7 +15,7 @@ import pandas as pd
 
 from agentorch.clients.context import CallContext
 from agentorch.telemetry import CostRecord, TelemetrySink
-from agentorch.types import PatternId, Platform
+from agentorch.types import PatternId, Platform, ScenarioId
 
 LEDGER_COLUMNS = [
     "pattern", "platform", "n_requests", "mean_cost_units",
@@ -23,9 +23,14 @@ LEDGER_COLUMNS = [
     "mean_service_calls", "total_cost_units",
 ]
 
+# Task 105: scenario-resolved ledger (per pattern x platform x scenario)
+# so per-scenario cost claims (S2 > S1) trace to an aggregated artifact.
+LEDGER_COLUMNS_SCENARIO = LEDGER_COLUMNS[:2] + ["scenario"] + LEDGER_COLUMNS[2:]
+
 
 def capture_request_cost(ctx: CallContext, sink: TelemetrySink, request_id: str,
-                         pattern: PatternId, platform: Platform) -> CostRecord:
+                         pattern: PatternId, platform: Platform,
+                         scenario: ScenarioId | None = None) -> CostRecord:
     """Emit one CostRecord from the context's per-request counters."""
     cost_model = ctx.cost_model
     if cost_model is None:
@@ -46,16 +51,26 @@ def capture_request_cost(ctx: CallContext, sink: TelemetrySink, request_id: str,
         tokens_out=ctx.tokens_out,
         service_calls=ctx.service_calls,
         cost_units=cost_units,
+        scenario=scenario,
     )
     sink.record_cost(rec)
     return rec
 
 
-def aggregate_ledger(cost_df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate CostRecords into a per-(pattern, platform) ledger frame."""
+def aggregate_ledger(cost_df: pd.DataFrame,
+                     by_scenario: bool = False) -> pd.DataFrame:
+    """Aggregate CostRecords into a ledger frame.
+
+    Default grouping is (pattern, platform); ``by_scenario=True`` adds
+    the scenario dimension (task 105) so per-scenario relative-cost
+    claims (multi-step S2 > single-step S1) trace to a ledger artifact.
+    """
+    cols = LEDGER_COLUMNS_SCENARIO if by_scenario else LEDGER_COLUMNS
+    keys = (["pattern", "platform", "scenario"] if by_scenario
+            else ["pattern", "platform"])
     if cost_df.empty:
-        return pd.DataFrame(columns=LEDGER_COLUMNS)
-    grouped = cost_df.groupby(["pattern", "platform"], as_index=False).agg(
+        return pd.DataFrame(columns=cols)
+    grouped = cost_df.groupby(keys, as_index=False).agg(
         n_requests=("request_id", "count"),
         mean_cost_units=("cost_units", "mean"),
         mean_model_invocations=("model_invocations", "mean"),
@@ -64,7 +79,7 @@ def aggregate_ledger(cost_df: pd.DataFrame) -> pd.DataFrame:
         mean_service_calls=("service_calls", "mean"),
         total_cost_units=("cost_units", "sum"),
     )
-    return grouped[LEDGER_COLUMNS].sort_values(["pattern", "platform"]).reset_index(drop=True)
+    return grouped[cols].sort_values(keys).reset_index(drop=True)
 
 
 def write_ledger(sink_or_df: "TelemetrySink | pd.DataFrame",

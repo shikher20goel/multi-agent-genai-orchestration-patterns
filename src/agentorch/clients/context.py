@@ -75,6 +75,12 @@ class CallContext:
     faults_seen: list = field(default_factory=list)
     # Per-request billable service-call names (cost capture, task 030).
     services_called: list = field(default_factory=list)
+    # Content-volume multiplier for the NEXT model invocation's token
+    # accounting (task 105): an invocation that generates the content of
+    # a multi-step work item (e.g. a 6-section document drafted in one
+    # call) produces proportionally more tokens. Patterns set this to the
+    # number of scenario steps the invocation covers; default 1.
+    content_scale: float = 1.0
     # Per-request degradation marker: the request completed but lost the
     # work of a faulted sub-unit (bulkhead/bridge isolation, task 104).
     degraded: bool = False
@@ -106,6 +112,7 @@ class CallContext:
 
     def reset_request(self) -> None:
         self.elapsed_s = 0.0
+        self.content_scale = 1.0
         self.nonblocking_s = 0.0
         self.model_invocations = 0
         self.service_calls = 0

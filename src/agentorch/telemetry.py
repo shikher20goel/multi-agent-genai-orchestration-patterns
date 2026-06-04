@@ -40,6 +40,9 @@ class CostRecord:
     tokens_out: int
     service_calls: int
     cost_units: float
+    # Task 105: scenario dimension so per-scenario cost claims (e.g.
+    # S2 multi-step > S1 single-step per pattern) trace to raw records.
+    scenario: ScenarioId | None = None
 
 
 @dataclass

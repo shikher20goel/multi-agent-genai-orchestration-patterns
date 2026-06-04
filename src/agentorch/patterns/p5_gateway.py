@@ -12,7 +12,7 @@ from typing import Any
 from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
 
 
 class GatewayPattern(Pattern):
@@ -54,28 +54,42 @@ class GatewayPattern(Pattern):
         tools = self._tools()
         tool_results: dict[str, Any] = {}
         failures: dict[str, str] = {}
+        # Task 105: every scenario step needs a routed tool execution, so
+        # the tool-call list is one full pass over the tool set, extended
+        # round-robin to cover multi-step items (S2 costs more per request
+        # than S1 on both platforms: tokens on Bedrock, Flex-credit
+        # actions on Agentforce).
+        steps = work_steps(item)
+        n_calls = max(len(tools), steps)
+        calls = [tools[j % len(tools)] for j in range(n_calls)]
         try:
-            # Initial reasoning step that decides which tools to call.
+            # Initial reasoning step that decides which tools to call;
+            # its plan covers the item's full multi-step content.
             if self.bedrock is not None:
+                self.ctx.content_scale = steps
                 self.bedrock.invoke_agent("router", "prod", f"sess-{item.id}",
                                           f"plan tools for {item.id}")
+                self.ctx.content_scale = 1.0
             else:
                 assert self.agentforce is not None
                 for t in tools:
                     self.agentforce.register_action(f"tool_{t}",
                                                     lambda a, t=t: {"tool": t, "ok": True})
                 self.agentforce.register_topic("route", [])
+                self.ctx.content_scale = steps
                 self.agentforce.send("route", {"item": item.id})
+                self.ctx.content_scale = 1.0
         except (BedrockClientError, AgentforceClientError) as exc:
             status = "timeout" if "timeout" in str(exc) else "error"
             return WorkResult(item_id=item.id, status=status, error=str(exc))
 
         # Bulkhead: each tool call is individually guarded; one tool's fault
         # is contained and the loop continues with the remaining tools.
-        for tool in tools:
+        for j, tool in enumerate(calls):
             try:
                 if self.agentcore is not None:
-                    res = self.agentcore.gateway_call(tool, {"item": item.id})
+                    res = self.agentcore.gateway_call(tool, {"item": item.id,
+                                                             "step": j})
                 else:
                     assert self.agentforce is not None
                     res = self.agentforce.run_agent_script(
@@ -84,7 +98,7 @@ class GatewayPattern(Pattern):
             except (BedrockClientError, AgentforceClientError) as exc:
                 failures[tool] = str(exc)
 
-        all_failed = len(failures) == len(tools)
+        all_failed = len(failures) == len(set(calls))
         status = "error" if all_failed else "ok"
         if failures and not all_failed:
             # Bulkhead isolation (task 104): the request completes but the

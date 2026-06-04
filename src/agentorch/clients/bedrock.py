@@ -23,10 +23,17 @@ class BedrockClientError(RuntimeError):
 
 
 def _draw_tokens(ctx: CallContext, text: str) -> tuple[int, int]:
-    """Deterministic synthetic token counts derived from input length + config means."""
+    """Deterministic synthetic token counts derived from input length + config means.
+
+    Task 105: both counts scale with ``ctx.content_scale`` — an invocation
+    covering N scenario steps (e.g. drafting a 6-section document in one
+    call) consumes and produces proportionally more tokens, so token-billed
+    platforms show multi-step (S2) cost > single-step (S1) cost per pattern.
+    """
     tokens_cfg = ctx.cfg.tokens
-    tokens_in = max(1, len(text) // 4) + int(tokens_cfg.input_mean)
-    tokens_out = int(tokens_cfg.output_mean)
+    scale = max(1.0, float(ctx.content_scale))
+    tokens_in = int((max(1, len(text) // 4) + int(tokens_cfg.input_mean)) * scale)
+    tokens_out = int(int(tokens_cfg.output_mean) * scale)
     return tokens_in, tokens_out
 
 

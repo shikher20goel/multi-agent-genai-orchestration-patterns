@@ -25,7 +25,7 @@ from agentorch.clients.bedrock import (
 from agentorch.clients.context import CallContext
 from agentorch.config import Config
 from agentorch.domain import WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
 from agentorch.types import Platform
 
 
@@ -89,14 +89,24 @@ class BridgePattern(Pattern):
         }
 
     def _local_work(self, item: WorkItem) -> str:
+        # Task 105: local processing covers the item's full multi-step
+        # content — token volume scales with steps; on Agentforce each
+        # step runs one Flex-credit-billed local action.
+        steps = work_steps(item)
         if self.bedrock is not None:
-            return self.bedrock.invoke_agent(
+            self.ctx.content_scale = steps
+            out = self.bedrock.invoke_agent(
                 "local", "prod", f"sess-{item.id}",
                 str(item.payload.get("task", item.id)))["completion"]
+            self.ctx.content_scale = 1.0
+            return out
         assert self.agentforce is not None
         self.agentforce.register_action("local_work")
-        self.agentforce.register_topic("local", ["local_work"])
-        return str(self.agentforce.send("local", {"item": item.id})["result"])
+        self.agentforce.register_topic("local", ["local_work"] * steps)
+        self.ctx.content_scale = steps
+        out = str(self.agentforce.send("local", {"item": item.id})["result"])
+        self.ctx.content_scale = 1.0
+        return out
 
     def _bridge_hop(self) -> None:
         """Cross-platform RTT term (task 101): every federated call pays

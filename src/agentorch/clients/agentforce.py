@@ -99,9 +99,10 @@ class MockAgentforceClient:
                 outcome,
             )
         tokens_cfg = ctx.cfg.tokens
+        scale = max(1.0, float(ctx.content_scale))
         ctx.model_invocations += 1
-        ctx.tokens_in += int(tokens_cfg.input_mean)
-        ctx.tokens_out += int(tokens_cfg.output_mean)
+        ctx.tokens_in += int(int(tokens_cfg.input_mean) * scale)
+        ctx.tokens_out += int(int(tokens_cfg.output_mean) * scale)
         if topic not in self._topics:
             raise KeyError(f"topic {topic!r} not registered")
         carried: dict[str, Any] = dict(message)

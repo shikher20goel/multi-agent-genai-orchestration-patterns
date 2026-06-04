@@ -3,10 +3,11 @@ HUMAN-gated).
 
 Writes ``figures/cost_per_1k.png`` (mean cost-units per 1000 requests,
 grouped bars per pattern x platform) and ``figures/cost_ledger.csv``
-(per-(pattern, platform) aggregation via
-``agentorch.rig.costcapture.aggregate_ledger``). Reads ONLY results/.
-Cost units are USD under the HUMAN-gated assumptions in
-``configs/costs.yaml``; the axis label states that.
+(task 105: per-(pattern, platform, scenario) aggregation via
+``agentorch.rig.costcapture.aggregate_ledger(by_scenario=True)`` so
+per-scenario relative-cost claims trace to the ledger). Reads ONLY
+results/. Cost units are USD per request under the HUMAN-gated dated
+assumptions in ``configs/costs.yaml``; the axis label states that.
 
 Usage: ``python -m agentorch.study.figures_cost [--results results/]
 [--out figures/]``.
@@ -69,8 +70,11 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     cost = pd.read_csv(Path(args.results) / "cost.csv")
+    # Task 105: the persisted ledger is scenario-resolved (42 rows);
+    # the figure shows the per-(pattern, platform) aggregate.
+    ledger_scenario = aggregate_ledger(cost, by_scenario=True)
+    ledger_scenario.to_csv(out / "cost_ledger.csv", index=False)
     ledger = aggregate_ledger(cost)
-    ledger.to_csv(out / "cost_ledger.csv", index=False)
     make_cost_per_1k(ledger, out / "cost_per_1k.png")
     print(f"wrote {out / 'cost_per_1k.png'} and {out / 'cost_ledger.csv'}")
     return 0

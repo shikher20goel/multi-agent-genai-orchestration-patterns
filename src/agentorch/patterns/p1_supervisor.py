@@ -23,7 +23,7 @@ from typing import Any
 from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import Agent, WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
 
 
 class SupervisorPattern(Pattern):
@@ -61,6 +61,13 @@ class SupervisorPattern(Pattern):
         n = int(self.cfg.patterns.p1.n_collaborators)
         return [Agent(id=f"collab-{i}", role=f"specialist-{i}") for i in range(n)]
 
+    def _steps_per_branch(self, item: WorkItem) -> int:
+        """Each collaborator branch handles its share of the item's
+        scenario steps SEQUENTIALLY within the parallel fan-out
+        (task 105): a multi-step item costs more model work per branch."""
+        k = max(1, int(self.cfg.patterns.p1.n_collaborators))
+        return -(-work_steps(item) // k)  # ceil division
+
     def _execute(self, item: WorkItem) -> WorkResult:
         task = str(item.payload.get("task", item.id))
         try:
@@ -80,16 +87,24 @@ class SupervisorPattern(Pattern):
 
         # Parallel fan-out: the request pays max(collaborators), not the
         # sum (tail-at-scale; Dean & Barroso 2013).
+        per_branch = self._steps_per_branch(item)
+
         def make_branch(agent: Agent):
             def branch():
-                return self.bedrock.invoke_agent(
-                    agent.id, "prod", session,
-                    f"subtask for {agent.role}: {task}")["completion"]
+                outs = []
+                for j in range(per_branch):
+                    outs.append(self.bedrock.invoke_agent(
+                        agent.id, "prod", session,
+                        f"subtask {j} for {agent.role}: {task}")["completion"])
+                return " ".join(outs)
             return branch
 
         parts = self._parallel([make_branch(a) for a in self._collaborators()])
+        # Synthesis covers the full multi-step content (task 105).
+        self.ctx.content_scale = work_steps(item)
         synthesis = self.bedrock.invoke_agent("supervisor", "prod", session,
                                               f"synthesize: {' | '.join(parts)}")
+        self.ctx.content_scale = 1.0
         return WorkResult(item_id=item.id, status="ok",
                           payload={"plan": plan["completion"],
                                    "answer": synthesis["completion"],
@@ -110,15 +125,23 @@ class SupervisorPattern(Pattern):
                                lambda args, a=agent: {f"part_{a.id}": f"{a.role} done"})
             af.register_topic(f"collab_{agent.id}", [agent.id])
 
+        per_branch = self._steps_per_branch(item)
+
         def make_branch(agent: Agent):
             def branch():
-                return af.send(f"collab_{agent.id}", {"task": task})["result"]
+                outs = []
+                for j in range(per_branch):
+                    outs.append(af.send(f"collab_{agent.id}",
+                                        {"task": task, "step": j})["result"])
+                return outs[-1]
             return branch
 
         parts = self._parallel([make_branch(a) for a in collaborators])
-        # Synthesis: closing supervisor model call.
+        # Synthesis: closing supervisor model call covering all steps.
         af.register_topic("supervise_synthesize", [])
+        self.ctx.content_scale = work_steps(item)
         synthesis = af.send("supervise_synthesize", {"parts": len(parts)})
+        self.ctx.content_scale = 1.0
         return WorkResult(item_id=item.id, status="ok",
                           payload={"answer": synthesis["result"],
                                    "n_collaborators": len(collaborators)})

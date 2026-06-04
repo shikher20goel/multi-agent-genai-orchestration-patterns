@@ -1,7 +1,9 @@
 # HUMAN decision queue — AgentOrchPatterns-RepoPackage
 All 21 HUMAN-gated tasks are implemented, tested, committed on `autonomous-build`, and flagged in `progress.txt`. Nothing below is marked passing or self-approved. Review order is the recommended batch order.
 
-## Batch 1 — Cost model assumptions (tasks 014, 030)
+## Batch 1 — Cost model assumptions (tasks 014, 030; REVISED by Phase 2 task 105)
+**Phase 2 task 105 update:** the unit is now explicitly USD per request under dated assumptions; Agentforce Agent Script actions bill one Flex action credit each (USD 0.10 list, 2025-05 Flex pricing announcement, [HUMAN: verify]) so no path is zero-billed; multi-step S2 work scales token volume (Bedrock) and per-step actions (Agentforce), making S2 > S1 cost per pattern and P1 fan-out > P2 single chain; HITL human time is documented as out-of-scope operational cost, not platform cost; the ledger is scenario-resolved (42 rows). Decisions needed: verify the Flex-credit price + the $2/conversation decomposition, and the content-scaling assumption (tokens proportional to step count).
+
 - **What:** `src/agentorch/cost.py` + `configs/costs.yaml` (every unit price carries a source comment + as-of date) and `rig/costcapture.py` -> `figures/cost_ledger.csv`, `figures/cost_per_1k.png`.
 - **Produced:** Bedrock token prices referenced to the AWS public pricing page (as-of 2025-06, marked [HUMAN: verify]); AgentCore per-service-call prices are labeled PLACEHOLDERS (no authoritative public price assumed); Agentforce $2/conversation decomposition referenced to the Salesforce 2024-09 announcement, PLACEHOLDER.
 - **Decision needed:** confirm or replace each unit price and its dated source; decide whether AgentCore service-call pricing stays in the model or is folded into a single per-invocation overhead; confirm P2-on-Agentforce billing 0 model invocations (Agent Script actions only) is the intended semantics.

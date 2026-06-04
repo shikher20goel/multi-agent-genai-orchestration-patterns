@@ -22,7 +22,7 @@ from typing import Any
 from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
 from agentorch.types import Component, Platform
 
 
@@ -101,19 +101,28 @@ class HitlPattern(Pattern):
 
     def _execute(self, item: WorkItem) -> WorkResult:
         threshold = float(self.cfg.patterns.p6.confidence_threshold)
+        steps = work_steps(item)
         try:
+            # Task 105: the draft covers the item's full multi-step content
+            # (token volume scales with steps); on Agentforce each section
+            # is assembled by one Flex-credit-billed draft action.
             if self.bedrock is not None:
+                self.ctx.content_scale = steps
                 draft = self.bedrock.invoke_agent(
                     "drafter", "prod", f"sess-{item.id}",
                     str(item.payload.get("task", item.id)))["completion"]
+                self.ctx.content_scale = 1.0
                 assert self.guardrails is not None
                 self.guardrails.apply(draft, mode="shadow")
             else:
                 assert self.agentforce is not None
                 self.agentforce.register_action("draft", lambda a: {"draft": "drafted"})
-                self.agentforce.register_topic("adjudicated_work", ["draft"])
+                self.agentforce.register_topic("adjudicated_work",
+                                               ["draft"] * steps)
+                self.ctx.content_scale = steps
                 draft = str(self.agentforce.send(
                     "adjudicated_work", {"item": item.id})["result"])
+                self.ctx.content_scale = 1.0
             confidence = self._confidence(item)
             adjudicated = False
             decision = "auto_approved"

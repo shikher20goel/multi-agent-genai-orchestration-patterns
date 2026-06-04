@@ -19,7 +19,7 @@ from typing import Any
 from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
 from agentorch.types import Component, Platform
 
 
@@ -76,11 +76,16 @@ class BlackboardPattern(Pattern):
         key = f"bb-{item.id}"
         self.agentcore.memory_put(key, [])
         session = f"sess-{item.id}"
+        share = -(-work_steps(item) // n)  # ceil: steps each specialist covers
         for i in range(n):
             board = self.agentcore.memory_get(key)
+            # Each specialist contributes its share of the multi-step
+            # content in one invocation (task 105: token volume scales).
+            self.ctx.content_scale = share
             resp = self.bedrock.invoke_agent(
                 f"specialist-{i}", "prod", session,
                 f"contribute given {len(board)} prior entries")
+            self.ctx.content_scale = 1.0
             board = list(board) + [resp["completion"]]
             self._contention_delay()
             self.agentcore.memory_put(key, board)
@@ -99,8 +104,13 @@ class BlackboardPattern(Pattern):
             board.append(f"contribution-{len(board)}")
             return {"board_size": len(board)}
 
+        # Each specialist's dispatch persists its share of the item's
+        # steps via per-step contribution actions (task 105: Flex-credit
+        # billed even though they make no model call).
+        share = -(-work_steps(item) // n)
         af.register_action("contribute", specialist)
-        af.register_topic("blackboard_work", ["contribute"])
+        af.register_topic("blackboard_work",
+                          ["contribute"] * max(1, share))
         for _ in range(n):
             # Each contribution: a memory read/write boundary op (paying the
             # write-contention term) + topic dispatch.
@@ -112,8 +122,10 @@ class BlackboardPattern(Pattern):
                                   error=f"blackboard store failed: "
                                         f"{outcome.fault.value if outcome.fault else 'unknown'}")
             self.ctx.service_calls += 1
+            self.ctx.content_scale = share
             af.send("blackboard_work", {"item": item.id})
-        complete = len(board) == n
+            self.ctx.content_scale = 1.0
+        complete = len(board) == n * max(1, share)
         return WorkResult(item_id=item.id, status="ok" if complete else "error",
                           payload={"contributions": len(board)},
                           error=None if complete else "blackboard incomplete")
