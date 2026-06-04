@@ -182,7 +182,7 @@
       ],
       "verify": "`pytest tests/test_p1.py` passes on both platforms for one scenario.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "017",
