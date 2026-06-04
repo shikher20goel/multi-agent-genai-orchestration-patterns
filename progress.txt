@@ -23,3 +23,4 @@ TASK 021 done: P6 HitlPattern pause/resume + immutable-style decision log; adjud
 TASK 022 done: P7 BridgePattern with independent remote fault domain; full remote outage contained (degraded, local ok)
 TASK 023 done: patterns/registry.py REGISTRY (7 patterns) + build(); uniform smoke on both platforms
 TASK 024 done: S1 RAG QA workload (single-step, retrieval passages, deterministic)
+TASK 025 done: S2 long-horizon doc-gen (4-8 sequential stages, runs through P2)
