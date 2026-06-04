@@ -734,7 +734,7 @@
    ],
    "verify": "Fresh-clone `bash run.sh` produces all expected files (manifest check) and exits 0.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "063",
