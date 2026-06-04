@@ -60,3 +60,4 @@ TASK 056 done: tests/test_demo.py runs demo.sh end-to-end (smoke outputs + figur
 TASK 057 implemented, awaiting human review
 TASK 058 implemented, awaiting human review
 TASK 059 implemented, awaiting human review
+TASK 060 implemented, awaiting human review
