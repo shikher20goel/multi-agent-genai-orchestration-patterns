@@ -752,7 +752,7 @@
    ],
    "verify": "All AUTO passes=true, suite green, run.sh green; emit completion promise.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   }
  ]
 }
