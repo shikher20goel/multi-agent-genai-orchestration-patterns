@@ -29,3 +29,4 @@ TASK 027 done: rig/loadgen.py open-loop Poisson loadgen, submit_ts from schedule
 TASK 028 done: rig/saturation.py Little's law headroom + find_saturation rate sweep; overload flagged unsustainable
 TASK 029 done: rig/faultcampaign.py Algorithm 2 sweep, contained/propagated per contract, FaultRecord per cell; campaign grid in default.yaml
 TASK 030 implemented, awaiting human review
+TASK 031 done: stats/percentiles.py linear-interp quantiles validated vs analytic uniform/lognormal

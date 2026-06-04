@@ -361,7 +361,7 @@
    ],
    "verify": "`pytest tests/test_percentiles.py` passes vs known distribution.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "032",
