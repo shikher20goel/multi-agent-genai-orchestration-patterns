@@ -2,17 +2,8 @@
 import pandas as pd
 import pytest
 
-from agentorch.config import load_config
 from agentorch.rig.costcapture import aggregate_ledger
 from agentorch.study.figures_cost import make_cost_per_1k
-from agentorch.study.run_study import run_study
-
-
-@pytest.fixture(scope="module")
-def smoke_results(tmp_path_factory):
-    out = tmp_path_factory.mktemp("rescost")
-    run_study(load_config(), out, smoke=True)
-    return out
 
 
 def test_cost_outputs(smoke_results, tmp_path) -> None:

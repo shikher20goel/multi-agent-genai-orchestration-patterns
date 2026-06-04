@@ -722,7 +722,7 @@
    ],
    "verify": "`pytest --cov` exits 0 with 0 failures.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "062",

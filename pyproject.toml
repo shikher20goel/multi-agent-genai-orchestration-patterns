@@ -33,3 +33,14 @@ target-version = "py310"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src/agentorch", "governance"]
+branch = false
+
+[tool.coverage.report]
+# Report-only: no fail-under threshold (per task 061); the report is
+# informational and the suite must exit 0.
+fail_under = 0
+show_missing = false
+skip_empty = true

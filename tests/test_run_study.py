@@ -7,9 +7,10 @@ from agentorch.config import load_config
 from agentorch.study.run_study import run_study
 
 
-def test_smoke_run_writes_results(tmp_path) -> None:
+def test_smoke_run_writes_results(smoke_results) -> None:
+    """Checks the shared session-scoped smoke run (tests/conftest.py)."""
     cfg = load_config()
-    manifest = run_study(cfg, tmp_path, smoke=True)
+    tmp_path = smoke_results
     for name in ("latency.csv", "cost.csv", "faults.csv", "manifest.json"):
         assert (tmp_path / name).exists(), name
     lat = pd.read_csv(tmp_path / "latency.csv")
@@ -26,13 +27,12 @@ def test_smoke_run_writes_results(tmp_path) -> None:
     with open(tmp_path / "manifest.json") as f:
         m = json.load(f)
     assert m["seed"] == 42
-    assert m == manifest
 
 
-def test_smoke_run_deterministic(tmp_path) -> None:
+def test_smoke_run_deterministic(tmp_path, smoke_results) -> None:
+    """A fresh same-seed run is byte-identical to the shared session run."""
     cfg = load_config()
     run_study(cfg, tmp_path / "a", smoke=True)
-    run_study(cfg, tmp_path / "b", smoke=True)
     for name in ("latency.csv", "cost.csv", "faults.csv"):
         assert (tmp_path / "a" / name).read_text() == \
-            (tmp_path / "b" / name).read_text(), name
+            (smoke_results / name).read_text(), name

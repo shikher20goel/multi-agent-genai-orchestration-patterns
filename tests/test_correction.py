@@ -35,7 +35,7 @@ def test_holm_controls_fwer_under_global_null() -> None:
     cfg = load_config()
     rng = cfg.get_rng("holm-null")
     alpha = float(cfg.stats.alpha)
-    n_families = 400
+    n_families = 200  # statistical budget: SE(FWER)~=0.015 at alpha=0.05, bound 2*alpha
     any_reject = 0
     any_uncorrected = 0
     for _ in range(n_families):

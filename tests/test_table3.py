@@ -3,17 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from agentorch.config import load_config
 from agentorch.study.make_table3 import build_table3
-from agentorch.study.run_study import run_study
-
-
-@pytest.fixture(scope="module")
-def smoke_results(tmp_path_factory):
-    out = tmp_path_factory.mktemp("res")
-    cfg = load_config()
-    run_study(cfg, out, smoke=True)
-    return out
 
 
 @pytest.fixture(scope="module")

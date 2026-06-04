@@ -1,17 +1,8 @@
 """Task 039 (HUMAN-gated): latency figures generated from results/ only."""
 import pandas as pd
-import pytest
 
 from agentorch.config import load_config
 from agentorch.study.figures_latency import make_ccdf, make_p99_ci
-from agentorch.study.run_study import run_study
-
-
-@pytest.fixture(scope="module")
-def smoke_results(tmp_path_factory):
-    out = tmp_path_factory.mktemp("resfig")
-    run_study(load_config(), out, smoke=True)
-    return out
 
 
 def test_figures_written_nonempty(smoke_results, tmp_path) -> None:

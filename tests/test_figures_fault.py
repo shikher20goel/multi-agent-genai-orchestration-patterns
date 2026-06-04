@@ -1,17 +1,7 @@
 """Task 041 (HUMAN-gated): fault matrix figure from results/faults.csv."""
 import pandas as pd
-import pytest
 
-from agentorch.config import load_config
 from agentorch.study.figures_fault import make_fault_matrix
-from agentorch.study.run_study import run_study
-
-
-@pytest.fixture(scope="module")
-def smoke_results(tmp_path_factory):
-    out = tmp_path_factory.mktemp("resfault")
-    run_study(load_config(), out, smoke=True)
-    return out
 
 
 def test_fault_matrix_written(smoke_results, tmp_path) -> None:

@@ -2,17 +2,7 @@
 import pandas as pd
 import pytest
 
-from agentorch.config import load_config
 from agentorch.study.make_table4 import GRADE_ORDER, build_table4
-from agentorch.study.run_study import run_study
-
-
-@pytest.fixture(scope="module")
-def smoke_results(tmp_path_factory):
-    out = tmp_path_factory.mktemp("res4")
-    cfg = load_config()
-    run_study(cfg, out, smoke=True)
-    return out
 
 
 @pytest.fixture(scope="module")
