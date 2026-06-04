@@ -52,3 +52,4 @@ TASK 048 done: README.md with the five mandated IEEE-reproducibility headings (R
 TASK 049 done: CITATION.cff (cff-version 1.2.0, ORCID 0009-0005-8392-0949, preferred-citation to IEEE Access submission, [USER: INSERT DOI] slot)
 TASK 050 done: pinned Dockerfile (python:3.11-slim, digest-pin comment slot, non-root) + environment/requirements.lock (pip-freeze dependency closure); fallback done-check passed (docker unavailable): pip install -r environment/requirements.lock resolves pinned
 TASK 051 done: run.sh master reproduction (set -euo pipefail, pip install -e ., full study -> results/, all tables+figures -> figures/, output manifest assert, idempotent); exits 0
+TASK 052 implemented, awaiting human review
