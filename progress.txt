@@ -5,3 +5,4 @@ TASK 003 done: .github/workflows/ci.yml (checkout, py3.11, install, ruff, pytest
 TASK 004 done: config.py Config/load_config/get_rng (sha256 child seeds), configs/default.yaml
 TASK 005 done: types.py with PatternId(7), ScenarioId(3), Platform, Mode, FaultType, Component
 TASK 006 done: domain.py Agent/WorkItem/WorkResult with status validation
+TASK 007 done: telemetry.py LatencyRecord/CostRecord/FaultRecord/TelemetrySink CSV roundtrip

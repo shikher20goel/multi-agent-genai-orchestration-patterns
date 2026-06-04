@@ -76,7 +76,7 @@
       ],
       "verify": "`pytest tests/test_telemetry.py` passes; latency_ms computed from separate timestamps.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "008",
