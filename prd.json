@@ -146,7 +146,7 @@
       ],
       "verify": "`pytest tests/test_agentforce_events.py` passes; escalation routes to human queue, falls back when empty.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "014",
