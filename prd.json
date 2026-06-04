@@ -496,7 +496,7 @@
    ],
    "verify": "Script writes decision_tree.png.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "043",
