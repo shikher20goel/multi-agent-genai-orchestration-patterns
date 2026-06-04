@@ -13,6 +13,7 @@ from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import WorkItem, WorkResult
 from agentorch.patterns.base import Pattern
+from agentorch.types import Component, Platform
 
 EVENT_CHAIN = ("item_received", "item_enriched", "item_resolved")
 
@@ -82,6 +83,20 @@ class ChoreographyPattern(Pattern):
 
         def make_handler(idx: int):
             def handler(payload: dict[str, Any]) -> None:
+                # Each subscriber is a model-backed agent: reacting to an
+                # event costs one model reasoning step (task 101 parity
+                # with the Bedrock instantiation).
+                outcome = self.ctx.boundary_call(
+                    Platform.AGENTFORCE, "model_invoke", Component.MODEL_BACKEND)
+                if not outcome.success:
+                    raise AgentforceClientError(
+                        f"choreography handler failed: "
+                        f"{outcome.fault.value if outcome.fault else 'unknown'}",
+                        outcome)
+                tokens_cfg = self.ctx.cfg.tokens
+                self.ctx.model_invocations += 1
+                self.ctx.tokens_in += int(tokens_cfg.input_mean)
+                self.ctx.tokens_out += int(tokens_cfg.output_mean)
                 self._request_log.append(EVENT_CHAIN[idx])
                 if idx + 1 < len(EVENT_CHAIN):
                     af.publish_event(EVENT_CHAIN[idx + 1], payload)

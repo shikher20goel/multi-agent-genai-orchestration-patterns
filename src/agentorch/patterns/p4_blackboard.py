@@ -1,4 +1,11 @@
-"""P4 Shared-Memory Blackboard (task 019).
+"""P4 Shared-Memory Blackboard (task 019; latency task 101).
+
+Store-mediated coordination is CONTENTION-BOUND: every blackboard write
+pays a serialization penalty that grows with the number of concurrent
+writers (``patterns.p4.contention_per_writer_s`` x (writers - 1), with
+writers = concurrent in-flight requests reported by the load
+generator). Under bursty load the in-flight count rises, so P4 latency
+degrades with load — the structural consequence in the paper's Table 3.
 
 Specialists iteratively read/write a shared memory; a controller decides
 when the solution is complete. Bedrock instantiation: AgentCore memory
@@ -48,6 +55,12 @@ class BlackboardPattern(Pattern):
                                  "controller-level completion policy"],
         }
 
+    def _contention_delay(self) -> None:
+        """Write-contention term (task 101): rises with concurrent writers."""
+        per_writer = float(self.cfg.patterns.p4.contention_per_writer_s)
+        writers = max(1, int(self.ctx.concurrent_in_flight))
+        self.ctx.add_delay(per_writer * (writers - 1))
+
     def _execute(self, item: WorkItem) -> WorkResult:
         n = int(self.cfg.patterns.p4.n_specialists)
         try:
@@ -69,6 +82,7 @@ class BlackboardPattern(Pattern):
                 f"specialist-{i}", "prod", session,
                 f"contribute given {len(board)} prior entries")
             board = list(board) + [resp["completion"]]
+            self._contention_delay()
             self.agentcore.memory_put(key, board)
         final = self.agentcore.memory_get(key)
         complete = len(final) == n
@@ -88,8 +102,15 @@ class BlackboardPattern(Pattern):
         af.register_action("contribute", specialist)
         af.register_topic("blackboard_work", ["contribute"])
         for _ in range(n):
-            # Each contribution: a memory read/write boundary op + topic dispatch.
-            self.ctx.boundary_call(Platform.AGENTFORCE, "memory", Component.MEMORY_STORE)
+            # Each contribution: a memory read/write boundary op (paying the
+            # write-contention term) + topic dispatch.
+            self._contention_delay()
+            outcome = self.ctx.boundary_call(Platform.AGENTFORCE, "memory",
+                                             Component.MEMORY_STORE)
+            if not outcome.success:
+                return WorkResult(item_id=item.id, status="error",
+                                  error=f"blackboard store failed: "
+                                        f"{outcome.fault.value if outcome.fault else 'unknown'}")
             self.ctx.service_calls += 1
             af.send("blackboard_work", {"item": item.id})
         complete = len(board) == n

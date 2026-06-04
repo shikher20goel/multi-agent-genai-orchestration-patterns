@@ -1,4 +1,8 @@
-"""P7 Federated Cross-Platform Bridge (task 022).
+"""P7 Federated Cross-Platform Bridge (task 022; latency task 101).
+
+Every federated call pays one cross-platform round trip
+(``latency.shared.cross_platform_rtt``) at the bridge, on top of the
+local-cluster service time.
 
 Work spans two platform clusters joined by a bridge; a full outage of
 one cluster is contained — work for the healthy cluster still completes
@@ -35,7 +39,16 @@ class BridgePattern(Pattern):
         remote_platform = (Platform.AGENTFORCE if platform is Platform.BEDROCK
                            else Platform.BEDROCK)
         self.remote_platform = remote_platform
-        self.remote_ctx = CallContext.build(cfg, clock=ctx.clock, sink=ctx.sink)
+        # Remote cluster: independent latency stream (task 103 prefix is
+        # inherited via the primary ctx builder in run_condition), shared
+        # fault injector so the campaign can arm a REMOTE-CLUSTER outage
+        # with unit="remote" (task 104) — local calls carry no unit and
+        # are unaffected by remote-only faults.
+        self.remote_ctx = CallContext.build(
+            cfg, clock=ctx.clock, sink=ctx.sink,
+            stream_prefix=getattr(ctx, "stream_prefix", "") + ":remote",
+            fault_injector=ctx.fault_injector)
+        self.remote_ctx.default_unit = "remote"
         if remote_platform is Platform.BEDROCK:
             self.remote_bedrock: MockBedrockAgentRuntime | None = (
                 MockBedrockAgentRuntime(self.remote_ctx))
@@ -85,6 +98,12 @@ class BridgePattern(Pattern):
         self.agentforce.register_topic("local", ["local_work"])
         return str(self.agentforce.send("local", {"item": item.id})["result"])
 
+    def _bridge_hop(self) -> None:
+        """Cross-platform RTT term (task 101): every federated call pays
+        one bridge round trip (latency.shared.cross_platform_rtt)."""
+        self.ctx.add_delay(
+            self.ctx.latency_model.sample_shared("cross_platform_rtt"))
+
     def _remote_work(self, item: WorkItem) -> str:
         if self.remote_bedrock is not None:
             return self.remote_bedrock.invoke_agent(
@@ -106,11 +125,16 @@ class BridgePattern(Pattern):
         # the request degrades (no remote enrichment) but still completes.
         remote: str | None = None
         remote_error: str | None = None
+        self._bridge_hop()
         try:
             remote = self._remote_work(item)
         except (BedrockClientError, AgentforceClientError) as exc:
             remote_error = str(exc)
         self.ctx.elapsed_s += self.remote_ctx.elapsed_s - remote_start
+        if remote is None:
+            # Task 104: remote-cluster outage is CONTAINED to the bridged
+            # work — the request completes degraded, never cascades.
+            self.ctx.degraded = True
         return WorkResult(item_id=item.id, status="ok",
                           payload={"local": local, "remote": remote,
                                    "degraded": remote is None,

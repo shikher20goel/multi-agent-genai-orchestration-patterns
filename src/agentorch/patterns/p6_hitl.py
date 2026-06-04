@@ -1,4 +1,13 @@
-"""P6 Human-in-the-Loop Adjudication (task 021).
+"""P6 Human-in-the-Loop Adjudication (task 021; latency task 101,
+deferral task 104).
+
+End-to-end latency is HUMAN-STEP-DOMINATED: an adjudicated request pays
+the routing hop plus a human review decision time drawn from the
+``latency.shared.human_decision_delay`` lognormal (p50 ~30 s — tens of
+seconds, configurable in configs/default.yaml). A human_queue OUTAGE
+window defers the decision: the item stays queued until the window
+ends and is then reviewed normally — correctness is isolated (no
+wrong auto-approval), latency rises, integrity is preserved.
 
 Low-confidence outputs pause the chain, route to a human queue, and
 resume with the recorded human decision. Bedrock instantiation:
@@ -24,6 +33,7 @@ class HitlPattern(Pattern):
         super().__init__(*args, **kwargs)
         self.decision_log: list[dict[str, Any]] = []
         self._paused: dict[str, dict[str, Any]] = {}
+        self._deferred = False
 
     @classmethod
     def meta(cls) -> dict[str, Any]:
@@ -64,7 +74,13 @@ class HitlPattern(Pattern):
         else:
             assert self.omni is not None
             self.omni.add_queue("adjudication", agents=1)
-            self.omni.handoff(item, "adjudication")
+            try:
+                self.omni.handoff(item, "adjudication")
+            except AgentforceClientError:
+                # Task 104: a faulted human queue defers the handoff; the
+                # paused state is durable and the caller waits out the
+                # outage (deferred decision, never auto-approval).
+                self._deferred = True
         self._paused[token] = state
         return token
 
@@ -102,12 +118,36 @@ class HitlPattern(Pattern):
             adjudicated = False
             decision = "auto_approved"
             if confidence < threshold:
+                self._deferred = False
                 token = self.pause(item, draft, confidence)
-                # Human-stub review time at the human-queue boundary.
-                self.ctx.boundary_call(
-                    self.platform,
-                    "omni_channel" if self.platform is Platform.AGENTFORCE else "memory",
-                    Component.HUMAN_QUEUE)
+                if self.platform is Platform.AGENTFORCE:
+                    deferred = self._deferred  # handoff hop inside pause()
+                else:
+                    routing = self.ctx.boundary_call(
+                        self.platform, "memory", Component.HUMAN_QUEUE)
+                    deferred = not routing.success
+                if deferred:
+                    # Task 104: a human_queue fault DEFERS the decision —
+                    # the item stays queued until the outage window ends,
+                    # then a human reviews it normally. Never auto-approve.
+                    window_end = self.ctx.fault_injector.window_end(
+                        Component.HUMAN_QUEUE)
+                    if window_end is not None:
+                        self.ctx.add_delay(
+                            max(0.0, window_end - self.ctx.sim_now),
+                            blocking=False)
+                    else:
+                        # Probabilistic queue fault: bounded re-route delay.
+                        self.ctx.add_delay(float(self.cfg.faults.throttle_delay_s),
+                                           blocking=False)
+                # Human review decision time (task 101): lognormal with
+                # p50 in the tens of seconds; dominates P6 end-to-end
+                # latency. The paused request RELEASES its compute server
+                # while waiting (blocking=False): the human queue is a
+                # separate resource from the model-serving pool.
+                self.ctx.add_delay(
+                    self.ctx.latency_model.sample_shared("human_decision_delay"),
+                    blocking=False)
                 entry = self.resume(token, decision="approved")
                 adjudicated = True
                 decision = entry["decision"]

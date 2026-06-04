@@ -86,7 +86,12 @@ class GatewayPattern(Pattern):
 
         all_failed = len(failures) == len(tools)
         status = "error" if all_failed else "ok"
+        if failures and not all_failed:
+            # Bulkhead isolation (task 104): the request completes but the
+            # faulted tool's contribution is lost — degraded, not failed.
+            self.ctx.degraded = True
         return WorkResult(item_id=item.id, status=status,
                           payload={"tools_ok": sorted(tool_results),
-                                   "tools_failed": sorted(failures)},
+                                   "tools_failed": sorted(failures),
+                                   "degraded": bool(failures and not all_failed)},
                           error="; ".join(failures.values()) or None)

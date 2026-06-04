@@ -60,6 +60,33 @@ class Pattern(ABC):
     def _execute(self, item: WorkItem) -> WorkResult:
         """Pattern-specific orchestration logic."""
 
+
+    def _parallel(self, branches: "list") -> list:
+        """Run branch callables as a parallel fan-out (task 101).
+
+        Each branch's service time is measured separately and the
+        request pays only the MAXIMUM branch time (plus whatever came
+        before), not the sum: this is the tail-at-scale fan-out
+        accounting (Dean & Barroso 2013). Returns the branch results.
+        A branch exception propagates after time accounting.
+        """
+        base = self.ctx.elapsed_s
+        durations: list[float] = []
+        results: list = []
+        error: Exception | None = None
+        for fn in branches:
+            self.ctx.elapsed_s = base       # branches start together
+            try:
+                results.append(fn())
+            except Exception as exc:        # account the failed branch too
+                if error is None:
+                    error = exc
+            durations.append(self.ctx.elapsed_s - base)
+        self.ctx.elapsed_s = base + (max(durations) if durations else 0.0)
+        if error is not None:
+            raise error
+        return results
+
     def run(self, item: WorkItem) -> tuple[WorkResult, float]:
         """Run one work item; returns (result, service_time_s)."""
         self.ctx.reset_request()

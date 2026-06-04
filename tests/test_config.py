@@ -12,7 +12,8 @@ def test_load_default_config() -> None:
 
 def test_attribute_access_nested() -> None:
     cfg = load_config()
-    assert cfg.latency.bedrock.model_invoke.mu < 0
+    # Task 101 recalibration: a model step's p50 is ~1.1 s (mu ~ 0.1).
+    assert -1.0 < cfg.latency.bedrock.model_invoke.mu < 1.0
 
 
 def test_same_seed_identical_draws() -> None:

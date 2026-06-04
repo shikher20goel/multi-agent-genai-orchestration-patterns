@@ -37,6 +37,7 @@ def generate_s3(n: int, rng: np.random.Generator, cfg: Config,
             scenario=ScenarioId.S3,
             payload={
                 "task": f"triage incident {i}",
+                "steps": 2,  # triage = classify + act (two model steps)
                 "severity": _SEVERITIES[int(rng.integers(0, len(_SEVERITIES)))],
                 "arrival_weight": bf if in_burst else 1.0,
                 "in_burst": in_burst,

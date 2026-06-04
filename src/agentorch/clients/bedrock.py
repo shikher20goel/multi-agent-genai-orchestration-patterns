@@ -97,7 +97,10 @@ class MockAgentCore:
             raise BedrockClientError(
                 f"gateway hop failed: {hop.fault.value if hop.fault else 'unknown'}", hop)
         ctx.service_calls += 1
-        tool_outcome = ctx.boundary_call(Platform.BEDROCK, "tool", Component.TOOL)
+        # Per-tool unit label: the campaign can fault ONE tool behind the
+        # gateway bulkhead (task 104).
+        tool_outcome = ctx.boundary_call(Platform.BEDROCK, "tool", Component.TOOL,
+                                         unit=tool)
         if not tool_outcome.success:
             raise BedrockClientError(
                 f"tool {tool} failed: "
@@ -137,6 +140,10 @@ class MockAgentCore:
     def observability_emit(self, event: dict[str, Any]) -> None:
         outcome = self._ctx.boundary_call(
             Platform.BEDROCK, "observability", Component.EVENT_BUS)
+        if not outcome.success:
+            from agentorch.clients.agentforce import _buffered_redelivery
+            outcome = _buffered_redelivery(self._ctx, outcome,
+                                           Platform.BEDROCK, "observability")
         if not outcome.success:
             raise BedrockClientError(
                 f"observability_emit failed: "
