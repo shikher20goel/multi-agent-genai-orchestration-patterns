@@ -6,6 +6,17 @@ study on an open mock rig", with placeholder slots
 passages are quoted verbatim from the submitted PDF for diffing.
 [HUMAN: insert final links, verify every quoted original against the
 current PDF, and approve before any edit lands in the manuscript.]
+Phase 2 (task 108) re-check: the quantitative claims in the revised
+text (42 baseline conditions, n = 500 per condition, 336 fault cells,
+BCa CIs, Mann-Whitney + Holm) were re-verified against the
+recalibrated regeneration (results/manifest.json fields
+n_baseline_conditions, n_per_condition, fault_campaign_cells) and are
+unchanged; no absolute latency/cost value is quoted in this file, so
+no further number refresh was needed. The mock-fidelity caveat
+sentence in the revised abstract ("comparative and structural ...
+carry no claim about absolute production performance") remains and is
+now mirrored prominently in the results section's opening paragraph
+and threats-to-validity (docs/manuscript/results_section.md).
 
 ---
 

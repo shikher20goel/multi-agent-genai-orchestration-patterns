@@ -80,3 +80,4 @@ TASK 045 re-flagged for human review against recalibrated artifact (phase 2)
 TASK 046 re-flagged for human review against recalibrated artifact (phase 2)
 TASK 047 re-flagged for human review against recalibrated artifact (phase 2)
 TASK 110 done: bash run.sh regenerated all 42-condition tables + figures from the calibrated rig (n=500, seed 42); docs/PHASE2_BEFORE_AFTER.md records before/after p50/p99 for P1/P2/P4/P6 with per-pattern explanations; RESULTS_TO_PAPER_MAP updated (scenario-resolved ledger, new Table 4); demo.sh green
+TASK 108 implemented, awaiting human review
