@@ -523,7 +523,7 @@
    ],
    "verify": "`pytest tests/test_hitl_example.py` passes; halt stops chain; log entries immutable.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "045",
