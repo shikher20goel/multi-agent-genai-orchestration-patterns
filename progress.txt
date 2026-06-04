@@ -93,3 +93,5 @@ TASK 206 implemented, awaiting human review
 TASK 207 implemented, awaiting human review
 TASK 207 re-flag: 11 fit-cell discrepancies (docs/FIT_DISCREPANCIES.md — P1-S1, P1-S2, P2-S1, P2-S2, P3-S1, P5-S1, P5-S3, P6-S1, P7-S1, P7-S2, P7-S3) awaiting author adjudication
 TASK 207 re-flag: $2/conversation Agentforce cost sensitivity caveat (configs/costs.yaml; manuscript cost subsection + figures_cost note) awaiting author confirmation
+TASK 208 done: phase 3 final gate — bash run.sh regenerated all outputs incl. fit_matrix.csv + table4_supplementary.csv + corrected cost figure (bit-identical to committed); fresh clone to /tmp + pip install --user -e . + bash run.sh + verify_repro OK (clone outputs bit-identical); pytest --cov green (232 passed, TOTAL 93%); agreement suite 25 tests green incl. 10 pinned Table-4 fit cells; fit_matrix.csv reproduces the paper on every non-flagged cell (10/10 agreed; 11 flagged in docs/FIT_DISCREPANCIES.md); only HUMAN items remain
+PAPER_FIT_MATRIX_RECONCILED

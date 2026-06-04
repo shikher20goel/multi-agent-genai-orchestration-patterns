@@ -966,7 +966,7 @@
       ],
       "verify": "See PHASE3_SPEC.md task 208",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     }
   ],
   "phase2_completion_promise": "PAPER_VALIDITY_COMPLETE",
