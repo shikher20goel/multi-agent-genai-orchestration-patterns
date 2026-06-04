@@ -69,20 +69,34 @@ class ChoreographyPattern(Pattern):
         return WorkResult(item_id=item.id, status="ok",
                           payload={"events": list(EVENT_CHAIN), "hops": len(hops)})
 
-    def _execute_agentforce(self, item: WorkItem) -> WorkResult:
-        assert self.agentforce is not None
+    def _ensure_subscribed(self) -> None:
+        """Register the event-chain handlers exactly once per client.
+
+        Re-subscribing per request would multiply handlers and fan the
+        chain out combinatorially across requests (root-cause fix).
+        """
+        if getattr(self, "_chain_subscribed", False):
+            return
         af = self.agentforce
-        log: list[str] = []
+        assert af is not None
 
         def make_handler(idx: int):
             def handler(payload: dict[str, Any]) -> None:
-                log.append(EVENT_CHAIN[idx])
+                self._request_log.append(EVENT_CHAIN[idx])
                 if idx + 1 < len(EVENT_CHAIN):
                     af.publish_event(EVENT_CHAIN[idx + 1], payload)
             return handler
 
         for i, event in enumerate(EVENT_CHAIN):
             af.subscribe(event, make_handler(i))
+        self._chain_subscribed = True
+
+    def _execute_agentforce(self, item: WorkItem) -> WorkResult:
+        assert self.agentforce is not None
+        af = self.agentforce
+        self._request_log: list[str] = []
+        log = self._request_log
+        self._ensure_subscribed()
         af.publish_event(EVENT_CHAIN[0], {"item": item.id})
         ok = log == list(EVENT_CHAIN)
         return WorkResult(item_id=item.id, status="ok" if ok else "error",
