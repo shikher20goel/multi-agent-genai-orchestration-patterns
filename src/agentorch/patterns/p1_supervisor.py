@@ -27,6 +27,9 @@ from agentorch.patterns.base import Pattern, work_steps
 
 
 class SupervisorPattern(Pattern):
+    # Task 201: the supervisor plans the decomposition per request and
+    # dispatches collaborators adaptively (docs/FIT_RULE.md).
+    CAPABILITIES = {"adaptive_decomposition": True}
     pattern_name = "P1 Supervisor-Collaborator Hierarchy"
 
     @classmethod

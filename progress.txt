@@ -83,3 +83,4 @@ TASK 110 done: bash run.sh regenerated all 42-condition tables + figures from th
 TASK 108 implemented, awaiting human review
 TASK 111 done: phase 2 final gate — tests/test_paper_agreement.py green (13 tests); pytest --cov green (214 passed, TOTAL 93%); fresh clone to /tmp + pip install --user -e . + bash run.sh green (table3/table4 bit-identical to committed); Table 3/4 reproduce paper directionally per the agreement suite; all Phase-2 AUTO tasks passes=true; only HUMAN-gated items remain unapproved (26 implemented + flagged)
 PAPER_VALIDITY_COMPLETE
+TASK 201 done: docs/FIT_RULE.md pre-registered BEFORE first computation; capabilities() flags on patterns (P1/P4 adaptive_decomposition, P3 event_absorption, P6 selective_human_routing); study/make_fit_matrix.py -> figures/fit_matrix.csv (21 platform-independent Weak/Moderate/Strong cells via Holm/MWU standings, pessimistic composites, both-platform pooling, upgrade-only capability gate); 6 unit tests

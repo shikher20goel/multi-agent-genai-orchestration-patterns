@@ -24,6 +24,9 @@ from agentorch.types import Component, Platform
 
 
 class BlackboardPattern(Pattern):
+    # Task 201: specialists contribute opportunistically against shared
+    # state; decomposition is emergent, not fixed (docs/FIT_RULE.md).
+    CAPABILITIES = {"adaptive_decomposition": True}
     pattern_name = "P4 Shared-Memory Blackboard"
 
     @classmethod

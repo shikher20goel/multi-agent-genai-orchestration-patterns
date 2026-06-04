@@ -27,6 +27,9 @@ from agentorch.types import Component, Platform
 
 
 class HitlPattern(Pattern):
+    # Task 201: the confidence gate routes ONLY below-threshold items
+    # to the human queue -- selective by design (docs/FIT_RULE.md).
+    CAPABILITIES = {"selective_human_routing": True}
     pattern_name = "P6 Human-in-the-Loop Adjudication"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

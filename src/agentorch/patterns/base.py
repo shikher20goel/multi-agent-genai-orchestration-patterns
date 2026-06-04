@@ -56,6 +56,22 @@ class Pattern(ABC):
     def meta(cls) -> dict[str, Any]:
         """Nine-element pattern metadata (catalog form)."""
 
+    @classmethod
+    def capabilities(cls) -> dict[str, bool]:
+        """Explicit workload-capability flags (Phase 3 task 201).
+
+        Separate from the nine-element catalog ``meta()`` so the
+        catalog template stays fixed. Each flag is set from the
+        pattern's ACTUAL implemented structure; one-line
+        justifications live in docs/FIT_RULE.md. Subclasses override
+        ``CAPABILITIES``; defaults are all-False.
+        """
+        defaults = {"adaptive_decomposition": False,
+                    "selective_human_routing": False,
+                    "event_absorption": False}
+        defaults.update(getattr(cls, "CAPABILITIES", {}))
+        return defaults
+
     @abstractmethod
     def _execute(self, item: WorkItem) -> WorkResult:
         """Pattern-specific orchestration logic."""

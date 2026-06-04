@@ -19,6 +19,9 @@ EVENT_CHAIN = ("item_received", "item_enriched", "item_resolved")
 
 
 class ChoreographyPattern(Pattern):
+    # Task 201: durable bus + decoupled consumer pool buffer arrival
+    # bursts ahead of processing (docs/FIT_RULE.md).
+    CAPABILITIES = {"event_absorption": True}
     pattern_name = "P3 Event-Driven Choreography"
 
     @classmethod
