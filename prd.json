@@ -238,7 +238,7 @@
       ],
       "verify": "`pytest tests/test_p6.py` passes; pause-resume works; decision logged.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "022",

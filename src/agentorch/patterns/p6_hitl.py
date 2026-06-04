@@ -1,0 +1,120 @@
+"""P6 Human-in-the-Loop Adjudication (task 021).
+
+Low-confidence outputs pause the chain, route to a human queue, and
+resume with the recorded human decision. Bedrock instantiation:
+guardrail/confidence gate + paused session resumed after a human-stub
+decision. Agentforce instantiation: Omni-Channel handoff to a human
+queue, then resume.
+"""
+from __future__ import annotations
+
+from typing import Any
+
+from agentorch.clients.agentforce import AgentforceClientError
+from agentorch.clients.bedrock import BedrockClientError
+from agentorch.domain import WorkItem, WorkResult
+from agentorch.patterns.base import Pattern
+from agentorch.types import Component, Platform
+
+
+class HitlPattern(Pattern):
+    pattern_name = "P6 Human-in-the-Loop Adjudication"
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.decision_log: list[dict[str, Any]] = []
+        self._paused: dict[str, dict[str, Any]] = {}
+
+    @classmethod
+    def meta(cls) -> dict[str, Any]:
+        return {
+            "name": cls.pattern_name,
+            "intent": "Gate consequential agent outputs behind a human decision "
+                      "when confidence is below threshold.",
+            "context": "Regulated or high-stakes actions (refunds, escalations, "
+                       "legal text) produced by agents.",
+            "problem": "Fully autonomous output of consequential actions violates "
+                       "oversight requirements and risk tolerance.",
+            "forces": ["safety vs throughput",
+                       "human latency vs automation speed",
+                       "auditability vs friction"],
+            "solution": "A confidence gate pauses the run, persists state, routes "
+                        "to a human queue, logs the decision, and resumes "
+                        "(approve) or stops (reject).",
+            "platform_instantiations": {
+                "bedrock": "Guardrail-checked output + paused session state in "
+                           "AgentCore memory; resume after human-stub decision.",
+                "agentforce": "Omni-Channel handoff to a human queue; platform "
+                              "event resumes the flow with the decision.",
+            },
+            "consequences": ["+ regulatory alignment, + logged accountability",
+                             "- human queue latency dominates p99",
+                             "- paused state must be durable"],
+            "governance_hooks": ["immutable decision log entries",
+                                 "EU AI Act Art. 14-style oversight point"],
+        }
+
+    # -- pause / resume API -------------------------------------------------
+    def pause(self, item: WorkItem, draft: str, confidence: float) -> str:
+        """Persist state and route to a human; returns a pause token."""
+        token = f"pause-{item.id}"
+        state = {"item_id": item.id, "draft": draft, "confidence": confidence}
+        if self.agentcore is not None:
+            self.agentcore.memory_put(token, state)
+        else:
+            assert self.omni is not None
+            self.omni.add_queue("adjudication", agents=1)
+            self.omni.handoff(item, "adjudication")
+        self._paused[token] = state
+        return token
+
+    def resume(self, token: str, decision: str, reviewer: str = "human-stub") -> dict[str, Any]:
+        """Apply the human decision to a paused run and log it."""
+        if token not in self._paused:
+            raise KeyError(f"no paused state for {token!r}")
+        state = self._paused.pop(token)
+        entry = {"token": token, "item_id": state["item_id"],
+                 "decision": decision, "reviewer": reviewer,
+                 "confidence": state["confidence"], "ts": self.ctx.clock.now()}
+        self.decision_log.append(entry)
+        return entry
+
+    def _confidence(self, item: WorkItem) -> float:
+        # Confidence supplied by the scenario payload; default mid-range.
+        return float(item.payload.get("confidence", 0.9))
+
+    def _execute(self, item: WorkItem) -> WorkResult:
+        threshold = float(self.cfg.patterns.p6.confidence_threshold)
+        try:
+            if self.bedrock is not None:
+                draft = self.bedrock.invoke_agent(
+                    "drafter", "prod", f"sess-{item.id}",
+                    str(item.payload.get("task", item.id)))["completion"]
+                assert self.guardrails is not None
+                self.guardrails.apply(draft, mode="shadow")
+            else:
+                assert self.agentforce is not None
+                self.agentforce.register_action("draft", lambda a: {"draft": "drafted"})
+                self.agentforce.register_topic("adjudicated_work", ["draft"])
+                draft = str(self.agentforce.send(
+                    "adjudicated_work", {"item": item.id})["result"])
+            confidence = self._confidence(item)
+            adjudicated = False
+            decision = "auto_approved"
+            if confidence < threshold:
+                token = self.pause(item, draft, confidence)
+                # Human-stub review time at the human-queue boundary.
+                self.ctx.boundary_call(
+                    self.platform,
+                    "omni_channel" if self.platform is Platform.AGENTFORCE else "memory",
+                    Component.HUMAN_QUEUE)
+                entry = self.resume(token, decision="approved")
+                adjudicated = True
+                decision = entry["decision"]
+            return WorkResult(item_id=item.id, status="ok",
+                              payload={"draft": draft, "adjudicated": adjudicated,
+                                       "decision": decision,
+                                       "confidence": confidence})
+        except (BedrockClientError, AgentforceClientError) as exc:
+            status = "timeout" if "timeout" in str(exc) else "error"
+            return WorkResult(item_id=item.id, status=status, error=str(exc))
