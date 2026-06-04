@@ -1,0 +1,45 @@
+# Per-platform unit-price assumptions for the cost model (task 014, HUMAN-gated).
+# EVERY price below must be human-verified before any manuscript number is final.
+# "cost_units" are USD under these assumptions.
+
+bedrock:
+  # Anthropic Claude 3.5 Sonnet on Amazon Bedrock, on-demand, us-east-1.
+  # Source: https://aws.amazon.com/bedrock/pricing/ (public pricing page), as of 2025-06.
+  # PLACEHOLDER values [HUMAN: verify against the current Bedrock pricing page].
+  price_per_1k_tokens_in: 0.003    # USD / 1K input tokens  [HUMAN: verify]
+  price_per_1k_tokens_out: 0.015   # USD / 1K output tokens [HUMAN: verify]
+  service_calls:
+    # AgentCore service prices are PLACEHOLDERS modeled on AWS serverless norms
+    # (e.g., Lambda/API Gateway request pricing scales). No authoritative public
+    # per-call AgentCore price was assumed. [HUMAN: verify all four]
+    gateway: 0.0000035        # USD / gateway tool-route call  PLACEHOLDER [HUMAN: verify]
+    tool: 0.0000020           # USD / tool execution           PLACEHOLDER [HUMAN: verify]
+    memory: 0.0000005         # USD / memory get/put           PLACEHOLDER [HUMAN: verify]
+    identity: 0.0000005       # USD / identity check           PLACEHOLDER [HUMAN: verify]
+    observability: 0.0000002  # USD / telemetry event          PLACEHOLDER [HUMAN: verify]
+    guardrails: 0.00075       # USD / guardrail text-unit scan PLACEHOLDER modeled on
+                              # Bedrock Guardrails per-1K-text-unit pricing [HUMAN: verify]
+    event_bus: 0.0000010      # USD / event publish (EventBridge-like) PLACEHOLDER [HUMAN: verify]
+
+agentforce:
+  # Salesforce Agentforce announced "$2 per conversation" list pricing
+  # (Salesforce press release, 2024-09; e.g. https://www.salesforce.com/news/).
+  # The rig works per model invocation/action, so the per-conversation list
+  # price is decomposed into PLACEHOLDER per-invocation units assuming
+  # ~4 model invocations per conversation. [HUMAN: verify decomposition]
+  price_per_conversation: 2.00     # USD list price [HUMAN: verify, as of 2024-09 announcement]
+  assumed_invocations_per_conversation: 4   # modeling assumption [HUMAN: verify]
+  # Derived per-invocation flat price (price_per_conversation / assumed invocations).
+  # Agentforce does not bill by token publicly; token prices set to 0 and the
+  # flat per-invocation charge carries the cost. [HUMAN: verify]
+  price_per_1k_tokens_in: 0.0      # USD; not token-billed publicly [HUMAN: verify]
+  price_per_1k_tokens_out: 0.0     # USD; not token-billed publicly [HUMAN: verify]
+  price_per_invocation_flat: 0.50  # USD = 2.00 / 4 PLACEHOLDER [HUMAN: verify]
+  service_calls:
+    # Salesforce platform operations are bundled in org licensing; marginal
+    # per-call prices are PLACEHOLDERS for relative comparison only. [HUMAN: verify]
+    action: 0.0000010        # USD / invoked action (Apex/Flow)  PLACEHOLDER [HUMAN: verify]
+    event_bus: 0.0000010     # USD / platform event publish      PLACEHOLDER [HUMAN: verify]
+    memory: 0.0000005        # USD / session-context store op    PLACEHOLDER [HUMAN: verify]
+    omni_channel: 0.0000020  # USD / Omni-Channel routing op     PLACEHOLDER [HUMAN: verify]
+    guardrails: 0.0000010    # USD / trust-layer scan            PLACEHOLDER [HUMAN: verify]
