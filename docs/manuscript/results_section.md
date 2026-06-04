@@ -73,11 +73,23 @@ All percentile estimates carry 95% BCa bootstrap confidence intervals;
 pairwise pattern comparisons use Mann–Whitney U with rank-biserial and
 Hodges–Lehmann effect estimates under Holm correction over the 21-pair
 family per condition, per the pre-committed plan
-(docs/STATISTICAL_ANALYSIS_PLAN.md); Table 4's grades are computed
-from these comparisons by the documented grade function
-(docs/GRADES.md). An automated agreement gate
-(tests/test_paper_agreement.py) asserts that the executed results
-satisfy the paper's directional claims on every regeneration.
+(docs/STATISTICAL_ANALYSIS_PLAN.md). Table 4 — the fit-for-purpose
+matrix — is figures/fit_matrix.csv: one platform-independent grade in
+{Weak, Moderate, Strong} per (pattern, scenario), 21 cells, computed
+from these Holm-corrected comparisons under the PRE-REGISTERED rule of
+docs/FIT_RULE.md (stressed property per scenario, both-platform
+pooling, structural capability gate); 10 of the paper's 21 published
+cells reproduce, and the 11 that do not are recorded with measured
+rationale in docs/FIT_DISCREPANCIES.md rather than forced (trace:
+figures/fit_matrix.csv col fit_grade;
+tests/fixtures/fit_agreed_cells.json pins the 10 agreed cells). A
+richer per-platform four-dimensional quality view (A/B/C
+equivalence-group grades on latency, reliability, cost, oversight) is
+released as supplementary material
+(figures/table4_supplementary.csv, grade function in docs/GRADES.md);
+it is NOT the fit-for-purpose matrix. An automated agreement gate
+(tests/test_paper_agreement.py) asserts the paper's directional
+claims AND the 10 agreed Table-4 fit cells on every regeneration.
 
 ### C. Latency Results
 
@@ -102,8 +114,14 @@ highest of all patterns in every condition — e.g. 61,892.3 ms (CI
 56,249.6–81,530.8) on Agentforce/S1, against machine-path medians of
 1,628.1 ms and 1,997.9 ms respectively (trace: figures/table3.csv rows
 P6,bedrock,S1 and P6,agentforce,S1 cols p50_ms, p99_ms and CI cols).
-Oversight has a measured latency price; Table 4 records it as a C
-latency grade alongside the pattern's unique A oversight grade.
+Oversight has a measured latency price; the supplementary
+per-platform table (figures/table4_supplementary.csv) records it as a
+C latency grade alongside the pattern's unique A oversight grade,
+while Table 4 (figures/fit_matrix.csv) still grades P6 Strong for S3
+— its tail inflation under burst is the smallest measured (p99
+S3/S1 = 0.93 on Agentforce and 1.05 on Bedrock; trace: computed from
+figures/table3.csv rows P6,*,{S1,S3} col p99_ms, rounded to 0.01) and
+its selective human routing is the scenario's required capability.
 
 Third, event-driven choreography absorbs bursts: under the bursty S3
 scenario, P3's p99 inflation relative to its own S1 baseline is 1.03×
@@ -247,10 +265,15 @@ model any production deployment.
 *Statistical.* Error rates of 0.0 in baseline mode make reliability
 grades depend entirely on the fault campaign; with n = 40 per fault
 cell, per-cell proportions are coarse. The Holm-corrected pairwise
-family controls the latency comparisons of Table 4 but no correction
-spans the full 42-condition grid; Table 4's latency grades compare
-slowest-decile tail samples (docs/GRADES.md), a pre-committed but
-human-reviewable choice.
+family controls the comparisons behind Table 4's fit grades and the
+supplementary table's quality grades, but no correction spans the
+full 42-condition grid; the fit rule's stressed-property endpoints
+(per-request S1 latency/cost, S2 growth factors, S3 slowest-decile
+tail inflation; docs/FIT_RULE.md) and the supplementary table's
+slowest-decile tail samples (docs/GRADES.md) are pre-committed but
+human-reviewable choices, and 11 of 21 published fit cells did not
+reproduce under the pre-registered rule (docs/FIT_DISCREPANCIES.md,
+flagged for author adjudication).
 
 ---
 
