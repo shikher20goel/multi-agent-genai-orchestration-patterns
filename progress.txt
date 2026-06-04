@@ -59,3 +59,4 @@ TASK 055 done: demo.sh end-to-end (smoke study -> results_demo/, p99_ci.png -> f
 TASK 056 done: tests/test_demo.py runs demo.sh end-to-end (smoke outputs + figure + all-pattern summary asserted)
 TASK 057 implemented, awaiting human review
 TASK 058 implemented, awaiting human review
+TASK 059 implemented, awaiting human review
