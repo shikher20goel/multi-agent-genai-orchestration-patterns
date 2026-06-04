@@ -127,3 +127,17 @@ def test_run_condition_wrapper() -> None:
     assert load.offered_utilization < 1.0
     assert load.offered_rate_rps == pytest.approx(
         load.utilization_target * load.saturation_rate_rps)
+
+def test_conditions_use_independent_latency_streams() -> None:
+    """Task 103: two conditions' per-request latencies must differ —
+    the shared 'latency' stream coupling is gone (SAP Option A)."""
+    cfg = load_config()
+    s1, s2 = TelemetrySink(), TelemetrySink()
+    run_condition(PatternId.GATEWAY, Platform.BEDROCK, ScenarioId.S1,
+                  n=20, cfg=cfg, sink=s1)
+    run_condition(PatternId.GATEWAY, Platform.BEDROCK, ScenarioId.S2,
+                  n=20, cfg=cfg, sink=s2)
+    lat1 = [r.latency_ms for r in s1.latency]
+    lat2 = [r.latency_ms for r in s2.latency]
+    assert lat1 != lat2
+

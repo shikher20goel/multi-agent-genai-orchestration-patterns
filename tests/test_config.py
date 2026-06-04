@@ -35,3 +35,17 @@ def test_different_seed_different_draws() -> None:
     a = Config({"seed": 1}).get_rng("s").random(10)
     b = Config({"seed": 2}).get_rng("s").random(10)
     assert not np.array_equal(a, b)
+
+def test_condition_streams_are_independent() -> None:
+    """Task 103 (Option A): different conditions draw from different
+    child streams — no common-random-numbers coupling. Same condition
+    name still reproduces exactly (determinism)."""
+    cfg = load_config()
+    a = cfg.get_rng("loadgen:P1:bedrock:S1:baseline:latency").random(64)
+    b = cfg.get_rng("loadgen:P1:bedrock:S2:baseline:latency").random(64)
+    c = cfg.get_rng("loadgen:P2:bedrock:S1:baseline:latency").random(64)
+    a2 = cfg.get_rng("loadgen:P1:bedrock:S1:baseline:latency").random(64)
+    assert (a == a2).all()
+    assert not (a == b).all()
+    assert not (a == c).all()
+    assert not (b == c).all()
