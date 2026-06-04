@@ -1,2 +1,3 @@
 Session start. No tasks complete yet.
 TASK 001 done: pyproject (setuptools src layout, extras dev), .gitignore (results/, figures/), agentorch.__version__
+TASK 002 done: tests/test_smoke.py, pytest -q green (1 test)

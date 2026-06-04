@@ -21,7 +21,7 @@
       ],
       "verify": "`pytest -q` passes with >=1 test.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "003",
