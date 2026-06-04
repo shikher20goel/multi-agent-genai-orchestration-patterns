@@ -158,9 +158,21 @@ rows, rounded to 4 decimals). The human reviewer's time in P6 is NOT billed as p
 cost; it is an out-of-scope operational cost (noted in
 configs/costs.yaml) and appears only as latency. Per-scenario
 cost-per-request values appear in Table 3's cost_per_request column
-(trace: figures/table3.csv col cost_per_request).
+(trace: figures/table3.csv col cost_per_request). Sensitivity caveat:
+the absolute Agentforce-versus-Bedrock cost gap (about two orders of
+magnitude) is dominated by the $2/conversation Agentforce pricing
+assumption (configs/costs.yaml, dated), not by topology; only the
+WITHIN-platform pattern ordering is robust to that assumption
+[HUMAN: confirm].
 
 ### E. Fault-Isolation Results
+
+Because the model backend sits on every pattern's critical path, a
+hard model_backend fault propagates across most patterns; the
+fault-isolation DIFFERENTIATION among patterns is carried by the
+orchestration-specific components (event_bus, gateway/tool,
+memory_store, human_queue, bridge), and the matrix should be read
+column-wise with that in mind (the figure caption states the same).
 
 Fig. fault_matrix.png classifies each of the 336 campaign cells as
 PROPAGATED (failures spread to requests that never traversed the

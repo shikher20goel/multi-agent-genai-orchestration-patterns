@@ -53,7 +53,8 @@ def make_cost_per_1k(ledger: pd.DataFrame, out_path: Path) -> None:
     ax.set_xticks(range(len(PATTERN_ORDER)))
     ax.set_xticklabels(PATTERN_ORDER)
     ax.set_xlabel("pattern")
-    ax.set_ylabel("cost units / 1k requests\n(USD, configs/costs.yaml assumptions)")
+    # Task 205: exactly ONE unit on the axis -- no "cost units"/"USD" mix.
+    ax.set_ylabel("USD per 1k requests\n(configs/costs.yaml assumptions, dated)")
     ax.set_yscale("log")
     ax.grid(True, axis="y", which="both", alpha=0.25, linewidth=0.4)
     ax.legend(frameon=False)
@@ -77,6 +78,9 @@ def main(argv: list[str] | None = None) -> int:
     ledger = aggregate_ledger(cost)
     make_cost_per_1k(ledger, out / "cost_per_1k.png")
     print(f"wrote {out / 'cost_per_1k.png'} and {out / 'cost_ledger.csv'}")
+    print("note: the Agentforce-vs-Bedrock cost gap is dominated by the "
+          "$2/conversation Agentforce assumption (configs/costs.yaml) "
+          "[HUMAN: confirm]")
     return 0
 
 
