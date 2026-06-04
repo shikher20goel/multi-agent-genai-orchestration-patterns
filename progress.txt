@@ -39,3 +39,4 @@ FULL STUDY RUN: n=500 per baseline condition (42 conds), fault campaign 40 req/c
 TASK 037 implemented, awaiting human review
 TASK 038 implemented, awaiting human review
 TASK 039 implemented, awaiting human review
+TASK 040 implemented, awaiting human review
