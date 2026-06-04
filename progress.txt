@@ -73,3 +73,4 @@ TASK 103 done: independent child RNG streams per (pattern,platform,scenario,mode
 TASK 104 done: fault campaign with outage windows + structural units + PROPAGATED/ISOLATED/ABSORBED/NOT_EXERCISED matching paper Table 3 (P1/P4 SPOF, P2 chain propagation, P3 bus absorbed, P5 bulkhead isolated, P7 remote-cluster isolated, P6 human_queue absorbed w/ correctness isolation); tests/test_paper_agreement.py (10 tests, six spec claims) green
 TASK 105 implemented, awaiting human review
 TASK 106 implemented, awaiting human review
+TASK 107 implemented, awaiting human review

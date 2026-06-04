@@ -41,7 +41,9 @@ All 21 HUMAN-gated tasks are implemented, tested, committed on `autonomous-build
 - **What:** `docs/COMPARISON_TABLE.md` — 10 related works extracted from the paper's Related Work ([1],[5],[8],[9],[14],[45],[46],[52],[60]...) vs this paper across artifact/eval/stats/cross-platform/governance columns. Citations marked [HUMAN: verify].
 - **Decision needed:** verify the 10 selections + each cell's claim about the cited work.
 
-## Batch 9 — Manuscript drafts (tasks 058–060)
+## Batch 9 — Manuscript drafts (tasks 058–060; plus Phase 2 task 107 AI-use disclosure)
+**Phase 2 task 107:** `docs/manuscript/ai_use_disclosure.md` — accurate disclosure that a Claude-based agentic AI pipeline generated the reference implementations, the evaluation rig, the executed study, the figures/tables, and drafted manuscript sections, with the author specifying the design, verifying everything, and taking full responsibility. Decision needed: verify current IEEE AI-disclosure wording/placement and approve the statement.
+
 - **What:** `docs/manuscript/results_section.md` (every number carries an inline trace to figures/ or results/), `abstract_scope_reframe.md` (original abstract quoted verbatim, revision + 8-item change list, [USER: INSERT GITHUB URL]/[USER: INSERT DOI] slots), `governance_section.md`, `rebuttal_prep.md` (7 objections with grounded responses).
 - **Decision needed:** approve each draft; paste final GitHub URL + DOI into the marked slots yourself. No real URL/DOI was inserted anywhere.
 
