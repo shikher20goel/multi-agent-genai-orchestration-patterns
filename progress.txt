@@ -43,3 +43,4 @@ TASK 040 implemented, awaiting human review
 TASK 041 implemented, awaiting human review
 TASK 042 done: study/decision_tree.py renders figures/decision_tree.png from REGISTRY meta(); all 7 leaves reachable
 TASK 043 implemented, awaiting human review
+Segment 2 complete: tasks 027-043 (6 AUTO pass, 11 HUMAN implemented+flagged); 176 tests, ruff clean; full study n=500/cond seed=42 wall ~2.7s
