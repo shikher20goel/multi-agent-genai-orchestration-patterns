@@ -58,3 +58,4 @@ TASK 054 implemented, awaiting human review (LICENSE: full Apache-2.0 text, copy
 TASK 055 done: demo.sh end-to-end (smoke study -> results_demo/, p99_ci.png -> figures_demo/, printed per-pattern summary table) in ~7s, exit 0
 TASK 056 done: tests/test_demo.py runs demo.sh end-to-end (smoke outputs + figure + all-pattern summary asserted)
 TASK 057 implemented, awaiting human review
+TASK 058 implemented, awaiting human review
