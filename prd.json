@@ -601,7 +601,7 @@
    ],
    "verify": "`bash run.sh` exits 0 and figures/ contains table3.csv, table4.csv, and all PNGs.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "052",
