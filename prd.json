@@ -267,7 +267,7 @@
       ],
       "verify": "`pytest tests/test_registry.py` passes for all 7 patterns.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "024",
