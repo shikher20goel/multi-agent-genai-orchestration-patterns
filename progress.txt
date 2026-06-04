@@ -17,3 +17,4 @@ TASK 015 done: patterns/base.py Pattern ABC (meta 9 keys, run->(WorkResult, serv
 TASK 016 done: P1 SupervisorPattern (Bedrock invoke_agent fan-out; Agentforce topic actions), both platforms tested
 TASK 017 done: P2 PipelinePattern (Bedrock session chain; Agentforce Agent Script), both platforms tested
 TASK 018 done: P3 ChoreographyPattern (Bedrock bus+observability; Agentforce platform events chain), both platforms tested
+TASK 019 done: P4 BlackboardPattern (AgentCore memory; Agentforce session store), both platforms tested

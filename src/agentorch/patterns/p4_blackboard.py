@@ -1,0 +1,98 @@
+"""P4 Shared-Memory Blackboard (task 019).
+
+Specialists iteratively read/write a shared memory; a controller decides
+when the solution is complete. Bedrock instantiation: AgentCore memory
+as the blackboard. Agentforce instantiation: session context store via
+memory-equivalent boundary calls (modeled with the memory service).
+"""
+from __future__ import annotations
+
+from typing import Any
+
+from agentorch.clients.agentforce import AgentforceClientError
+from agentorch.clients.bedrock import BedrockClientError
+from agentorch.domain import WorkItem, WorkResult
+from agentorch.patterns.base import Pattern
+from agentorch.types import Component, Platform
+
+
+class BlackboardPattern(Pattern):
+    pattern_name = "P4 Shared-Memory Blackboard"
+
+    @classmethod
+    def meta(cls) -> dict[str, Any]:
+        return {
+            "name": cls.pattern_name,
+            "intent": "Let specialists contribute partial solutions to a shared "
+                      "memory until a complete answer emerges.",
+            "context": "Ill-structured problems where contribution order is not "
+                       "fixed and partial results inform later steps.",
+            "problem": "Pipelines force a fixed order; supervisors must know the "
+                       "full decomposition up front.",
+            "forces": ["opportunistic contribution vs convergence guarantees",
+                       "shared state vs contention/consistency",
+                       "memory store availability is critical"],
+            "solution": "A blackboard (shared memory) plus N specialists that read "
+                        "current state and append contributions; a controller "
+                        "checks completion.",
+            "platform_instantiations": {
+                "bedrock": "AgentCore memory_get/memory_put as the blackboard; "
+                           "specialists are Bedrock agents.",
+                "agentforce": "Session context store ops as the blackboard; "
+                              "specialists are topic actions.",
+            },
+            "consequences": ["+ flexible, order-free collaboration",
+                             "- memory store is a single shared dependency",
+                             "- convergence must be bounded explicitly"],
+            "governance_hooks": ["versioned blackboard writes for audit",
+                                 "controller-level completion policy"],
+        }
+
+    def _execute(self, item: WorkItem) -> WorkResult:
+        n = int(self.cfg.patterns.p4.n_specialists)
+        try:
+            if self.bedrock is not None:
+                return self._execute_bedrock(item, n)
+            return self._execute_agentforce(item, n)
+        except (BedrockClientError, AgentforceClientError) as exc:
+            status = "timeout" if "timeout" in str(exc) else "error"
+            return WorkResult(item_id=item.id, status=status, error=str(exc))
+
+    def _execute_bedrock(self, item: WorkItem, n: int) -> WorkResult:
+        assert self.bedrock is not None and self.agentcore is not None
+        key = f"bb-{item.id}"
+        self.agentcore.memory_put(key, [])
+        session = f"sess-{item.id}"
+        for i in range(n):
+            board = self.agentcore.memory_get(key)
+            resp = self.bedrock.invoke_agent(
+                f"specialist-{i}", "prod", session,
+                f"contribute given {len(board)} prior entries")
+            board = list(board) + [resp["completion"]]
+            self.agentcore.memory_put(key, board)
+        final = self.agentcore.memory_get(key)
+        complete = len(final) == n
+        return WorkResult(item_id=item.id, status="ok" if complete else "error",
+                          payload={"contributions": len(final)},
+                          error=None if complete else "blackboard incomplete")
+
+    def _execute_agentforce(self, item: WorkItem, n: int) -> WorkResult:
+        assert self.agentforce is not None
+        af = self.agentforce
+        board: list[str] = []
+
+        def specialist(args: dict[str, Any]) -> dict[str, Any]:
+            board.append(f"contribution-{len(board)}")
+            return {"board_size": len(board)}
+
+        af.register_action("contribute", specialist)
+        af.register_topic("blackboard_work", ["contribute"])
+        for _ in range(n):
+            # Each contribution: a memory read/write boundary op + topic dispatch.
+            self.ctx.boundary_call(Platform.AGENTFORCE, "memory", Component.MEMORY_STORE)
+            self.ctx.service_calls += 1
+            af.send("blackboard_work", {"item": item.id})
+        complete = len(board) == n
+        return WorkResult(item_id=item.id, status="ok" if complete else "error",
+                          payload={"contributions": len(board)},
+                          error=None if complete else "blackboard incomplete")
