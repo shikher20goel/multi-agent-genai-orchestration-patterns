@@ -123,7 +123,7 @@
       ],
       "verify": "`pytest tests/test_agentcore_mock.py` passes; gateway adds one hop; guardrails shadow mode logs but does not block.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "012",
