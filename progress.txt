@@ -47,3 +47,4 @@ Segment 2 complete: tasks 027-043 (6 AUTO pass, 11 HUMAN implemented+flagged); 1
 TASK 044 done: governance/hitl_example.py confidence gate -> human stub -> hash-chained AuditLog (verify_chain, immutable entries, halt stops chain); 9 tests
 TASK 045 implemented, awaiting human review
 TASK 046 implemented, awaiting human review
+TASK 047 implemented, awaiting human review
