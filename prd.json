@@ -65,7 +65,7 @@
       ],
       "verify": "`pytest tests/test_agent.py` passes.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "007",
