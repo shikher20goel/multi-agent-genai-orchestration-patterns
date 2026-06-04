@@ -875,7 +875,7 @@
    ],
    "verify": "See PHASE2_SPEC.md task 111. Agreement gate: pytest tests/test_paper_agreement.py",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   }
  ],
  "phase2_completion_promise": "PAPER_VALIDITY_COMPLETE"
