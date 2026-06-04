@@ -423,7 +423,7 @@
    ],
    "verify": "`python -m agentorch.study.run_study --smoke` runs a reduced study to completion and writes results.",
    "gate": "AUTO",
-   "passes": false
+   "passes": true
   },
   {
    "id": "037",

@@ -70,5 +70,5 @@ stats:
 study:
   rate_rps: 2.0
   concurrency: 4
-  n_items: 200
+  n_items: 500
   smoke_n_items: 20

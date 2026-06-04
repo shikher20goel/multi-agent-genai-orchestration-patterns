@@ -34,3 +34,4 @@ TASK 032 implemented, awaiting human review
 TASK 033 implemented, awaiting human review
 TASK 034 implemented, awaiting human review
 TASK 035 implemented, awaiting human review
+TASK 036 done: study/run_study.py 42-condition baseline + 336-cell fault campaign + cost capture; smoke writes latency/cost/faults/manifest; n_items raised to 500
