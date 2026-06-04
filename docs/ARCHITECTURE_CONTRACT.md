@@ -1,0 +1,33 @@
+# Architecture contract (binding for all build iterations)
+
+Package `agentorch` lives under `src/agentorch/`. Python >=3.10 compatible (no 3.11-only syntax). All public functions type-hinted. `ruff check src tests` must stay clean. All tunables in `configs/*.yaml`; no magic numbers in code.
+
+## Modules and key interfaces
+- `config.py`: `load_config(path|None) -> Config` (dataclass wrapping dict, attribute access); `Config.get_rng(name: str) -> np.random.Generator` derives a child seed from master seed + name (deterministic, independent streams). Master seed in `configs/default.yaml`.
+- `types.py`: `PatternId` enum P1..P7 (SUPERVISOR, PIPELINE, CHOREOGRAPHY, BLACKBOARD, GATEWAY, HITL, BRIDGE); `ScenarioId` S1,S2,S3; `Platform` AGENTFORCE,BEDROCK; `Mode` BASELINE,FAULT; `FaultType` TIMEOUT,ERROR,THROTTLE,OUTAGE; `Component` MODEL_BACKEND,GATEWAY,TOOL,EVENT_BUS,MEMORY_STORE,HUMAN_QUEUE.
+- `domain.py`: `Agent(id, role)`; `WorkItem(id, scenario, payload, created_at)`; `WorkResult(item_id, status, payload, error)` with status in {"ok","error","timeout"}.
+- `telemetry.py`: `LatencyRecord(request_id, pattern, scenario, platform, mode, submit_ts, complete_ts, fault, success)` + property `latency_ms = (complete_ts - submit_ts)*1000`; `CostRecord(request_id, pattern, platform, model_invocations, tokens_in, tokens_out, service_calls, cost_units)`; `FaultRecord(component, fault, contained, requests_affected)`; `TelemetrySink` collects all three, `to_dataframe()` per kind, `write(dir)` / `read(dir)` as parquet-free CSV.
+- `latency.py`: `LatencyModel(cfg, rng)`; `.sample(platform, service) -> float seconds` lognormal w/ per-platform/service mu/sigma from `configs/default.yaml` (`latency:` section). p99>p50 guaranteed by distribution.
+- `faults.py`: `FaultInjector`; `.arm(component, fault_type, probability)`, `.disarm(...)`, `.check(component) -> FaultType|None` using its own rng. Mocks call `.check()` at the boundary before serving.
+- `cost.py`: `CostModel(cfg)`; `.invocation_cost(platform, tokens_in, tokens_out) -> float`; `.service_call_cost(platform, service) -> float`; unit prices ONLY from `configs/costs.yaml` (HUMAN-gated assumptions, sources/dates in YAML comments).
+- `clients/bedrock.py`: `MockBedrockAgentRuntime.invoke_agent(agentId, agentAliasId, sessionId, inputText) -> dict` ({"completion":..., "sessionId":..., "usage":{"inputTokens","outputTokens"}}); `MockAgentCore.invoke_agent_runtime(agentRuntimeArn, runtimeSessionId, payload, qualifier="DEFAULT")`; AgentCore services: `gateway_call(tool, args)` (adds one extra latency hop), `memory_get/put`, `identity_check`, `observability_emit`; `MockGuardrails.apply(text, mode="shadow"|"block")` shadow logs but never blocks. Every entry point: fault check -> latency sample -> cost record via shared `CallContext` (sink, latency_model, fault_injector, cost_model, clock).
+- `clients/agentforce.py`: `MockAgentforceClient.start_session(...)`, `.send(topic, message)` routes topic->actions; `.run_agent_script(script: list[dict])` sequential action chaining; `.publish_event(event_type, payload)` -> subscribers; `OmniChannel.handoff(item, queue)` routes to human queue, falls back to default queue when target empty/absent.
+- `clock.py`: `VirtualClock` (monotonic float seconds, `.advance(dt)`, `.now()`). ALL timing is virtual; nothing sleeps.
+- `patterns/base.py`: `Pattern` ABC: `meta() -> dict` with EXACTLY the 9 keys: name, intent, context, problem, forces, solution, platform_instantiations, consequences, governance_hooks; `run(item: WorkItem) -> WorkResult`; constructor `(platform, ctx: CallContext, cfg)`. Service-time accounting: each client call advances a per-request elapsed accumulator; pattern returns (`WorkResult`, `service_time_s`).
+- `patterns/registry.py`: `REGISTRY: dict[PatternId, type[Pattern]]`; `build(pattern_id, platform, ctx, cfg) -> Pattern`.
+- `scenarios/`: `generate(scenario_id, n, rng, cfg) -> list[WorkItem]`; S3 has configurable `burst_factor`.
+- `rig/loadgen.py`: Algorithm 1, OPEN-LOOP: Poisson arrivals at `rate_rps`; `submit_ts` from the arrival schedule (never from completion — coordinated-omission correct); concurrency-`c` server pool per condition: `start = max(submit, earliest_free_server)`, `complete = start + service_time`; emits LatencyRecord per item. Keeps issuing during stalls (queue grows).
+- `rig/saturation.py`: Little's law headroom `L = lambda * W`; `find_saturation(pattern, platform, scenario, rates) -> max sustainable rate` (utilization<1 criterion).
+- `rig/faultcampaign.py`: Algorithm 2: for each (component, fault_type) in campaign config: run window with injector armed, classify `contained` (failures confined to requests traversing the faulted component; success rate of non-traversing requests >= threshold) vs propagated; emits FaultRecord.
+- `rig/costcapture.py`: aggregates CostRecords per pattern/platform -> per-request mean cost units + ledger CSV.
+- `stats/percentiles.py`: `percentiles(x, ps=(50,95,99,99.9))`.
+- `stats/bootstrap.py`: `bca_ci(x, stat_fn, alpha=0.05, n_resamples from cfg, rng) -> (lo, hi)` using `scipy.stats.bootstrap(method='BCa')`.
+- `stats/compare.py`: `compare(x, y) -> CompareResult(u, p, rank_biserial, hodges_lehmann)`.
+- `stats/correction.py`: `holm(pvals: list) -> rejected flags + adjusted p` (statsmodels `multipletests(method='holm')`); family = the 21 pairwise pattern comparisons per (platform, scenario) condition.
+- `study/run_study.py`: `python -m agentorch.study.run_study [--smoke] [--out results/]` runs all 7x2x3 baseline conditions + fault campaign + cost capture; writes `results/latency.csv`, `results/cost.csv`, `results/faults.csv`, `results/manifest.json` (config hash, seed, n).
+- `study/make_table3.py` / `make_table4.py`: read `results/`, write `figures/table3.csv`, `figures/table4.csv`.
+- `study/figures_latency.py` (ccdf.png, p99_ci.png), `figures_cost.py` (cost_per_1k.png + cost_ledger.csv), `figures_fault.py` (fault_matrix.png), `decision_tree.py` (decision_tree.png). All matplotlib Agg, read ONLY from results/.
+- `governance/hitl_example.py`: runnable; confidence gate -> human stub decision -> hash-chained append-only `AuditLog` (entries immutable; `verify_chain()`); `halt()` stops the chain.
+
+## Test files map 1:1 to prd.json task done-checks (tests/test_config.py etc.).
+## Loop rules recap: AUTO task -> implement, run done-check, set passes:true in prd.json, `git commit` (one per task), one line in progress.txt. HUMAN task -> implement fully + tests, do NOT set passes, append "TASK <id> implemented, awaiting human review". Never network. Never real cloud SDKs.
