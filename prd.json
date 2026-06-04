@@ -193,7 +193,7 @@
       ],
       "verify": "`pytest tests/test_p2.py` passes both platforms.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "018",
