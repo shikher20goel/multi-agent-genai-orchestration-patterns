@@ -17,8 +17,9 @@ No network access and no cloud credentials are needed or used: all
 platform behavior is mocked locally and every run is seeded and
 deterministic (same seed → identical output).
 
-Repository: [USER: INSERT GITHUB URL] · Archived artifact DOI:
-[USER: INSERT DOI]
+Repository: https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns ·
+Archived artifact DOI: minted at the tagged release (see the Releases page
+and the badge below once the Zenodo deposit is live).
 
 ## Requirements
 
@@ -137,4 +138,5 @@ Goel. (License choice pending final human confirmation; see
 `progress.txt`.)
 
 If you use this artifact, please cite the paper via `CITATION.cff`
-(preferred-citation; DOI slot: [USER: INSERT DOI]).
+(preferred-citation; the archived-artifact DOI is minted at the tagged
+release and recorded there).
