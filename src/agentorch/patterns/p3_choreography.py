@@ -12,12 +12,16 @@ from typing import Any
 from agentorch.clients.agentforce import AgentforceClientError
 from agentorch.clients.bedrock import BedrockClientError
 from agentorch.domain import WorkItem, WorkResult
-from agentorch.patterns.base import Pattern
+from agentorch.patterns.base import Pattern, work_steps
+from agentorch.types import Component, Platform
 
 EVENT_CHAIN = ("item_received", "item_enriched", "item_resolved")
 
 
 class ChoreographyPattern(Pattern):
+    # Task 201: durable bus + decoupled consumer pool buffer arrival
+    # bursts ahead of processing (docs/FIT_RULE.md).
+    CAPABILITIES = {"event_absorption": True}
     pattern_name = "P3 Event-Driven Choreography"
 
     @classmethod
@@ -61,9 +65,15 @@ class ChoreographyPattern(Pattern):
         assert self.bedrock is not None and self.agentcore is not None
         session = f"sess-{item.id}"
         hops = []
+        steps = work_steps(item)
         for event in EVENT_CHAIN:
+            # The enrichment hop processes the item's full multi-step
+            # content in one batched reaction (task 105): its token
+            # volume scales with the step count.
+            self.ctx.content_scale = steps if event == "item_enriched" else 1.0
             resp = self.bedrock.invoke_agent(f"agent-{event}", "prod", session,
                                              f"react to {event}")
+            self.ctx.content_scale = 1.0
             self.agentcore.observability_emit({"event": event, "item": item.id})
             hops.append(resp["completion"])
         return WorkResult(item_id=item.id, status="ok",
@@ -82,7 +92,34 @@ class ChoreographyPattern(Pattern):
 
         def make_handler(idx: int):
             def handler(payload: dict[str, Any]) -> None:
-                self._request_log.append(EVENT_CHAIN[idx])
+                # Each subscriber is a model-backed agent: reacting to an
+                # event costs one model reasoning step (task 101 parity
+                # with the Bedrock instantiation).
+                event = EVENT_CHAIN[idx]
+                steps = int(payload.get("steps", 1))
+                # The enrichment handler batches the item's steps into one
+                # reaction (token volume scales) and persists each step's
+                # enrichment via one platform action (Flex-credit billed,
+                # task 105).
+                self.ctx.content_scale = steps if event == "item_enriched" else 1.0
+                outcome = self.ctx.boundary_call(
+                    Platform.AGENTFORCE, "model_invoke", Component.MODEL_BACKEND)
+                if not outcome.success:
+                    self.ctx.content_scale = 1.0
+                    raise AgentforceClientError(
+                        f"choreography handler failed: "
+                        f"{outcome.fault.value if outcome.fault else 'unknown'}",
+                        outcome)
+                tokens_cfg = self.ctx.cfg.tokens
+                scale = max(1.0, float(self.ctx.content_scale))
+                self.ctx.model_invocations += 1
+                self.ctx.tokens_in += int(int(tokens_cfg.input_mean) * scale)
+                self.ctx.tokens_out += int(int(tokens_cfg.output_mean) * scale)
+                self.ctx.content_scale = 1.0
+                if event == "item_enriched":
+                    af.run_agent_script(
+                        [{"action": f"enrich_step_{j}"} for j in range(steps)])
+                self._request_log.append(event)
                 if idx + 1 < len(EVENT_CHAIN):
                     af.publish_event(EVENT_CHAIN[idx + 1], payload)
             return handler
@@ -97,7 +134,11 @@ class ChoreographyPattern(Pattern):
         self._request_log: list[str] = []
         log = self._request_log
         self._ensure_subscribed()
-        af.publish_event(EVENT_CHAIN[0], {"item": item.id})
+        steps = work_steps(item)
+        for j in range(steps):
+            af.register_action(f"enrich_step_{j}",
+                               lambda args, j=j: {"enriched_step": j})
+        af.publish_event(EVENT_CHAIN[0], {"item": item.id, "steps": steps})
         ok = log == list(EVENT_CHAIN)
         return WorkResult(item_id=item.id, status="ok" if ok else "error",
                           payload={"events": log, "hops": len(log)},

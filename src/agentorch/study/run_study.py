@@ -57,11 +57,25 @@ def run_study(cfg: Config, out_dir: str | Path, smoke: bool = False) -> dict:
 
     sink = TelemetrySink()
     n_conditions = 0
+    condition_loads: dict[str, dict] = {}
     for pattern_id in PatternId:
         for platform in Platform:
             for scenario in ScenarioId:
-                run_condition(pattern_id, platform, scenario, n=n,
-                              cfg=cfg, sink=sink)
+                stats, load = run_condition(pattern_id, platform, scenario,
+                                            n=n, cfg=cfg, sink=sink)
+                key = f"{pattern_id.value}:{platform.value}:{scenario.value}"
+                # Task 102: per-condition saturation check in the manifest.
+                condition_loads[key] = {
+                    "mean_service_s": round(load.mean_service_s, 6),
+                    "saturation_rate_rps": round(load.saturation_rate_rps, 6),
+                    "utilization_target": load.utilization_target,
+                    "offered_rate_rps": round(load.offered_rate_rps, 6),
+                    "offered_utilization": round(load.offered_utilization, 6),
+                    "little_l_per_server": round(
+                        load.measured_little_l_per_server, 6),
+                    "effective_concurrency": load.effective_concurrency,
+                    "max_queue_depth": stats.max_queue_depth,
+                }
                 n_conditions += 1
 
     fault_rows: list[dict] = []
@@ -76,12 +90,16 @@ def run_study(cfg: Config, out_dir: str | Path, smoke: bool = False) -> dict:
                     "scenario": FAULT_SCENARIO.value,
                     "component": o.component.value,
                     "fault": o.fault.value,
+                    "classification": o.classification,
                     "contained": o.contained,
                     "requests_affected": o.requests_affected,
                     "n_traversing": o.n_traversing,
                     "n_non_traversing": o.n_non_traversing,
                     "non_traversing_success_rate": o.non_traversing_success_rate,
                     "traversing_success_rate": o.traversing_success_rate,
+                    "traversing_degraded_rate": o.traversing_degraded_rate,
+                    "baseline_mean_latency_s": o.baseline_mean_latency_s,
+                    "fault_mean_latency_s": o.fault_mean_latency_s,
                 })
 
     sink.to_dataframe("latency").to_csv(out / "latency.csv", index=False)
@@ -96,6 +114,8 @@ def run_study(cfg: Config, out_dir: str | Path, smoke: bool = False) -> dict:
         "fault_campaign_n_per_cell": campaign_n,
         "fault_campaign_cells": len(fault_rows),
         "fault_campaign_scenario": FAULT_SCENARIO.value,
+        "utilization_target": float(cfg.load.utilization_target),
+        "conditions": condition_loads,
         "smoke": smoke,
         "git_rev": _git_rev(),
         "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

@@ -26,7 +26,12 @@ mkdir -p results figures
 
 echo "== [3/4] Regenerate tables -> figures/ =="
 "$PYTHON" -m agentorch.study.make_table3 --results results/ --out figures/table3.csv
-"$PYTHON" -m agentorch.study.make_table4 --results results/ --out figures/table4.csv
+"$PYTHON" -m agentorch.study.make_table4 --results results/ --out figures/table4_supplementary.csv
+# fit_matrix.csv = the paper's Table 4 (pre-registered rule, docs/FIT_RULE.md).
+# NOTE: the agreed-cell fixture (tests/fixtures/fit_agreed_cells.json) is
+# COMMITTED, generated once by task 203 via --emit-agreed; run.sh does not
+# regenerate it, so the agreement gate stays stable and explicit.
+"$PYTHON" -m agentorch.study.make_fit_matrix --results results/ --out figures/fit_matrix.csv
 
 echo "== [4/4] Regenerate figures -> figures/ =="
 "$PYTHON" -m agentorch.study.figures_latency --results results/ --out figures/
@@ -37,7 +42,7 @@ echo "== [4/4] Regenerate figures -> figures/ =="
 echo "== Outputs =="
 ls -1 results/ figures/
 
-for f in figures/table3.csv figures/table4.csv figures/ccdf.png figures/p99_ci.png \
+for f in figures/table3.csv figures/fit_matrix.csv figures/table4_supplementary.csv figures/ccdf.png figures/p99_ci.png \
          figures/cost_per_1k.png figures/cost_ledger.csv figures/fault_matrix.png \
          figures/decision_tree.png results/manifest.json; do
     [ -f "$f" ] || { echo "MISSING expected output: $f" >&2; exit 1; }

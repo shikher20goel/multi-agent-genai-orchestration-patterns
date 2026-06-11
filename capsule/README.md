@@ -21,6 +21,8 @@ Publishing this capsule (creating the Code Ocean capsule, uploading to
 Zenodo, minting a DOI, inserting the resulting URL/DOI into the
 manuscript and `CITATION.cff`) is **explicitly left to the human
 author** per project policy (`CLAUDE.md`, "Forbidden autonomous
-actions"). Nothing in this repository has been published; the
-placeholders `[USER: INSERT GITHUB URL]` and `[USER: INSERT DOI]` mark
-every location the human must fill after publication.
+actions"). The repository is public at
+https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns;
+the archived-artifact DOI is minted at the tagged GitHub release via
+Zenodo and is recorded in the manuscript's Data Availability statement
+once live.

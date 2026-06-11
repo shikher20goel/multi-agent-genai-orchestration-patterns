@@ -61,7 +61,15 @@ def make_fault_matrix(faults: pd.DataFrame, out_path: Path) -> None:
                 row = sub[(sub["pattern"] == pattern)
                           & (sub["component"] == component)
                           & (sub["fault"] == fault)]
-                if row.empty or int(row.iloc[0]["n_traversing"]) == 0:
+                if row.empty:
+                    grid[i, j] = 0
+                elif "classification" in row.columns:
+                    # Task 104: the campaign emits an explicit
+                    # PROPAGATED/ISOLATED/ABSORBED/NOT_EXERCISED class.
+                    grid[i, j] = {"not_exercised": 0, "propagated": 1,
+                                  "isolated": 2, "absorbed": 3}[
+                        str(row.iloc[0]["classification"])]
+                elif int(row.iloc[0]["n_traversing"]) == 0:
                     grid[i, j] = 0
                 elif not bool(row.iloc[0]["contained"]):
                     grid[i, j] = 1
@@ -85,6 +93,15 @@ def make_fault_matrix(faults: pd.DataFrame, out_path: Path) -> None:
               Patch(facecolor="#d62728", label="propagated"),
               Patch(facecolor="#d9d9d9", label="not exercised")]
     fig.legend(handles=legend, loc="upper right", frameon=False, fontsize=8)
+    # Task 205: model_backend is a shared critical-path dependency of
+    # EVERY pattern, so a hard model_backend fault propagates across
+    # most patterns; fault-isolation DIFFERENTIATION is carried by the
+    # orchestration-specific components.
+    fig.suptitle("model_backend is on every pattern's critical path "
+                 "(hard faults propagate broadly);\n"
+                 "isolation differentiation is carried by event_bus, "
+                 "gateway/tool, memory_store, human_queue, bridge",
+                 fontsize=7, y=0.995)
     fig.tight_layout()
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)

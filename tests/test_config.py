@@ -12,7 +12,8 @@ def test_load_default_config() -> None:
 
 def test_attribute_access_nested() -> None:
     cfg = load_config()
-    assert cfg.latency.bedrock.model_invoke.mu < 0
+    # Task 101 recalibration: a model step's p50 is ~1.1 s (mu ~ 0.1).
+    assert -1.0 < cfg.latency.bedrock.model_invoke.mu < 1.0
 
 
 def test_same_seed_identical_draws() -> None:
@@ -34,3 +35,17 @@ def test_different_seed_different_draws() -> None:
     a = Config({"seed": 1}).get_rng("s").random(10)
     b = Config({"seed": 2}).get_rng("s").random(10)
     assert not np.array_equal(a, b)
+
+def test_condition_streams_are_independent() -> None:
+    """Task 103 (Option A): different conditions draw from different
+    child streams — no common-random-numbers coupling. Same condition
+    name still reproduces exactly (determinism)."""
+    cfg = load_config()
+    a = cfg.get_rng("loadgen:P1:bedrock:S1:baseline:latency").random(64)
+    b = cfg.get_rng("loadgen:P1:bedrock:S2:baseline:latency").random(64)
+    c = cfg.get_rng("loadgen:P2:bedrock:S1:baseline:latency").random(64)
+    a2 = cfg.get_rng("loadgen:P1:bedrock:S1:baseline:latency").random(64)
+    assert (a == a2).all()
+    assert not (a == b).all()
+    assert not (a == c).all()
+    assert not (b == c).all()

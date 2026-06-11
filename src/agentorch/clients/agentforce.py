@@ -21,6 +21,24 @@ class AgentforceClientError(RuntimeError):
         self.outcome = outcome
 
 
+def _buffered_redelivery(ctx: CallContext, outcome: CallOutcome,
+                         platform: Platform, service: str) -> CallOutcome:
+    """Durable-bus semantics (task 104): an event published into a bus
+    OUTAGE window is buffered and redelivered when the window ends —
+    the request succeeds with elevated latency (absorbed), it does not
+    fail. Non-window faults keep their original outcome."""
+    from agentorch.types import FaultType
+    if outcome.fault is not FaultType.OUTAGE:
+        return outcome
+    window_end = ctx.fault_injector.window_end(Component.EVENT_BUS)
+    if window_end is None:
+        return outcome
+    wait = max(0.0, window_end - ctx.sim_now)
+    ctx.add_delay(wait)
+    retry = ctx.boundary_call(platform, service, Component.EVENT_BUS)
+    return retry
+
+
 class MockAgentforceClient:
     """Topics -> actions routing, Agent Script chaining, platform events."""
 
@@ -49,7 +67,10 @@ class MockAgentforceClient:
     # -- core invocation paths --------------------------------------------
     def _run_action(self, action: str, args: dict[str, Any]) -> dict[str, Any]:
         ctx = self._ctx
-        outcome = ctx.boundary_call(Platform.AGENTFORCE, "action", Component.TOOL)
+        # Per-action unit label so a single action's fault can be injected
+        # (P5 bulkhead containment, task 104).
+        outcome = ctx.boundary_call(Platform.AGENTFORCE, "action", Component.TOOL,
+                                    unit=action)
         if not outcome.success:
             raise AgentforceClientError(
                 f"action {action} failed: "
@@ -78,9 +99,10 @@ class MockAgentforceClient:
                 outcome,
             )
         tokens_cfg = ctx.cfg.tokens
+        scale = max(1.0, float(ctx.content_scale))
         ctx.model_invocations += 1
-        ctx.tokens_in += int(tokens_cfg.input_mean)
-        ctx.tokens_out += int(tokens_cfg.output_mean)
+        ctx.tokens_in += int(int(tokens_cfg.input_mean) * scale)
+        ctx.tokens_out += int(int(tokens_cfg.output_mean) * scale)
         if topic not in self._topics:
             raise KeyError(f"topic {topic!r} not registered")
         carried: dict[str, Any] = dict(message)
@@ -113,6 +135,9 @@ class MockAgentforceClient:
         """Publish a platform event; deliver to all subscribers. Returns count."""
         ctx = self._ctx
         outcome = ctx.boundary_call(Platform.AGENTFORCE, "event_bus", Component.EVENT_BUS)
+        if not outcome.success:
+            outcome = _buffered_redelivery(ctx, outcome, Platform.AGENTFORCE,
+                                           "event_bus")
         if not outcome.success:
             raise AgentforceClientError(
                 f"publish_event failed: "

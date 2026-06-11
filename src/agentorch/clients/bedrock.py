@@ -23,10 +23,17 @@ class BedrockClientError(RuntimeError):
 
 
 def _draw_tokens(ctx: CallContext, text: str) -> tuple[int, int]:
-    """Deterministic synthetic token counts derived from input length + config means."""
+    """Deterministic synthetic token counts derived from input length + config means.
+
+    Task 105: both counts scale with ``ctx.content_scale`` — an invocation
+    covering N scenario steps (e.g. drafting a 6-section document in one
+    call) consumes and produces proportionally more tokens, so token-billed
+    platforms show multi-step (S2) cost > single-step (S1) cost per pattern.
+    """
     tokens_cfg = ctx.cfg.tokens
-    tokens_in = max(1, len(text) // 4) + int(tokens_cfg.input_mean)
-    tokens_out = int(tokens_cfg.output_mean)
+    scale = max(1.0, float(ctx.content_scale))
+    tokens_in = int((max(1, len(text) // 4) + int(tokens_cfg.input_mean)) * scale)
+    tokens_out = int(int(tokens_cfg.output_mean) * scale)
     return tokens_in, tokens_out
 
 
@@ -97,7 +104,10 @@ class MockAgentCore:
             raise BedrockClientError(
                 f"gateway hop failed: {hop.fault.value if hop.fault else 'unknown'}", hop)
         ctx.service_calls += 1
-        tool_outcome = ctx.boundary_call(Platform.BEDROCK, "tool", Component.TOOL)
+        # Per-tool unit label: the campaign can fault ONE tool behind the
+        # gateway bulkhead (task 104).
+        tool_outcome = ctx.boundary_call(Platform.BEDROCK, "tool", Component.TOOL,
+                                         unit=tool)
         if not tool_outcome.success:
             raise BedrockClientError(
                 f"tool {tool} failed: "
@@ -137,6 +147,10 @@ class MockAgentCore:
     def observability_emit(self, event: dict[str, Any]) -> None:
         outcome = self._ctx.boundary_call(
             Platform.BEDROCK, "observability", Component.EVENT_BUS)
+        if not outcome.success:
+            from agentorch.clients.agentforce import _buffered_redelivery
+            outcome = _buffered_redelivery(self._ctx, outcome,
+                                           Platform.BEDROCK, "observability")
         if not outcome.success:
             raise BedrockClientError(
                 f"observability_emit failed: "

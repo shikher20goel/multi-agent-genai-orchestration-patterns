@@ -56,15 +56,71 @@ class Pattern(ABC):
     def meta(cls) -> dict[str, Any]:
         """Nine-element pattern metadata (catalog form)."""
 
+    @classmethod
+    def capabilities(cls) -> dict[str, bool]:
+        """Explicit workload-capability flags (Phase 3 task 201).
+
+        Separate from the nine-element catalog ``meta()`` so the
+        catalog template stays fixed. Each flag is set from the
+        pattern's ACTUAL implemented structure; one-line
+        justifications live in docs/FIT_RULE.md. Subclasses override
+        ``CAPABILITIES``; defaults are all-False.
+        """
+        defaults = {"adaptive_decomposition": False,
+                    "selective_human_routing": False,
+                    "event_absorption": False}
+        defaults.update(getattr(cls, "CAPABILITIES", {}))
+        return defaults
+
     @abstractmethod
     def _execute(self, item: WorkItem) -> WorkResult:
         """Pattern-specific orchestration logic."""
+
+
+    def _parallel(self, branches: "list") -> list:
+        """Run branch callables as a parallel fan-out (task 101).
+
+        Each branch's service time is measured separately and the
+        request pays only the MAXIMUM branch time (plus whatever came
+        before), not the sum: this is the tail-at-scale fan-out
+        accounting (Dean & Barroso 2013). Returns the branch results.
+        A branch exception propagates after time accounting.
+        """
+        base = self.ctx.elapsed_s
+        durations: list[float] = []
+        results: list = []
+        error: Exception | None = None
+        for fn in branches:
+            self.ctx.elapsed_s = base       # branches start together
+            try:
+                results.append(fn())
+            except Exception as exc:        # account the failed branch too
+                if error is None:
+                    error = exc
+            durations.append(self.ctx.elapsed_s - base)
+        self.ctx.elapsed_s = base + (max(durations) if durations else 0.0)
+        if error is not None:
+            raise error
+        return results
 
     def run(self, item: WorkItem) -> tuple[WorkResult, float]:
         """Run one work item; returns (result, service_time_s)."""
         self.ctx.reset_request()
         result = self._execute(item)
         return result, self.ctx.elapsed_s
+
+
+def work_steps(item: WorkItem) -> int:
+    """Scenario step count of a work item (task 105).
+
+    A multi-step item (S2 doc-gen carries 4-8 steps, S3 triage 2) is
+    intrinsically more work than a single-step item, whatever the
+    coordination topology: every pattern processes each step, so both
+    model-token volume (Bedrock token billing) and per-step platform
+    actions (Agentforce Flex-credit billing) scale with it — the
+    structural basis of the S2 > S1 relative-cost claim.
+    """
+    return max(1, int(item.payload.get("steps", 1)))
 
 
 def validate_meta(meta: dict[str, Any]) -> None:

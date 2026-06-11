@@ -30,10 +30,12 @@ def test_p7_remote_cluster_outage_contained(platform: Platform) -> None:
     cfg = load_config()
     ctx = CallContext.build(cfg)
     p = BridgePattern(platform, ctx, cfg)
-    # Outage of the ENTIRE remote cluster: arm every component in the
-    # remote context's fault domain.
+    # Outage of the ENTIRE remote cluster: the remote fault domain is
+    # the shared injector's unit="remote" (task 104) — local-cluster
+    # calls carry no unit and are unaffected.
     for comp in Component:
-        p.remote_ctx.fault_injector.arm(comp, FaultType.OUTAGE, 1.0)
+        p.remote_ctx.fault_injector.arm(comp, FaultType.OUTAGE, 1.0,
+                                        unit="remote")
     result, _ = p.run(WorkItem(id="w1", scenario=ScenarioId.S1))
     assert result.ok, "local work must still complete"
     assert result.payload["degraded"] is True

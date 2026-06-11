@@ -21,7 +21,7 @@ authors:
 version: 0.1.0
 date-released: "2026-06-04"
 license: Apache-2.0
-repository-code: "[USER: INSERT GITHUB URL]"
+repository-code: "https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns"
 keywords:
   - multi-agent systems
   - generative AI
@@ -43,5 +43,6 @@ preferred-citation:
   year: 2026
   status: submitted
   notes: >-
-    Submission under review at IEEE Access. DOI to be assigned on
-    acceptance: [USER: INSERT DOI]
+    Submission under review at IEEE Access. The archived-artifact DOI is
+    minted at the tagged GitHub release via Zenodo and recorded on the
+    repository Releases page.

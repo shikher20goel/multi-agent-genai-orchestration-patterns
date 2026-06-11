@@ -17,8 +17,9 @@ No network access and no cloud credentials are needed or used: all
 platform behavior is mocked locally and every run is seeded and
 deterministic (same seed → identical output).
 
-Repository: [USER: INSERT GITHUB URL] · Archived artifact DOI:
-[USER: INSERT DOI]
+Repository: https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns ·
+Archived artifact DOI: minted at the tagged release (see the Releases page
+and the badge below once the Zenodo deposit is live).
 
 ## Requirements
 
@@ -84,7 +85,8 @@ Individual steps:
 python3 -m agentorch.study.run_study --out results/          # full study
 python3 -m agentorch.study.run_study --smoke --out results/  # reduced smoke study
 python3 -m agentorch.study.make_table3 --results results/ --out figures/table3.csv
-python3 -m agentorch.study.make_table4 --results results/ --out figures/table4.csv
+python3 -m agentorch.study.make_table4 --results results/ --out figures/table4_supplementary.csv
+python3 -m agentorch.study.make_fit_matrix --results results/ --out figures/fit_matrix.csv
 python3 -m agentorch.study.figures_latency --results results/ --out figures/
 python3 -m agentorch.study.figures_cost   --results results/ --out figures/
 python3 -m agentorch.study.figures_fault  --results results/ --out figures/
@@ -113,7 +115,8 @@ After `bash run.sh` completes (exit code 0):
   condition, git revision, timestamp, wall time.
 - `figures/table3.csv` — synoptic comparison (paper Table 3): p50/p95/
   p99 latency with 95% BCa CIs, error rate, throughput, cost/request.
-- `figures/table4.csv` — fit-for-purpose grades (paper Table 4).
+- `figures/fit_matrix.csv` — fit-for-purpose matrix (paper Table 4): platform-independent Weak/Moderate/Strong per (pattern, scenario), pre-registered rule in `docs/FIT_RULE.md`.
+- `figures/table4_supplementary.csv` — supplementary per-platform A/B/C quality grades (latency/reliability/cost/oversight); NOT the fit-for-purpose matrix.
 - `figures/ccdf.png`, `figures/p99_ci.png` — latency figures.
 - `figures/cost_per_1k.png`, `figures/cost_ledger.csv` — cost outputs.
 - `figures/fault_matrix.png` — fault-isolation matrix.
@@ -135,4 +138,5 @@ Goel. (License choice pending final human confirmation; see
 `progress.txt`.)
 
 If you use this artifact, please cite the paper via `CITATION.cff`
-(preferred-citation; DOI slot: [USER: INSERT DOI]).
+(preferred-citation; the archived-artifact DOI is minted at the tagged
+release and recorded there).

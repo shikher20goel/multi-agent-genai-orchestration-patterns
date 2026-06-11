@@ -107,7 +107,16 @@ random stream. Child streams are derived deterministically as
 SHA-256(master seed, stream name) via `agentorch.config.Config.get_rng`,
 so arrival schedules, service-time draws, fault firings, scenario
 generation, and bootstrap resampling are independent, reproducible
-streams. The master seed, config hash, n, git revision, and timestamp are
+streams.
+
+**Independence across conditions (Option A; Phase 2 task 103).** Each
+(pattern, platform, scenario, mode) condition derives its OWN child
+streams: the stream names embed the full condition string (e.g.
+`loadgen:P2:bedrock:S2:baseline:latency`), so latency draws, fault
+firings, arrivals, and scenario items are statistically independent
+across conditions. No common-random-numbers coupling is used; the
+between-condition independence assumption of the Mann–Whitney U tests
+(Section 4) therefore holds by construction. The master seed, config hash, n, git revision, and timestamp are
 recorded in `results/manifest.json` by `agentorch.study.run_study`.
 Re-running with the same seed must reproduce every CSV bit-for-bit
 (timestamp and git fields aside).
@@ -116,7 +125,9 @@ Re-running with the same seed must reproduce every CSV bit-for-bit
 
 - Table 3 (`figures/table3.csv`): per condition — n, p50/p95/p99 with BCa
   CIs, error rate, throughput, cost per request.
-- Table 4 (`figures/table4.csv`): fit-for-purpose grades derived from the
+- Supplementary per-platform grades (`figures/table4_supplementary.csv`; the
+  platform-independent fit matrix is `figures/fit_matrix.csv`,
+  docs/FIT_RULE.md): grades derived from the
   endpoints by the explicit rules documented in
   `src/agentorch/study/make_table4.py`.
 - Figures: CCDF and p99-with-CI latency plots, cost per 1k requests,
