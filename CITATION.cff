@@ -18,10 +18,10 @@ authors:
   - family-names: Goel
     given-names: Shikher
     orcid: "https://orcid.org/0009-0005-8392-0949"
-version: 1.0.0
-date-released: "2026-06-14"
+version: 1.1.0
+date-released: "2026-06-22"
 license: Apache-2.0
-doi: 10.5281/zenodo.20685030
+doi: 10.5281/zenodo.20685029
 repository-code: "https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns"
 keywords:
   - multi-agent systems
@@ -44,6 +44,6 @@ preferred-citation:
   year: 2026
   status: submitted
   notes: >-
-    Submission under review at IEEE Access. The archived-artifact DOI
-    (10.5281/zenodo.20685030) is minted via Zenodo from the tagged
-    GitHub release v1.0.0.
+    Submission under review at IEEE Access. The archived-artifact concept
+    DOI (10.5281/zenodo.20685029) resolves to the latest Zenodo version
+    of this package.
