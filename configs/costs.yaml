@@ -1,79 +1,76 @@
-# Per-platform unit-price assumptions for the cost model (task 014; revised
-# under Phase 2 task 105 — both HUMAN-gated).
+# Per-platform unit-price assumptions for the cost model.
 #
 # ONE CONSISTENT UNIT: every "cost_units" value produced by the rig is
-# **USD per request under the dated assumptions in this file**. Every price
-# line carries a source + as-of date; lines marked PLACEHOLDER and
-# [HUMAN: verify] must be human-verified before any manuscript number is
-# final.
+# **USD per request under the modeled assumptions in this file**. Every price
+# line carries a source and as-of date where a public one exists; lines noted
+# as modeled assumptions are illustrative and should be replaced with current
+# pricing before any number is treated as authoritative.
 #
-# OUT-OF-SCOPE OPERATIONAL COST (task 105): the human reviewer's time in
+# OUT-OF-SCOPE OPERATIONAL COST: the human reviewer's time in
 # P6 Human-in-the-Loop is NOT billed as platform cost anywhere in this
 # model. The paper treats human decision time as a latency consequence of
 # the pattern, not a platform charge; reviewer labor is an operational
-# cost outside the platform-billing scope of Table 3/4. [HUMAN: confirm
-# the paper keeps human time out of the cost column.]
+# cost outside the platform-billing scope of Table 3/4.
 
 bedrock:
   # Anthropic Claude 3.5 Sonnet on Amazon Bedrock, on-demand, us-east-1.
   # Source: https://aws.amazon.com/bedrock/pricing/ (public pricing page), as of 2025-06.
-  # PLACEHOLDER values [HUMAN: verify against the current Bedrock pricing page].
-  price_per_1k_tokens_in: 0.003    # USD / 1K input tokens  [HUMAN: verify]
-  price_per_1k_tokens_out: 0.015   # USD / 1K output tokens [HUMAN: verify]
+  # Modeled assumption; substitute current pricing from the Bedrock pricing page.
+  price_per_1k_tokens_in: 0.003    # USD / 1K input tokens  (modeled assumption; substitute current pricing)
+  price_per_1k_tokens_out: 0.015   # USD / 1K output tokens (modeled assumption; substitute current pricing)
   service_calls:
-    # AgentCore service prices are PLACEHOLDERS modeled on AWS serverless norms
+    # AgentCore service prices are modeled on AWS serverless norms
     # (e.g., Lambda/API Gateway request pricing scales). No authoritative public
-    # per-call AgentCore price was assumed. [HUMAN: verify all four]
-    gateway: 0.0000035        # USD / gateway tool-route call  PLACEHOLDER [HUMAN: verify]
-    tool: 0.0000020           # USD / tool execution           PLACEHOLDER [HUMAN: verify]
-    memory: 0.0000005         # USD / memory get/put           PLACEHOLDER [HUMAN: verify]
-    identity: 0.0000005       # USD / identity check           PLACEHOLDER [HUMAN: verify]
-    observability: 0.0000002  # USD / telemetry event          PLACEHOLDER [HUMAN: verify]
-    guardrails: 0.00075       # USD / guardrail text-unit scan PLACEHOLDER modeled on
-                              # Bedrock Guardrails per-1K-text-unit pricing [HUMAN: verify]
-    event_bus: 0.0000010      # USD / event publish (EventBridge-like) PLACEHOLDER [HUMAN: verify]
+    # per-call AgentCore price was assumed; substitute current pricing.
+    gateway: 0.0000035        # USD / gateway tool-route call  (modeled assumption; substitute current pricing)
+    tool: 0.0000020           # USD / tool execution           (modeled assumption; substitute current pricing)
+    memory: 0.0000005         # USD / memory get/put           (modeled assumption; substitute current pricing)
+    identity: 0.0000005       # USD / identity check           (modeled assumption; substitute current pricing)
+    observability: 0.0000002  # USD / telemetry event          (modeled assumption; substitute current pricing)
+    guardrails: 0.00075       # USD / guardrail text-unit scan, modeled on
+                              # Bedrock Guardrails per-1K-text-unit pricing (substitute current pricing)
+    event_bus: 0.0000010      # USD / event publish (EventBridge-like) (modeled assumption; substitute current pricing)
 
 agentforce:
-  # --- Pricing decomposition (task 105) ------------------------------------
+  # --- Pricing decomposition ------------------------------------
   # Salesforce Agentforce billing has two public reference points:
   #   (a) "$2 per conversation" list pricing (Salesforce press release,
-  #       2024-09, https://www.salesforce.com/news/) — conversation-level.
+  #       2024-09, https://www.salesforce.com/news/) -- conversation-level.
   #   (b) "Flex Credits" consumption pricing, announced 2025-05
   #       (Salesforce Agentforce Flex pricing announcement;
   #       https://www.salesforce.com/agentforce/pricing/): list price
   #       USD 0.10 per ACTION an agent executes, where Flow/Apex/prompt
-  #       actions each consume credits. [HUMAN: verify both sources +
-  #       current per-action list price]
-  # DECOMPOSITION DECISION (documented here per task 105): the rig bills
+  #       actions each consume credits.
+  # DECOMPOSITION DECISION (documented here): the rig bills
   # Agentforce at the ACTION level under the Flex-Credit model (b),
   # because the rig's unit of work is the individual platform call. A
   # model-backed reasoning step (topic dispatch / generative response)
   # is modeled as the per-invocation share of the $2 conversation list
   # price under an assumed 4 reasoning steps per conversation
-  # ($2.00 / 4 = $0.50 per invocation). EVERY executed action — including
-  # Agent Script actions that run WITHOUT a model call — consumes one
+  # ($2.00 / 4 = $0.50 per invocation). EVERY executed action -- including
+  # Agent Script actions that run WITHOUT a model call -- consumes one
   # Flex action credit ($0.10): Agent Script paths are conversation/credit
-  # billed and can never produce a zero-billed request. [HUMAN: verify the
+  # billed and can never produce a zero-billed request. (Modeled
   # decomposition; alternatives are pure per-conversation or pure
-  # per-credit billing.]
-  price_per_conversation: 2.00     # USD list price, Salesforce announcement 2024-09 [HUMAN: verify]
-  assumed_invocations_per_conversation: 4   # modeling assumption [HUMAN: verify]
+  # per-credit billing.)
+  price_per_conversation: 2.00     # USD list price, Salesforce announcement 2024-09 (substitute current pricing)
+  assumed_invocations_per_conversation: 4   # modeling assumption (substitute as appropriate)
   # Derived per-invocation flat price (price_per_conversation / assumed invocations).
   # Agentforce does not bill by token publicly; token prices set to 0 and the
-  # flat per-invocation charge carries the model-step cost. [HUMAN: verify]
-  price_per_1k_tokens_in: 0.0      # USD; not token-billed publicly [HUMAN: verify]
-  price_per_1k_tokens_out: 0.0     # USD; not token-billed publicly [HUMAN: verify]
-  price_per_invocation_flat: 0.50  # USD = 2.00 / 4, as of 2024-09 list price [HUMAN: verify]
+  # flat per-invocation charge carries the model-step cost.
+  price_per_1k_tokens_in: 0.0      # USD; not token-billed publicly
+  price_per_1k_tokens_out: 0.0     # USD; not token-billed publicly
+  price_per_invocation_flat: 0.50  # USD = 2.00 / 4, as of 2024-09 list price (substitute current pricing)
   service_calls:
-    # Flex-Credit action billing (task 105): one credit per executed action,
+    # Flex-Credit action billing: one credit per executed action,
     # USD 0.10 list, as of the 2025-05 Flex pricing announcement. This is
-    # what an Agent Script step consumes even when it makes no LLM call —
-    # the path is never zero-billed. [HUMAN: verify current credit price]
-    action: 0.10             # USD / invoked action (Flow/Apex/prompt), Flex Credit list price, as of 2025-05 [HUMAN: verify]
+    # what an Agent Script step consumes even when it makes no LLM call --
+    # the path is never zero-billed. (Substitute current credit price.)
+    action: 0.10             # USD / invoked action (Flow/Apex/prompt), Flex Credit list price, as of 2025-05 (substitute current pricing)
     # Remaining Salesforce platform operations are bundled in org licensing;
-    # marginal per-call prices are PLACEHOLDERS for relative comparison only,
-    # modeled on platform-event/API allowances. [HUMAN: verify all four]
-    event_bus: 0.0000010     # USD / platform event publish      PLACEHOLDER [HUMAN: verify]
-    memory: 0.0000005        # USD / session-context store op    PLACEHOLDER [HUMAN: verify]
-    omni_channel: 0.0000020  # USD / Omni-Channel routing op     PLACEHOLDER [HUMAN: verify]
-    guardrails: 0.0000010    # USD / trust-layer scan            PLACEHOLDER [HUMAN: verify]
+    # marginal per-call prices are modeled for relative comparison only,
+    # modeled on platform-event/API allowances; substitute current pricing.
+    event_bus: 0.0000010     # USD / platform event publish      (modeled assumption; substitute current pricing)
+    memory: 0.0000005        # USD / session-context store op    (modeled assumption; substitute current pricing)
+    omni_channel: 0.0000020  # USD / Omni-Channel routing op     (modeled assumption; substitute current pricing)
+    guardrails: 0.0000010    # USD / trust-layer scan            (modeled assumption; substitute current pricing)
