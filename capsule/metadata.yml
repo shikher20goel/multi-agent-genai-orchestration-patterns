@@ -1,4 +1,4 @@
-# Code Ocean-style capsule metadata (task 053).
+# Code Ocean-style capsule metadata.
 metadata_version: 1
 title: >-
   AgentOrchPatterns: reproducibility capsule for "A Pattern Catalog for
@@ -7,7 +7,7 @@ title: >-
 authors:
   - name: Shikher Goel
     orcid: "https://orcid.org/0009-0005-8392-0949"
-license: "Apache-2.0 [HUMAN: confirm license choice before publishing]"
+license: "Apache-2.0"
 description: >-
   Executable, deterministic measurement study backing the IEEE Access
   submission: seven multi-agent orchestration patterns instantiated
