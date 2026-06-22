@@ -18,8 +18,7 @@ platform behavior is mocked locally and every run is seeded and
 deterministic (same seed → identical output).
 
 Repository: https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns ·
-Archived artifact DOI: minted at the tagged release (see the Releases page
-and the badge below once the Zenodo deposit is live).
+Archived artifact DOI: [10.5281/zenodo.20685029](https://doi.org/10.5281/zenodo.20685029) (Zenodo concept DOI; resolves to the latest version).
 
 ## Requirements
 
@@ -133,10 +132,8 @@ per-pattern summary table on stdout.
 
 ## License
 
-Apache License 2.0 — see the `LICENSE` file. Copyright 2026 Shikher
-Goel. (License choice pending final human confirmation; see
-`progress.txt`.)
+Apache License 2.0 — see the `LICENSE` file. Copyright 2026 Shikher Goel.
 
 If you use this artifact, please cite the paper via `CITATION.cff`
-(preferred-citation; the archived-artifact DOI is minted at the tagged
-release and recorded there).
+(preferred-citation; the archived-artifact concept DOI is
+10.5281/zenodo.20685029, recorded there).
