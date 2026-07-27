@@ -40,8 +40,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 1.866
+      }
     },
     "n1000": {
       "override": {
@@ -73,8 +72,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 4.832
+      }
     },
     "n2000": {
       "override": {
@@ -106,8 +104,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 8.637
+      }
     },
     "rho050": {
       "override": {
@@ -139,8 +136,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 2.786
+      }
     },
     "rho060": {
       "override": {
@@ -172,8 +168,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 2.85
+      }
     },
     "rho080": {
       "override": {
@@ -211,8 +206,7 @@
         "hitl_tail_dominant": true,
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
-      },
-      "wall_time_s": 2.86
+      }
     }
   },
   "quick": false

@@ -268,7 +268,11 @@ def run_sweep(out_root: Path, figures_dir: Path, only: str | None = None,
             "kendall_tau_median_latency": compare_orderings(
                 meds["baseline"], meds[name]),
             "headline_contrasts": heads[name],
-            "wall_time_s": manifests[name].get("wall_time_s"),
+            # Wall-clock time is intentionally NOT persisted here: it is
+            # machine-dependent and would break the bit-identical
+            # reproducibility the study guarantees (reviewer R2-4's
+            # determinism check). Per-run timing is still recorded in
+            # results_sweep/<variant>/manifest.json for diagnostics.
         }
 
     pd.DataFrame(rows).to_csv(figures_dir / "sensitivity_sweep.csv",
