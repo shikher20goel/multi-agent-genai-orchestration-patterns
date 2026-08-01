@@ -1,0 +1,20 @@
+# Live-endpoint anchor configuration. NO SECRETS IN THIS FILE -
+# credentials come from the environment:
+#   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (IAM user: anchor-runner)
+#   AGENTFORCE_CLIENT_ID / AGENTFORCE_CLIENT_SECRET (ECA: Anchor API Client)
+scenario: S1
+n_requests: 30
+patterns: [P1, P2]
+
+bedrock:
+  enabled: true
+  region: us-east-2
+  # Bedrock Agents Classic closed to new accounts (July 30, 2026);
+  # the anchor issues the pattern call sequences via the Converse API.
+  model_id: "us.amazon.nova-micro-v1:0"
+
+agentforce:
+  enabled: true
+  domain: "https://orgfarm-04d1f5d7a4-dev-ed.develop.my.salesforce.com"
+  agent_id: "0XxgK0000021hwDSAQ"
+  api_version: "v1"
