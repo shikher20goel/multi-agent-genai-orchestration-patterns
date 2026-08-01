@@ -1,0 +1,219 @@
+{
+  "baseline": {
+    "n_items": 500,
+    "utilization_target": 0.7,
+    "headline_contrasts": {
+      "pipeline_additive": true,
+      "hitl_tail_dominant": true,
+      "choreography_burst_absorption": true,
+      "supervisor_costliest": true
+    }
+  },
+  "variants": {
+    "n250": {
+      "override": {
+        "study.n_items": 250
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 20,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 0.9048,
+        "agentforce:S2": 0.9048,
+        "agentforce:S3": 0.7143,
+        "bedrock:S1": 0.9048,
+        "bedrock:S2": 1.0,
+        "bedrock:S3": 1.0,
+        "mean": 0.9048
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 3.241
+    },
+    "n1000": {
+      "override": {
+        "study.n_items": 1000
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 20,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 0.9048,
+        "agentforce:S2": 0.9048,
+        "agentforce:S3": 0.4286,
+        "bedrock:S1": 1.0,
+        "bedrock:S2": 0.9048,
+        "bedrock:S3": 0.9048,
+        "mean": 0.8413
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 7.441
+    },
+    "n2000": {
+      "override": {
+        "study.n_items": 2000
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 20,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 0.9048,
+        "agentforce:S2": 1.0,
+        "agentforce:S3": 0.5238,
+        "bedrock:S1": 1.0,
+        "bedrock:S2": 0.8095,
+        "bedrock:S3": 0.7143,
+        "mean": 0.8254
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 13.797
+    },
+    "rho050": {
+      "override": {
+        "load.utilization_target": 0.5
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 20,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 1.0,
+        "agentforce:S2": 0.9048,
+        "agentforce:S3": 0.3333,
+        "bedrock:S1": 1.0,
+        "bedrock:S2": 0.8095,
+        "bedrock:S3": 0.2381,
+        "mean": 0.7143
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 4.803
+    },
+    "rho060": {
+      "override": {
+        "load.utilization_target": 0.6
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 20,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 1.0,
+        "agentforce:S2": 0.9048,
+        "agentforce:S3": 0.4286,
+        "bedrock:S1": 1.0,
+        "bedrock:S2": 0.8095,
+        "bedrock:S3": 0.4286,
+        "mean": 0.7619
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 4.863
+    },
+    "rho080": {
+      "override": {
+        "load.utilization_target": 0.8
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 19,
+        "cells_total": 21,
+        "moving_cells": [
+          {
+            "pattern": "P1",
+            "scenario": "S2",
+            "baseline": "Moderate",
+            "variant": "Strong"
+          },
+          {
+            "pattern": "P7",
+            "scenario": "S3",
+            "baseline": "Weak",
+            "variant": "Moderate"
+          }
+        ]
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 0.9048,
+        "agentforce:S2": 0.8095,
+        "agentforce:S3": 0.3333,
+        "bedrock:S1": 0.9048,
+        "bedrock:S2": 0.7143,
+        "bedrock:S3": 0.9048,
+        "mean": 0.7619
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 4.691
+    }
+  },
+  "quick": false
+}
