@@ -1,0 +1,34 @@
+{
+  "scenario": "S1",
+  "n_requests": 30,
+  "platforms": {
+    "bedrock": {
+      "P1": {
+        "n_ok": 30,
+        "n_total": 30,
+        "median_latency_s": 1.5617,
+        "mean_invocations": 5
+      },
+      "P2": {
+        "n_ok": 30,
+        "n_total": 30,
+        "median_latency_s": 0.5658,
+        "mean_invocations": 1
+      }
+    },
+    "agentforce": {
+      "P1": {
+        "n_ok": 30,
+        "n_total": 30,
+        "median_latency_s": 11.3173,
+        "mean_invocations": 5
+      },
+      "P2": {
+        "n_ok": 30,
+        "n_total": 30,
+        "median_latency_s": 2.7552,
+        "mean_invocations": 1
+      }
+    }
+  }
+}
