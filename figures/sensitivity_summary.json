@@ -41,7 +41,7 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 3.241
+      "wall_time_s": 2.729
     },
     "n1000": {
       "override": {
@@ -74,7 +74,7 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 7.441
+      "wall_time_s": 6.27
     },
     "n2000": {
       "override": {
@@ -107,7 +107,33 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 13.797
+      "wall_time_s": 11.43
+    },
+    "n5000": {
+      "override": {
+        "study.n_items": 5000
+      },
+      "fit_vs_baseline": {
+        "cells_agree": 21,
+        "cells_total": 21,
+        "moving_cells": []
+      },
+      "kendall_tau_median_latency": {
+        "agentforce:S1": 0.9048,
+        "agentforce:S2": 1.0,
+        "agentforce:S3": 0.619,
+        "bedrock:S1": 1.0,
+        "bedrock:S2": 0.8095,
+        "bedrock:S3": 0.7143,
+        "mean": 0.8413
+      },
+      "headline_contrasts": {
+        "pipeline_additive": true,
+        "hitl_tail_dominant": true,
+        "choreography_burst_absorption": true,
+        "supervisor_costliest": true
+      },
+      "wall_time_s": 31.943
     },
     "rho050": {
       "override": {
@@ -140,7 +166,7 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 4.803
+      "wall_time_s": 3.847
     },
     "rho060": {
       "override": {
@@ -173,7 +199,7 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 4.863
+      "wall_time_s": 3.839
     },
     "rho080": {
       "override": {
@@ -212,7 +238,7 @@
         "choreography_burst_absorption": true,
         "supervisor_costliest": true
       },
-      "wall_time_s": 4.691
+      "wall_time_s": 3.814
     }
   },
   "quick": false

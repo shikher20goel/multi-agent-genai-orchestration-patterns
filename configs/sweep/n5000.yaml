@@ -1,0 +1,5 @@
+# Sensitivity-sweep overlay (R2-4): single-parameter variant "n5000".
+# Applied by scripts/sensitivity_sweep.py on top of configs/default.yaml;
+# master seed and all other parameters unchanged.
+study:
+  n_items: 5000

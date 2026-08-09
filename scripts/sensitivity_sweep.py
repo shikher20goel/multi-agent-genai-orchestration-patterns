@@ -63,7 +63,7 @@ PATTERNS = [f"P{i}" for i in range(1, 8)]
 PLATFORMS = ["agentforce", "bedrock"]
 SCENARIOS = ["S1", "S2", "S3"]
 
-VARIANTS: tuple[str, ...] = ("n250", "n1000", "n2000",
+VARIANTS: tuple[str, ...] = ("n250", "n1000", "n2000", "n5000",
                              "rho050", "rho060", "rho080")
 
 
