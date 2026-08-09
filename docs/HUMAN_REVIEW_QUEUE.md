@@ -87,7 +87,7 @@ honest calibration-vs-refinement read in `docs/FIT_DISCREPANCIES.md`:
   parallel dispatch/cost attributability, closed-loop human
   throttling, adaptive-decomposition payoff, multi-stage S1 chain).
   The orthogonal claims (e.g. P5 bulkhead ISOLATED, P7 remote-cluster
-  outage ISOLATED, P1/P2 best S2 completion) ARE separately confirmed
+  outage ISOLATED, P1/P2 best S2 completion) ARE separately corroborated
   by the fault campaign and the Phase-2 agreement suite.
 
 **Decision needed:** per cell, either (a) keep the paper grade and
