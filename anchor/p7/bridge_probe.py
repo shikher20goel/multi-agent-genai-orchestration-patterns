@@ -164,6 +164,25 @@ class CometdClient:
         return ([m for m in out if not m["channel"].startswith("/meta/")],
                 self._reply(out, "/meta/connect"))
 
+    def disconnect(self):
+        """Best-effort Bayeux teardown when a session is abandoned.
+
+        The injected fault models a bridge process that dies before it can
+        persist its replay cursor. Tearing the CometD session down on the
+        way out is transport hygiene only: orphaned subscribers linger
+        server-side for their session timeout, and an org that accumulates
+        them stops feeding replayed events to the sessions that follow.
+        What makes Salesforce redeliver is the resubscribe from the
+        un-advanced cursor, not the state of the abandoned socket.
+        """
+        try:
+            self._post([{"channel": "/meta/disconnect",
+                         "clientId": self.client_id}])
+        except Exception:
+            pass
+        finally:
+            self.http.close()
+
 
 # ----------------------------------------------------------------- AWS side
 def invoke_agentcore(client, runtime_arn, task):
@@ -256,6 +275,14 @@ def run_probe(cfg, ingress_on, run_label):
                 print(f"[{run_label}] batch n={len(rids)} "
                       f"replay {rids[0]}..{rids[-1]}", flush=True)
             if not events:
+                # Salesforce answers the first /meta/connect after a
+                # handshake with an ack-only message and pushes the replayed
+                # events on the next one, so an empty poll is normal; it is
+                # logged because a run that goes quiet here is the signature
+                # of a starved subscription.
+                print(f"[{run_label}] poll: 0 events "
+                      f"(t+{int(time.time() - start_ts)}s, "
+                      f"distinct={len(processed)}/{n})", flush=True)
                 if (len({i["task_id"] for i in invocations}) >= n
                         and time.time() - last_event_at >= idle_secs):
                     done = True
@@ -314,6 +341,7 @@ def run_probe(cfg, ingress_on, run_label):
                       f"skipped_stale={skipped_stale}", flush=True)
                 continue
             break  # crashed: re-handshake from durable_replay
+        c.disconnect()
 
     # ------------------------------------------------------------- Metrics
     inv_ids = [i["task_id"] for i in invocations]
