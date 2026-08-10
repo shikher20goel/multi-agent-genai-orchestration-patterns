@@ -80,6 +80,11 @@ class CometdClient:
 
     def __init__(self, inst, tok, refresh=None):
         self.url = f"{inst}/cometd/{API_VERSION.lstrip('v')}"
+        # One HTTP session for the whole Bayeux conversation: Salesforce
+        # returns a BAYEUX_BROWSER cookie at handshake and routes subsequent
+        # /meta/* calls on it. Dropping the cookie yields 403::Unknown client
+        # on subscribe even though the handshake succeeded.
+        self.http = requests.Session()
         self.token = tok
         # The Salesforce Bayeux endpoint authenticates with the "OAuth"
         # scheme; "Bearer" is accepted by the REST endpoints but rejected
@@ -95,16 +100,16 @@ class CometdClient:
         self.msg_id += 1
         for m in body:
             m["id"] = str(self.msg_id)
-        r = requests.post(self.url, headers=self.headers, json=body,
-                          timeout=125)
+        r = self.http.post(self.url, headers=self.headers, json=body,
+                           timeout=125)
         if r.status_code == 401 and self.refresh is not None:
             # Client-credentials access tokens expire (~30 min) and a probe
             # run can outlive one. Re-fetch once and retry; this is transport
             # housekeeping only and does not touch delivery semantics.
             self.token = self.refresh()
             self.headers["Authorization"] = f"{self.scheme} {self.token}"
-            r = requests.post(self.url, headers=self.headers, json=body,
-                              timeout=125)
+            r = self.http.post(self.url, headers=self.headers, json=body,
+                               timeout=125)
         r.raise_for_status()
         return r.json()
 

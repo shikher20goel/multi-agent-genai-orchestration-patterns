@@ -83,7 +83,11 @@ def load_module():
     m = importlib.util.module_from_spec(spec)
     sys.modules["bp"] = m
     spec.loader.exec_module(m)
-    fake_requests = types.SimpleNamespace(post=fake_post)
+    class FakeSession:
+        def post(self, *a, **k):
+            return fake_post(*a, **k)
+
+    fake_requests = types.SimpleNamespace(post=fake_post, Session=FakeSession)
     m.requests = fake_requests
     m.boto3 = types.SimpleNamespace(client=lambda *a, **k: FakeAgentCore())
     m.time.sleep = lambda *_: None
