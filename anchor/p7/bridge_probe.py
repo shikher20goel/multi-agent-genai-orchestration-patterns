@@ -149,12 +149,20 @@ class CometdClient:
             raise AssertionError(f"subscribe failed: {out}")
 
     def connect(self):
-        """One long-poll cycle; returns delivered event messages."""
+        """One long-poll cycle.
+
+        Returns (event messages, the /meta/connect reply). The caller needs
+        the meta reply because an expired or evicted Bayeux session answers
+        with successful=false plus advice reconnect=handshake and NO event
+        messages; treating that as "nothing to do" would poll a dead client
+        until the run's hard time bound.
+        """
         out = self._post([{
             "channel": "/meta/connect", "clientId": self.client_id,
             "connectionType": "long-polling",
         }])
-        return [m for m in out if not m["channel"].startswith("/meta/")]
+        return ([m for m in out if not m["channel"].startswith("/meta/")],
+                self._reply(out, "/meta/connect"))
 
 
 # ----------------------------------------------------------------- AWS side
@@ -200,6 +208,8 @@ def run_probe(cfg, ingress_on, run_label):
     invocations = []             # (task_id, seq, invoked_at, dup_flag)
     deliveries = []              # every delivery incl. redeliveries
     crashes = 0
+    skipped_foreign = 0          # events from other run labels
+    skipped_stale = 0            # same label, earlier attempt's task ids
 
     print(f"[{run_label}] publishing {n} tasks ...")
     published = publish_tasks(inst, tok, n, run_label)
@@ -232,7 +242,19 @@ def run_probe(cfg, ingress_on, run_label):
         c.subscribe(channel, durable_replay)
         session_seen = 0
         while True:
-            events = c.connect()
+            events, meta = c.connect()
+            if not meta.get("successful", True):
+                # Bayeux session gone (403::Unknown client after eviction or
+                # token rotation). Re-handshake from the durable cursor
+                # instead of polling a client the server has forgotten.
+                print(f"[{run_label}] connect unsuccessful "
+                      f"({meta.get('error')}) -> re-handshaking",
+                      flush=True)
+                break
+            if events:
+                rids = [e["data"]["event"]["replayId"] for e in events]
+                print(f"[{run_label}] batch n={len(rids)} "
+                      f"replay {rids[0]}..{rids[-1]}", flush=True)
             if not events:
                 if (len({i["task_id"] for i in invocations}) >= n
                         and time.time() - last_event_at >= idle_secs):
@@ -249,12 +271,14 @@ def run_probe(cfg, ingress_on, run_label):
                 payload, replay = d["payload"], d["event"]["replayId"]
                 if payload.get("Run_Label__c") != run_label:
                     durable_replay = replay
+                    skipped_foreign += 1
                     continue
                 if payload["Task_Id__c"] not in published_ids:
                     # Same label, earlier attempt: still inside the retention
                     # window but not part of this run's request set. Skip and
                     # advance the cursor so reruns stay measurable.
                     durable_replay = replay
+                    skipped_stale += 1
                     continue
                 task = {"task_id": payload["Task_Id__c"],
                         "seq": int(payload["Seq__c"])}
@@ -273,6 +297,9 @@ def run_probe(cfg, ingress_on, run_label):
                 processed_file.write_text(
                     json.dumps(sorted(processed)))
                 session_seen += 1
+                print(f"[{run_label}] invoked seq={task['seq']} "
+                      f"replay={replay} dup={dup} "
+                      f"distinct={len(processed)}/{n}", flush=True)
                 # FAULT INJECTION: crash AFTER invoke, BEFORE durable
                 # cursor update -> live Salesforce redelivery on resume.
                 if rng.random() < p_crash and crashes < cfg["max_crashes"]:
@@ -282,6 +309,9 @@ def run_probe(cfg, ingress_on, run_label):
                     break  # abandon CometD session; cursor NOT advanced
                 durable_replay = replay
             else:
+                print(f"[{run_label}] batch done cursor={durable_replay} "
+                      f"skipped_foreign={skipped_foreign} "
+                      f"skipped_stale={skipped_stale}", flush=True)
                 continue
             break  # crashed: re-handshake from durable_replay
 
@@ -299,6 +329,8 @@ def run_probe(cfg, ingress_on, run_label):
         "redeliveries_observed": len(deliveries) - len(
             {d["task_id"] for d in deliveries}),
         "injected_crashes": crashes,
+        "skipped_foreign_label": skipped_foreign,
+        "skipped_stale_attempt": skipped_stale,
         "invocations": len(invocations),
         "duplicate_invocations": dup_invocations,
         "ordering_inversions": inversions,
