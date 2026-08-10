@@ -46,12 +46,14 @@ def fake_post(url, headers=None, json=None, data=None, timeout=None):
         if ch == "/meta/handshake":
             cid = f"c{len(SESSIONS)}"
             SESSIONS[cid] = 0
-            return FakeResp([{"successful": True, "clientId": cid}])
+            return FakeResp([{"channel": "/meta/handshake",
+                              "successful": True, "clientId": cid}])
         if ch == "/meta/subscribe":
             cid = msg["clientId"]
             rid = list(msg["ext"]["replay"].values())[0]
             SESSIONS[cid] = 0 if rid in (-2,) else (10**9 if rid == -1 else rid)
-            return FakeResp([{"successful": True}])
+            return FakeResp([{"channel": "/meta/subscribe",
+                              "successful": True}])
         if ch == "/meta/connect":
             cid = msg["clientId"]
             cur = SESSIONS[cid]

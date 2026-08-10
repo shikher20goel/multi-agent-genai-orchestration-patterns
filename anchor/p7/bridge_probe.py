@@ -113,6 +113,15 @@ class CometdClient:
         r.raise_for_status()
         return r.json()
 
+    @staticmethod
+    def _reply(out, channel):
+        """A Bayeux response may carry several messages in any order; pick
+        the one acknowledging the meta channel we asked about."""
+        for m in out:
+            if m.get("channel") == channel:
+                return m
+        return {}
+
     def handshake(self):
         last = None
         for scheme in ("OAuth", "Bearer"):
@@ -122,11 +131,12 @@ class CometdClient:
                 "channel": "/meta/handshake", "version": "1.0",
                 "supportedConnectionTypes": ["long-polling"],
             }])
-            if out[0].get("successful"):
-                self.client_id = out[0]["clientId"]
+            m = self._reply(out, "/meta/handshake")
+            if m.get("successful"):
+                self.client_id = m["clientId"]
                 return
             last = out
-        raise AssertionError(last)
+        raise AssertionError(f"handshake failed: {last}")
 
     def subscribe(self, channel, replay_id):
         out = self._post([{
@@ -134,7 +144,9 @@ class CometdClient:
             "subscription": channel,
             "ext": {"replay": {channel: replay_id}},
         }])
-        assert out[0]["successful"], out
+        m = self._reply(out, "/meta/subscribe")
+        if not m.get("successful"):
+            raise AssertionError(f"subscribe failed: {out}")
 
     def connect(self):
         """One long-poll cycle; returns delivered event messages."""
