@@ -1,0 +1,9 @@
+# P7 live bridge probe configuration (no secrets in this file — ever).
+seed: 42
+n_tasks: 30
+p_crash: 0.3          # crash probability per processed event
+max_crashes: 8        # bound on injected crashes per run
+idle_polls_to_finish: 3
+aws_region: us-east-1          # AgentCore region (verify in console)
+agent_runtime_arn: "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/p7probe-XCBJfZDMUI"
+results_dir: anchor/p7/results
