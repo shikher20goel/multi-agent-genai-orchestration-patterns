@@ -102,7 +102,8 @@ def main():
                       SF_CLIENT_SECRET="s")
     m = load_module()
     cfg = {"seed": 42, "n_tasks": 30, "p_crash": 0.3, "max_crashes": 8,
-           "idle_polls_to_finish": 3, "aws_region": "us-east-1",
+           "idle_seconds_to_finish": 0.2,
+           "max_run_seconds": 120, "aws_region": "us-east-1",
            "agent_runtime_arn": "arn:test",
            "results_dir": str(HERE / "mockresults")}
 

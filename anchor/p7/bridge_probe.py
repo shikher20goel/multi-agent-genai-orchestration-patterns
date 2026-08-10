@@ -212,22 +212,38 @@ def run_probe(cfg, ingress_on, run_label):
         tok, _ = sf_token(cfg)
         return tok
 
+    # Termination is time-based, not poll-count-based. Salesforce answers
+    # /meta/connect immediately with an ack-only response in several
+    # situations (notably the first connect after a handshake, which this
+    # probe performs after every injected crash), so "N empty polls" would
+    # end the run while events are still queued. Instead: stop once every
+    # logical task has been invoked AND the stream has produced nothing new
+    # for idle_seconds_to_finish, bounded by max_run_seconds.
+    start_ts = time.time()
+    last_event_at = time.time()
+    idle_secs = cfg["idle_seconds_to_finish"]
+    max_secs = cfg["max_run_seconds"]
+    timed_out = False
+
     done = False
     while not done:
         c = CometdClient(inst, tok, refresh=_refresh_token)
         c.handshake()
         c.subscribe(channel, durable_replay)
         session_seen = 0
-        idle_polls = 0
         while True:
             events = c.connect()
             if not events:
-                idle_polls += 1
-                if idle_polls >= cfg["idle_polls_to_finish"]:
+                if (len({i["task_id"] for i in invocations}) >= n
+                        and time.time() - last_event_at >= idle_secs):
+                    done = True
+                    break
+                if time.time() - start_ts >= max_secs:
+                    timed_out = True
                     done = True
                     break
                 continue
-            idle_polls = 0
+            last_event_at = time.time()
             for ev in events:
                 d = ev["data"]
                 payload, replay = d["payload"], d["event"]["replayId"]
@@ -268,8 +284,6 @@ def run_probe(cfg, ingress_on, run_label):
             else:
                 continue
             break  # crashed: re-handshake from durable_replay
-        if not done and session_seen == 0 and crashes >= cfg["max_crashes"]:
-            done = len({i["task_id"] for i in invocations}) >= n
 
     # ------------------------------------------------------------- Metrics
     inv_ids = [i["task_id"] for i in invocations]
@@ -289,6 +303,9 @@ def run_probe(cfg, ingress_on, run_label):
         "duplicate_invocations": dup_invocations,
         "ordering_inversions": inversions,
         "distinct_tasks_invoked": len(set(inv_ids)),
+        "all_tasks_invoked": len(set(inv_ids)) == n,
+        "timed_out": timed_out,
+        "wall_seconds": round(time.time() - start_ts, 1),
     }
     (state_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     (state_dir / "invocations.json").write_text(

@@ -18,6 +18,14 @@ def load(results_dir, label):
     if s["deliveries_observed"] == 0:
         sys.exit(f"REFUSING: {label} recorded zero deliveries — not a "
                  f"real run.")
+    if not s.get("all_tasks_invoked"):
+        sys.exit(f"REFUSING: {label} invoked only "
+                 f"{s['distinct_tasks_invoked']}/{s['n_tasks']} logical "
+                 f"tasks — the run did not complete, so its counts are "
+                 f"not reportable.")
+    if s.get("timed_out"):
+        sys.exit(f"REFUSING: {label} hit max_run_seconds — truncated "
+                 f"run, counts are not reportable.")
     return s
 
 
