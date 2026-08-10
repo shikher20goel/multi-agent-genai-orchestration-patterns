@@ -80,7 +80,12 @@ class CometdClient:
 
     def __init__(self, inst, tok, refresh=None):
         self.url = f"{inst}/cometd/{API_VERSION.lstrip('v')}"
-        self.headers = {"Authorization": f"Bearer {tok}",
+        self.token = tok
+        # The Salesforce Bayeux endpoint authenticates with the "OAuth"
+        # scheme; "Bearer" is accepted by the REST endpoints but rejected
+        # here (403::Handshake denied / 401::Authentication invalid).
+        self.scheme = "OAuth"
+        self.headers = {"Authorization": f"{self.scheme} {tok}",
                         "Content-Type": "application/json"}
         self.client_id = None
         self.msg_id = 0
@@ -96,19 +101,27 @@ class CometdClient:
             # Client-credentials access tokens expire (~30 min) and a probe
             # run can outlive one. Re-fetch once and retry; this is transport
             # housekeeping only and does not touch delivery semantics.
-            self.headers["Authorization"] = f"Bearer {self.refresh()}"
+            self.token = self.refresh()
+            self.headers["Authorization"] = f"{self.scheme} {self.token}"
             r = requests.post(self.url, headers=self.headers, json=body,
                               timeout=125)
         r.raise_for_status()
         return r.json()
 
     def handshake(self):
-        out = self._post([{
-            "channel": "/meta/handshake", "version": "1.0",
-            "supportedConnectionTypes": ["long-polling"],
-        }])
-        assert out[0]["successful"], out
-        self.client_id = out[0]["clientId"]
+        last = None
+        for scheme in ("OAuth", "Bearer"):
+            self.scheme = scheme
+            self.headers["Authorization"] = f"{scheme} {self.token}"
+            out = self._post([{
+                "channel": "/meta/handshake", "version": "1.0",
+                "supportedConnectionTypes": ["long-polling"],
+            }])
+            if out[0].get("successful"):
+                self.client_id = out[0]["clientId"]
+                return
+            last = out
+        raise AssertionError(last)
 
     def subscribe(self, channel, replay_id):
         out = self._post([{
@@ -173,6 +186,7 @@ def run_probe(cfg, ingress_on, run_label):
 
     print(f"[{run_label}] publishing {n} tasks ...")
     published = publish_tasks(inst, tok, n, run_label)
+    published_ids = {p["task_id"] for p in published}
 
     print(f"[{run_label}] subscribing (ingress="
           f"{'ON' if ingress_on else 'OFF'}) ...")
@@ -201,6 +215,12 @@ def run_probe(cfg, ingress_on, run_label):
                 d = ev["data"]
                 payload, replay = d["payload"], d["event"]["replayId"]
                 if payload.get("Run_Label__c") != run_label:
+                    durable_replay = replay
+                    continue
+                if payload["Task_Id__c"] not in published_ids:
+                    # Same label, earlier attempt: still inside the retention
+                    # window but not part of this run's request set. Skip and
+                    # advance the cursor so reruns stay measurable.
                     durable_replay = replay
                     continue
                 task = {"task_id": payload["Task_Id__c"],
