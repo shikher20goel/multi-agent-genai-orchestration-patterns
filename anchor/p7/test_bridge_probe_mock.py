@@ -89,6 +89,11 @@ def load_module():
         def post(self, *a, **k):
             return fake_post(*a, **k)
 
+        def close(self):
+            # Real requests.Session.close() is called by CometdClient.disconnect();
+            # the fake must expose the same no-op-able interface.
+            pass
+
     fake_requests = types.SimpleNamespace(post=fake_post, Session=FakeSession)
     m.requests = fake_requests
     m.boto3 = types.SimpleNamespace(client=lambda *a, **k: FakeAgentCore())
