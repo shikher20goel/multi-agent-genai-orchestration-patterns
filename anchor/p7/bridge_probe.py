@@ -258,6 +258,12 @@ def run_probe(cfg, ingress_on, run_label):
     first_session = True
     while not done:
         if not first_session:
+            # Pause before re-establishing. A resumed subscriber that
+            # attaches immediately after several earlier resumes was
+            # observed to be served no replayed events at all, while the
+            # same subscription placed after a pause received its batch;
+            # the backoff also mirrors a supervisor's restart delay.
+            time.sleep(cfg.get("resume_backoff_seconds", 15))
             # A bridge process that has crashed re-authenticates on
             # restart, so the resumed subscriber carries a fresh access
             # token. This is also what makes the resumed subscription
@@ -273,6 +279,8 @@ def run_probe(cfg, ingress_on, run_label):
         c.handshake()
         c.subscribe(channel, durable_replay)
         session_seen = 0
+        session_progress_at = time.time()
+        resub_secs = cfg.get("resubscribe_after_seconds", 120)
         while True:
             events, meta = c.connect()
             if not meta.get("successful", True):
@@ -284,6 +292,7 @@ def run_probe(cfg, ingress_on, run_label):
                       flush=True)
                 break
             if events:
+                session_progress_at = time.time()
                 rids = [e["data"]["event"]["replayId"] for e in events]
                 print(f"[{run_label}] batch n={len(rids)} "
                       f"replay {rids[0]}..{rids[-1]}", flush=True)
@@ -303,6 +312,17 @@ def run_probe(cfg, ingress_on, run_label):
                 if time.time() - start_ts >= max_secs:
                     timed_out = True
                     done = True
+                    break
+                if (len(processed) < n
+                        and time.time() - session_progress_at >= resub_secs):
+                    # This subscriber has been served nothing for long
+                    # enough that it is starved rather than idle: tasks are
+                    # still outstanding and the events sit in the retention
+                    # window. Tear it down and re-establish from the durable
+                    # cursor, which has been observed to deliver them.
+                    print(f"[{run_label}] subscription starved for "
+                          f"{resub_secs}s -> re-establishing from "
+                          f"{durable_replay}", flush=True)
                     break
                 continue
             last_event_at = time.time()

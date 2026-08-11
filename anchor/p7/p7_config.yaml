@@ -4,7 +4,9 @@ n_tasks: 30
 p_crash: 0.3          # crash probability per processed event
 max_crashes: 8        # bound on injected crashes per run
 idle_seconds_to_finish: 90   # quiet period required before declaring the stream drained
-max_run_seconds: 1800         # hard bound; a run that hits this is refused by analyze
+max_run_seconds: 3600         # hard bound; a run that hits this is refused by analyze
+resume_backoff_seconds: 20    # pause before a crashed subscriber re-attaches
+resubscribe_after_seconds: 150  # a starved subscription is re-established after this
 aws_region: us-east-1          # AgentCore region (verify in console)
 agent_runtime_arn: "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/p7probe-XCBJfZDMUI"
 results_dir: anchor/p7/results
