@@ -255,7 +255,20 @@ def run_probe(cfg, ingress_on, run_label):
     timed_out = False
 
     done = False
+    first_session = True
     while not done:
+        if not first_session:
+            # A bridge process that has crashed re-authenticates on
+            # restart, so the resumed subscriber carries a fresh access
+            # token. This is also what makes the resumed subscription
+            # observable: reusing the in-memory token across a simulated
+            # crash was observed to produce a successful handshake and
+            # subscribe whose /meta/connect then returned no replayed
+            # events, while an identical subscription at the same replay
+            # ID from a freshly authenticated process received the batch
+            # immediately.
+            tok, inst = sf_token(cfg)
+        first_session = False
         c = CometdClient(inst, tok, refresh=_refresh_token)
         c.handshake()
         c.subscribe(channel, durable_replay)
