@@ -150,5 +150,6 @@ release and recorded there).
 | Table 7 (supplementary quality view) | `figures/table4_supplementary.csv` + `docs/GRADES.md` |
 | Table 8 (sensitivity sweep) | `figures/sensitivity_sweep.csv`, `figures/sensitivity_summary.json` via `scripts/sensitivity_sweep.py` + `configs/sweep/` |
 | Table 9 (live-endpoint anchor) | `anchor/results/` via `anchor/run_anchor.py` |
+| Table 10 (P7 live bridge probe) | `anchor/p7/results/` via `anchor/p7/bridge_probe.py` and `anchor/p7/analyze_p7.py` |
 
 Internal artifact filenames (`table3.csv`, `table4_supplementary.csv`) are historical and unchanged; the mapping above is authoritative.
