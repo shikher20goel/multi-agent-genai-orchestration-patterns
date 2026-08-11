@@ -1,0 +1,20 @@
+{
+  "run_label": "C2",
+  "ingress": "on",
+  "n_tasks": 30,
+  "seed": 42,
+  "p_crash": 0.3,
+  "published": 30,
+  "deliveries_observed": 38,
+  "redeliveries_observed": 8,
+  "injected_crashes": 8,
+  "skipped_foreign_label": 300,
+  "skipped_stale_attempt": 0,
+  "invocations": 30,
+  "duplicate_invocations": 0,
+  "ordering_inversions": 0,
+  "distinct_tasks_invoked": 30,
+  "all_tasks_invoked": true,
+  "timed_out": false,
+  "wall_seconds": 800.4
+}
