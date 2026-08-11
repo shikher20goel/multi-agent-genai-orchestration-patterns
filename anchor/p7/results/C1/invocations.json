@@ -1,0 +1,344 @@
+[
+  {
+    "task_id": "39cd21dd-3fd7-42ae-ad4d-c744db2bd497",
+    "seq": 1,
+    "latency_s": 0.6025,
+    "status": 200,
+    "resp_digest": "9adca34310ae2e08",
+    "duplicate": false,
+    "invoked_at": 1786407139.575754
+  },
+  {
+    "task_id": "5ffd00cd-c736-4fd5-ba8b-f155c2a444ba",
+    "seq": 2,
+    "latency_s": 1.0205,
+    "status": 200,
+    "resp_digest": "ce676e839b2a4a76",
+    "duplicate": false,
+    "invoked_at": 1786407140.5966358
+  },
+  {
+    "task_id": "5ffd00cd-c736-4fd5-ba8b-f155c2a444ba",
+    "seq": 2,
+    "latency_s": 0.1277,
+    "status": 200,
+    "resp_digest": "ce676e839b2a4a76",
+    "duplicate": true,
+    "invoked_at": 1786407161.4827137
+  },
+  {
+    "task_id": "5ffd00cd-c736-4fd5-ba8b-f155c2a444ba",
+    "seq": 2,
+    "latency_s": 0.1165,
+    "status": 200,
+    "resp_digest": "ce676e839b2a4a76",
+    "duplicate": true,
+    "invoked_at": 1786407423.032036
+  },
+  {
+    "task_id": "5ffd00cd-c736-4fd5-ba8b-f155c2a444ba",
+    "seq": 2,
+    "latency_s": 0.1134,
+    "status": 200,
+    "resp_digest": "ce676e839b2a4a76",
+    "duplicate": true,
+    "invoked_at": 1786407443.7653377
+  },
+  {
+    "task_id": "d9d16640-a089-438e-93f8-5ce555a7d209",
+    "seq": 3,
+    "latency_s": 1.0746,
+    "status": 200,
+    "resp_digest": "8dda1ba3d80dbbbf",
+    "duplicate": false,
+    "invoked_at": 1786407444.840348
+  },
+  {
+    "task_id": "2e6a604f-3d52-4ed1-aa6e-3a38db1ca6eb",
+    "seq": 4,
+    "latency_s": 0.854,
+    "status": 200,
+    "resp_digest": "4f74076c2092855f",
+    "duplicate": false,
+    "invoked_at": 1786407445.6946607
+  },
+  {
+    "task_id": "16a4639b-61e1-451e-a71f-2bf353d7c6fb",
+    "seq": 5,
+    "latency_s": 0.5776,
+    "status": 200,
+    "resp_digest": "09df5a99a86e070e",
+    "duplicate": false,
+    "invoked_at": 1786407446.2775493
+  },
+  {
+    "task_id": "16a4639b-61e1-451e-a71f-2bf353d7c6fb",
+    "seq": 5,
+    "latency_s": 0.1287,
+    "status": 200,
+    "resp_digest": "09df5a99a86e070e",
+    "duplicate": true,
+    "invoked_at": 1786407467.121403
+  },
+  {
+    "task_id": "9bfdaf73-ad9e-4c93-9056-c6aa599f0cc4",
+    "seq": 6,
+    "latency_s": 1.5825,
+    "status": 200,
+    "resp_digest": "6c835fd8e1d89071",
+    "duplicate": false,
+    "invoked_at": 1786407468.7101655
+  },
+  {
+    "task_id": "9bfdaf73-ad9e-4c93-9056-c6aa599f0cc4",
+    "seq": 6,
+    "latency_s": 0.1477,
+    "status": 200,
+    "resp_digest": "6c835fd8e1d89071",
+    "duplicate": true,
+    "invoked_at": 1786407490.064825
+  },
+  {
+    "task_id": "9bfdaf73-ad9e-4c93-9056-c6aa599f0cc4",
+    "seq": 6,
+    "latency_s": 0.1163,
+    "status": 200,
+    "resp_digest": "6c835fd8e1d89071",
+    "duplicate": true,
+    "invoked_at": 1786407511.0775952
+  },
+  {
+    "task_id": "54b298b8-cd19-45c8-bff1-a17497c9f8e5",
+    "seq": 7,
+    "latency_s": 0.6877,
+    "status": 200,
+    "resp_digest": "6da9abc3a9be9e0f",
+    "duplicate": false,
+    "invoked_at": 1786407511.7657566
+  },
+  {
+    "task_id": "54b298b8-cd19-45c8-bff1-a17497c9f8e5",
+    "seq": 7,
+    "latency_s": 0.123,
+    "status": 200,
+    "resp_digest": "6da9abc3a9be9e0f",
+    "duplicate": true,
+    "invoked_at": 1786407532.536089
+  },
+  {
+    "task_id": "54b298b8-cd19-45c8-bff1-a17497c9f8e5",
+    "seq": 7,
+    "latency_s": 0.1209,
+    "status": 200,
+    "resp_digest": "6da9abc3a9be9e0f",
+    "duplicate": true,
+    "invoked_at": 1786407553.8353426
+  },
+  {
+    "task_id": "6177102d-ebd2-4749-b124-bad3e4f4c4e1",
+    "seq": 8,
+    "latency_s": 0.4384,
+    "status": 200,
+    "resp_digest": "a07f58621b6c8845",
+    "duplicate": false,
+    "invoked_at": 1786407554.2741532
+  },
+  {
+    "task_id": "6004ab18-fb0c-4463-8d90-c9d6850fe1f8",
+    "seq": 9,
+    "latency_s": 1.0826,
+    "status": 200,
+    "resp_digest": "42b0b2cf1bdbe6ee",
+    "duplicate": false,
+    "invoked_at": 1786407555.357186
+  },
+  {
+    "task_id": "d374c511-9c20-4ae0-869f-d5f4f7c41171",
+    "seq": 10,
+    "latency_s": 1.1347,
+    "status": 200,
+    "resp_digest": "4b510fd0296c2d0f",
+    "duplicate": false,
+    "invoked_at": 1786407556.4923446
+  },
+  {
+    "task_id": "639b247c-7cd9-437d-b270-87845921ff7e",
+    "seq": 11,
+    "latency_s": 0.8605,
+    "status": 200,
+    "resp_digest": "0e329911716f5b85",
+    "duplicate": false,
+    "invoked_at": 1786407557.3534431
+  },
+  {
+    "task_id": "308880f5-f6c5-4c0f-9877-cb52d6f50352",
+    "seq": 12,
+    "latency_s": 0.4974,
+    "status": 200,
+    "resp_digest": "b0f52383ac179bb7",
+    "duplicate": false,
+    "invoked_at": 1786407557.8513029
+  },
+  {
+    "task_id": "5f5f6c35-473d-4f28-bd0d-a3e6b0b666a3",
+    "seq": 13,
+    "latency_s": 0.4523,
+    "status": 200,
+    "resp_digest": "e5b1223a52b9d093",
+    "duplicate": false,
+    "invoked_at": 1786407558.3060057
+  },
+  {
+    "task_id": "7b970533-3110-400e-ae1c-55438f8163d2",
+    "seq": 14,
+    "latency_s": 0.8113,
+    "status": 200,
+    "resp_digest": "85426a84a8eaf6ff",
+    "duplicate": false,
+    "invoked_at": 1786407559.1177037
+  },
+  {
+    "task_id": "4f4bd960-53b5-4b1a-873d-25a17da80a71",
+    "seq": 15,
+    "latency_s": 0.5259,
+    "status": 200,
+    "resp_digest": "254988546755d891",
+    "duplicate": false,
+    "invoked_at": 1786407559.6440115
+  },
+  {
+    "task_id": "b1951fb1-2cb1-4a45-80d7-91621ad32ba6",
+    "seq": 16,
+    "latency_s": 0.9857,
+    "status": 200,
+    "resp_digest": "fe2f8d5c0c87bdc7",
+    "duplicate": false,
+    "invoked_at": 1786407560.6301
+  },
+  {
+    "task_id": "472500ae-a56e-4399-b701-35103f97d5b1",
+    "seq": 17,
+    "latency_s": 1.0039,
+    "status": 200,
+    "resp_digest": "285499b86ade938d",
+    "duplicate": false,
+    "invoked_at": 1786407561.6344228
+  },
+  {
+    "task_id": "ae2923db-da36-4841-a606-fc1bcd7dd020",
+    "seq": 18,
+    "latency_s": 7.4311,
+    "status": 200,
+    "resp_digest": "7f0346692e2e11e2",
+    "duplicate": false,
+    "invoked_at": 1786407569.0668128
+  },
+  {
+    "task_id": "3ee137c0-d915-4bb1-bf28-f7774e9ece01",
+    "seq": 19,
+    "latency_s": 7.398,
+    "status": 200,
+    "resp_digest": "1d1fbcdcfb712462",
+    "duplicate": false,
+    "invoked_at": 1786407576.4656093
+  },
+  {
+    "task_id": "e8c1fb19-8b90-4de1-89fb-fa006c396504",
+    "seq": 20,
+    "latency_s": 0.3935,
+    "status": 200,
+    "resp_digest": "c1621e80afa8cda0",
+    "duplicate": false,
+    "invoked_at": 1786407576.8596125
+  },
+  {
+    "task_id": "96a1a043-a9ad-4098-afc2-0317c11244be",
+    "seq": 21,
+    "latency_s": 0.4725,
+    "status": 200,
+    "resp_digest": "a3e7bed42287f4bb",
+    "duplicate": false,
+    "invoked_at": 1786407577.3325264
+  },
+  {
+    "task_id": "a6aa471b-4a86-4dc4-accb-a7ca9ff2187c",
+    "seq": 22,
+    "latency_s": 0.629,
+    "status": 200,
+    "resp_digest": "fccb08e9ac86f6ee",
+    "duplicate": false,
+    "invoked_at": 1786407577.9618373
+  },
+  {
+    "task_id": "30a1b9dc-0413-4ea9-b11c-9510f8e871da",
+    "seq": 23,
+    "latency_s": 0.4603,
+    "status": 200,
+    "resp_digest": "ec814f0c61f245dd",
+    "duplicate": false,
+    "invoked_at": 1786407578.4225736
+  },
+  {
+    "task_id": "8a8b39e5-7578-4e64-b557-9692ebc428f8",
+    "seq": 24,
+    "latency_s": 0.4353,
+    "status": 200,
+    "resp_digest": "fda6f4ccb55895a0",
+    "duplicate": false,
+    "invoked_at": 1786407578.8582451
+  },
+  {
+    "task_id": "01c9727e-bdf3-440d-b184-b07f9e67dec6",
+    "seq": 25,
+    "latency_s": 0.4492,
+    "status": 200,
+    "resp_digest": "d24ce491e585093c",
+    "duplicate": false,
+    "invoked_at": 1786407579.30829
+  },
+  {
+    "task_id": "d43c122b-0b16-47e4-9f07-88cea8dd4fc2",
+    "seq": 26,
+    "latency_s": 0.5585,
+    "status": 200,
+    "resp_digest": "bcc7369467a405ce",
+    "duplicate": false,
+    "invoked_at": 1786407579.8672915
+  },
+  {
+    "task_id": "63204890-203c-42fd-9d99-b853c21bdd94",
+    "seq": 27,
+    "latency_s": 0.511,
+    "status": 200,
+    "resp_digest": "ef7ce1a1f0c117bd",
+    "duplicate": false,
+    "invoked_at": 1786407580.378755
+  },
+  {
+    "task_id": "4299b89f-9e9e-4cae-b9c2-73866814430b",
+    "seq": 28,
+    "latency_s": 0.5881,
+    "status": 200,
+    "resp_digest": "4ad8fbc53d278a24",
+    "duplicate": false,
+    "invoked_at": 1786407580.9671807
+  },
+  {
+    "task_id": "de76cb55-48f6-41b4-94a4-3f2ecc31fdae",
+    "seq": 29,
+    "latency_s": 0.4968,
+    "status": 200,
+    "resp_digest": "da0387f31c8f1973",
+    "duplicate": false,
+    "invoked_at": 1786407581.4643204
+  },
+  {
+    "task_id": "e5251014-4755-4607-9e36-c24f8cb76503",
+    "seq": 30,
+    "latency_s": 9.4933,
+    "status": 200,
+    "resp_digest": "0290d51888bfec66",
+    "duplicate": false,
+    "invoked_at": 1786407590.9580736
+  }
+]
