@@ -13,9 +13,20 @@ load generator, a 336-cell fault-injection campaign, a cost model, and
 a pre-committed statistics pipeline (BCa bootstrap CIs, Mann–Whitney U
 with effect sizes, Holm correction).
 
-No network access and no cloud credentials are needed or used: all
-platform behavior is mocked locally and every run is seeded and
-deterministic (same seed → identical output).
+The **main reproduction path** (`run.sh`, the sweep, the fault campaign)
+needs no network access and no cloud credentials: all platform behavior
+is mocked locally and every run is seeded and deterministic (same seed →
+identical output).
+
+Two directories are deliberate exceptions, and are **not** part of the
+deterministic path: `anchor/` (Table 9, live-endpoint anchor) and
+`anchor/p7/` (Table 10, live bridge probe) each invoke real Salesforce
+and Amazon Bedrock/AgentCore endpoints and therefore require the caller's
+own credentials and network access. Their committed `results/` are
+records of executed live runs, not regenerable offline; `anchor/p7/`
+additionally ships an offline mock gate
+(`anchor/p7/test_bridge_probe_mock.py`) that exercises the harness logic
+with no credentials.
 
 Repository: https://github.com/shikher20goel/multi-agent-genai-orchestration-patterns ·
 Archived artifact DOI: minted at the tagged release (see the Releases page

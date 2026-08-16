@@ -54,6 +54,15 @@ def fake_post(url, headers=None, json=None, data=None, timeout=None):
             SESSIONS[cid] = 0 if rid in (-2,) else (10**9 if rid == -1 else rid)
             return FakeResp([{"channel": "/meta/subscribe",
                               "successful": True}])
+        if ch == "/meta/disconnect":
+            # CometdClient.disconnect() posts this on teardown. Without a
+            # handler the mock fell through to the AssertionError below,
+            # which disconnect()'s `except Exception: pass` swallowed — so
+            # every teardown silently exercised the error path and a real
+            # disconnect regression could not surface here.
+            SESSIONS.pop(msg["clientId"], None)
+            return FakeResp([{"channel": "/meta/disconnect",
+                              "successful": True}])
         if ch == "/meta/connect":
             cid = msg["clientId"]
             cur = SESSIONS[cid]
