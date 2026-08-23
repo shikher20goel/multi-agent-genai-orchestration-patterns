@@ -1,0 +1,40 @@
+# Managed-runtime anchor + load contrast (reviewer R1-1, R2-2).
+# NO SECRETS IN THIS FILE - credentials come from the environment:
+#   AWS via the standard boto3 chain (IAM user: anchor-runner)
+#   AGENTFORCE_CLIENT_ID / AGENTFORCE_CLIENT_SECRET
+#
+# This config is SEPARATE from anchor_config.yaml, and every arm sets a
+# distinct record_prefix, so the 1 Aug n=30 records the manuscript's
+# Table 9 already cites are never overwritten.
+scenario: S1
+n_requests: 100
+patterns: [P1, P2]
+concurrency: [1, 8]
+
+agentcore:
+  enabled: true
+  region: us-east-1
+  record_prefix: agentcore
+  # runtime_arns intentionally omitted: read from agentcore/runtimes.json,
+  # which deploy_agentcore.py writes. ARNs are never hand-typed.
+
+bedrock:
+  # Same-region direct-Converse control. Without it, any AgentCore-vs-direct
+  # difference would be confounded with the us-east-2/us-east-1 move, since
+  # the managed runtime lives in us-east-1 and the 1 Aug anchor ran in
+  # us-east-2. Sequential only; this arm is a control, not a load study.
+  enabled: true
+  region: us-east-1
+  model_id: "us.amazon.nova-micro-v1:0"
+  record_prefix: bedrock_direct_use1
+  concurrency: [1]
+
+agentforce:
+  # Best effort under org API limits. If the higher level throttles, the
+  # throttle is recorded as a result rather than worked around.
+  enabled: true
+  domain: "https://orgfarm-04d1f5d7a4-dev-ed.develop.my.salesforce.com"
+  agent_id: "0XxgK0000021hwDSAQ"
+  api_version: "v1"
+  record_prefix: agentforce_load
+  concurrency: [1, 4]

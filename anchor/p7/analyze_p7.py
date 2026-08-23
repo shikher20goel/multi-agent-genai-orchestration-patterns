@@ -1,9 +1,16 @@
-"""Summarize the P7 probe runs (C1 ingress-off, C2 ingress-on).
+"""Summarize the P7 probe runs.
 
-NO-FABRICATION GUARD: refuses to emit a comparison unless both
+C1/C2 exercise the CRM retry direction (ingress off/on in the bridge).
+C3/C4 exercise the AWS SDK retry direction (ingress off/on at the target
+boundary); they are analysed only if their results are present.
+
+NO-FABRICATION GUARD: refuses to emit a comparison unless the
 summary.json files exist and were produced by real runs (non-zero
-deliveries). Prints the LaTeX table row values for §VI-H verbatim
-from recorded data — nothing is typed by hand into the manuscript.
+deliveries, all tasks handled, not truncated). Prints the LaTeX table row
+values for §VI-H verbatim from recorded data — nothing is typed by hand
+into the manuscript. Whether the SDK retry actually fired is REPORTED,
+never assumed: a C3/C4 pair in which it did not fire is printed as such
+rather than being dressed up as a result.
 """
 import json
 import sys
@@ -27,6 +34,61 @@ def load(results_dir, label):
         sys.exit(f"REFUSING: {label} hit max_run_seconds — truncated "
                  f"run, counts are not reportable.")
     return s
+
+
+def load_retry(results_dir, label):
+    """Loader for the C3/C4 summaries, which have their own shape."""
+    p = Path(results_dir) / label / "summary.json"
+    if not p.exists():
+        return None
+    s = json.loads(p.read_text())
+    if s.get("logical_calls", 0) != s.get("n_tasks"):
+        sys.exit(f"REFUSING: {label} made {s.get('logical_calls')} logical "
+                 f"calls for {s.get('n_tasks')} tasks — incomplete run.")
+    if s.get("timed_out"):
+        sys.exit(f"REFUSING: {label} hit max_run_seconds — truncated run.")
+    if s.get("redeliveries_observed", 0) != 0:
+        # A CRM-side redelivery here would make duplicate executions
+        # ambiguous between the two retry domains, which is the one thing
+        # this condition exists to rule out.
+        sys.exit(f"REFUSING: {label} saw "
+                 f"{s['redeliveries_observed']} CRM redeliveries; duplicate "
+                 f"executions could not be attributed to the AWS direction.")
+    return s
+
+
+def report_retry(c3, c4):
+    print("\n=== P7 probe, AWS-retry direction (live) ===")
+    for s in (c3, c4):
+        print(f"  {s['run_label']} bridge_ingress={s['bridge_ingress']} "
+              f"agent_ingress={s['agent_ingress']}: "
+              f"published={s['published']} "
+              f"deliveries={s['deliveries_observed']} "
+              f"redeliveries={s['redeliveries_observed']} "
+              f"logical_calls={s['logical_calls']} "
+              f"wire_attempts={s['wire_attempts_total']} "
+              f"retried_calls={s['calls_with_sdk_retry']} "
+              f"agent_entries>1={s['agent_entries_gt_1']} "
+              f"DUP_EXECUTIONS={s['duplicate_agent_executions']}")
+
+    fired = c3["calls_with_sdk_retry"] > 0 and c4["calls_with_sdk_retry"] > 0
+    print(f"\nSDK retry fired on the wire: {fired}")
+    if not fired:
+        print("  -> the AWS retry surface was NOT exercised in this pair; "
+              "nothing here may be reported as having exercised it.")
+        return
+    holds = (c3["duplicate_agent_executions"] > 0
+             and c4["duplicate_agent_executions"] == 0)
+    print(f"P7 target-boundary ingress claim holds: {holds}")
+    print("  note: the bridge-side ingress was ON in both conditions and "
+          "suppressed nothing, because the bridge issued one logical call.")
+    print("\nLaTeX rows (Table: §VI-H, AWS-retry direction):")
+    for s in (c3, c4):
+        print(f"  {s['run_label']} & {s['agent_ingress']} & "
+              f"{s['published']} & {s['logical_calls']} & "
+              f"{s['wire_attempts_total']} & {s['calls_with_sdk_retry']} & "
+              f"{s['agent_entries_gt_1']} & "
+              f"{s['duplicate_agent_executions']} \\\\")
 
 
 def main():
@@ -56,6 +118,12 @@ def main():
               f"{s['redeliveries_observed']} & {s['invocations']} & "
               f"{s['duplicate_invocations']} & "
               f"{s['ordering_inversions']} \\\\")
+
+    c3, c4 = load_retry(results_dir, "C3"), load_retry(results_dir, "C4")
+    if c3 and c4:
+        report_retry(c3, c4)
+    else:
+        print("\n(no C3/C4 results present — AWS-retry direction not run)")
 
 
 if __name__ == "__main__":

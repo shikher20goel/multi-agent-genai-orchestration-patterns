@@ -1,25 +1,32 @@
 {
   "scenario": "S1",
+  "n_requests": 30,
   "per_platform": {
     "bedrock": {
       "p1_median_latency_s": 1.5617,
       "p2_median_latency_s": 0.5658,
+      "latency_ratio_p1_over_p2": 2.76,
       "p1_mean_invocations": 5,
       "p2_mean_invocations": 1,
       "latency_ordering_holds": true,
       "invocation_ordering_holds": true,
       "p1_n_ok": 30,
-      "p2_n_ok": 30
+      "p2_n_ok": 30,
+      "p1_n_total": 30,
+      "p2_n_total": 30
     },
     "agentforce": {
       "p1_median_latency_s": 11.3173,
       "p2_median_latency_s": 2.7552,
+      "latency_ratio_p1_over_p2": 4.11,
       "p1_mean_invocations": 5,
       "p2_mean_invocations": 1,
       "latency_ordering_holds": true,
       "invocation_ordering_holds": true,
       "p1_n_ok": 30,
-      "p2_n_ok": 30
+      "p2_n_ok": 30,
+      "p1_n_total": 30,
+      "p2_n_total": 30
     }
   }
 }
