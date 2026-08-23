@@ -45,6 +45,10 @@ def main(argv=None) -> int:
     ap.add_argument("--role-arn")
     ap.add_argument("--copy-role-from", default="p7probe")
     ap.add_argument("--runtime-name", default="p7retry")
+    # A rebuilt agent MUST get a new tag: updating a runtime while reusing
+    # a tag can leave it serving the cached image, and the run would then
+    # silently measure the old code.
+    ap.add_argument("--tag", default=IMAGE_TAG)
     ap.add_argument("--skip-build", action="store_true")
     a = ap.parse_args(argv)
 
@@ -54,7 +58,7 @@ def main(argv=None) -> int:
 
     role_arn = a.role_arn or _dep.role_of(ac_ctl, a.copy_role_from)
 
-    _dep.REPO_NAME, _dep.IMAGE_TAG = REPO_NAME, IMAGE_TAG
+    _dep.REPO_NAME, _dep.IMAGE_TAG = REPO_NAME, a.tag
     _dep.AGENT_DIR = AGENT_DIR
     image_uri = _dep.ensure_ecr(ecr, account, a.region)
     if not a.skip_build:

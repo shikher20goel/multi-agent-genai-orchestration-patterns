@@ -47,6 +47,17 @@ def load_retry(results_dir, label):
                  f"calls for {s.get('n_tasks')} tasks — incomplete run.")
     if s.get("timed_out"):
         sys.exit(f"REFUSING: {label} hit max_run_seconds — truncated run.")
+    if s.get("calls_ok", 0) != s.get("logical_calls"):
+        # duplicate_agent_executions is counted only over calls that came
+        # back, because the counters ride on the response. If some calls
+        # never returned, a low duplicate count would understate rather
+        # than measure, so the pair is not reportable from client records
+        # alone — read the agent's CloudWatch lines instead.
+        sys.exit(f"REFUSING: {label} had "
+                 f"{s['logical_calls'] - s.get('calls_ok', 0)} logical calls "
+                 f"return no response; duplicate executions cannot be "
+                 f"counted from client records. Use the agent's CloudWatch "
+                 f"log lines (P7RETRY exec ...) for those tasks.")
     if s.get("redeliveries_observed", 0) != 0:
         # A CRM-side redelivery here would make duplicate executions
         # ambiguous between the two retry domains, which is the one thing

@@ -56,7 +56,7 @@ _WARM = set()        # idem keys whose work has run at least once here
 DEFAULT_DELAY_S = float(os.environ.get("P7_RETRY_DELAY_S", "0"))
 
 
-def _work(task_id, seq, delay_s, warm_delay_s):
+def _work(key, task_id, seq, delay_s, warm_delay_s):
     """The unit of work whose repetition is the thing being counted.
 
     Cold on a key, warm afterwards -- an ordinary property of real work,
@@ -67,14 +67,23 @@ def _work(task_id, seq, delay_s, warm_delay_s):
     Without the asymmetry every attempt would time out and the duplicate
     execution -- which has already happened by then -- would be invisible
     from the client side. CloudWatch corroboration does not depend on it.
+
+    The execution is counted HERE, where the work commits to running, and
+    NOT on completion. Because the cold path is slow and the warm path is
+    not, a reissued call routinely finishes BEFORE the call it duplicated;
+    a completion-time counter reports 1 for what were two runs and so
+    understates duplicates -- the one direction of error this probe must
+    not have.
     """
     with _LOCK:
-        warm = task_id in _WARM
-        _WARM.add(task_id)
+        warm = key in _WARM
+        _WARM.add(key)
+        _EXECUTIONS[key] = _EXECUTIONS.get(key, 0) + 1
+        n = _EXECUTIONS[key]
     d = warm_delay_s if warm else delay_s
     if d > 0:
         time.sleep(d)
-    return hashlib.sha256(f"{task_id}:{seq}".encode()).hexdigest()[:16]
+    return hashlib.sha256(f"{task_id}:{seq}".encode()).hexdigest()[:16], n
 
 
 @app.entrypoint
@@ -121,7 +130,8 @@ def handler(payload, context=None):
                 "entered_at": entered_at, "completed_at": time.time()}
 
     try:
-        digest = _work(task_id, seq, delay_s, warm_delay_s)
+        digest, executions = _work(key, task_id, seq, delay_s,
+                                   warm_delay_s)
     except Exception as exc:
         if ingress_on and owner:
             with _LOCK:
@@ -135,8 +145,6 @@ def handler(payload, context=None):
                 "ingress": "on" if ingress_on else "off"}
 
     with _LOCK:
-        _EXECUTIONS[key] = _EXECUTIONS.get(key, 0) + 1
-        executions = _EXECUTIONS[key]
         if ingress_on:
             _RESULTS[key] = digest
             ev = _INFLIGHT.pop(key, None)
