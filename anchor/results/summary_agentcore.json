@@ -1,0 +1,95 @@
+{
+  "scenario": "S1",
+  "n_requests": 100,
+  "platforms": {
+    "bedrock_direct_use1": {
+      "P1": {
+        "n_ok": 100,
+        "n_total": 100,
+        "median_latency_s": 1.6504,
+        "mean_invocations": 5
+      },
+      "P2": {
+        "n_ok": 100,
+        "n_total": 100,
+        "median_latency_s": 0.5774,
+        "mean_invocations": 1
+      }
+    },
+    "agentcore": {
+      "P1": {
+        "n_ok": 100,
+        "n_total": 100,
+        "median_latency_s": 2.0334,
+        "mean_invocations": 5,
+        "median_in_runtime_latency_s": 1.5371
+      },
+      "P2": {
+        "n_ok": 100,
+        "n_total": 100,
+        "median_latency_s": 1.0636,
+        "mean_invocations": 1,
+        "median_in_runtime_latency_s": 0.5947
+      }
+    }
+  },
+  "concurrency_levels": [
+    1,
+    8
+  ],
+  "by_concurrency": {
+    "bedrock_direct_use1": {
+      "c1": {
+        "P1": {
+          "n_ok": 100,
+          "n_total": 100,
+          "median_latency_s": 1.6504,
+          "mean_invocations": 5
+        },
+        "P2": {
+          "n_ok": 100,
+          "n_total": 100,
+          "median_latency_s": 0.5774,
+          "mean_invocations": 1
+        }
+      }
+    },
+    "agentcore": {
+      "c1": {
+        "P1": {
+          "n_ok": 100,
+          "n_total": 100,
+          "median_latency_s": 2.0334,
+          "mean_invocations": 5,
+          "median_in_runtime_latency_s": 1.5371
+        },
+        "P2": {
+          "n_ok": 100,
+          "n_total": 100,
+          "median_latency_s": 1.0636,
+          "mean_invocations": 1,
+          "median_in_runtime_latency_s": 0.5947
+        }
+      },
+      "c8": {
+        "P1": {
+          "n_ok": 89,
+          "n_total": 100,
+          "median_latency_s": 6.8744,
+          "mean_invocations": 5,
+          "median_in_runtime_latency_s": 1.6751,
+          "error_statuses": [
+            "error:ThrottlingException"
+          ]
+        },
+        "P2": {
+          "n_ok": 100,
+          "n_total": 100,
+          "median_latency_s": 3.601,
+          "mean_invocations": 1,
+          "median_in_runtime_latency_s": 0.56
+        }
+      }
+    }
+  }
+}

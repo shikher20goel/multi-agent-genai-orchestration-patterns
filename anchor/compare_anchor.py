@@ -53,15 +53,25 @@ def _pair(pats: dict) -> dict:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--summary", default=str(RESULTS / "summary.json"))
+    # Repeatable: arms needing different credentials run in separate
+    # passes and write separate summaries; the comparison still sees one
+    # study. Later files win on a key collision.
+    ap.add_argument("--summary", action="append", default=None)
     ap.add_argument("--out", default=str(RESULTS / "anchor_findings.json"))
     a = ap.parse_args(argv)
 
-    summ = Path(a.summary)
-    if not summ.exists():
-        sys.exit(f"No {summ} - run `python -m anchor.run_anchor` against live "
-                 "endpoints first. This tool never invents numbers.")
-    data = json.loads(summ.read_text())
+    paths = [Path(x) for x in (a.summary or [str(RESULTS / "summary.json")])]
+    data = {}
+    for summ in paths:
+        if not summ.exists():
+            sys.exit(f"No {summ} - run `python -m anchor.run_anchor` against "
+                     "live endpoints first. This tool never invents numbers.")
+        d = json.loads(summ.read_text())
+        for key in ("scenario", "n_requests"):
+            data.setdefault(key, d.get(key))
+        data.setdefault("platforms", {}).update(d.get("platforms", {}))
+        for plat, lv in (d.get("by_concurrency") or {}).items():
+            data.setdefault("by_concurrency", {}).setdefault(plat, {}).update(lv)
     findings = {"scenario": data.get("scenario"),
                 "n_requests": data.get("n_requests"),
                 "per_platform": {}}

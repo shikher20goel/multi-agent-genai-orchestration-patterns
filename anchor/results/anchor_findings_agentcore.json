@@ -1,0 +1,88 @@
+{
+  "scenario": "S1",
+  "n_requests": 100,
+  "per_platform": {
+    "bedrock_direct_use1": {
+      "p1_median_latency_s": 1.6504,
+      "p2_median_latency_s": 0.5774,
+      "latency_ratio_p1_over_p2": 2.86,
+      "p1_mean_invocations": 5,
+      "p2_mean_invocations": 1,
+      "latency_ordering_holds": true,
+      "invocation_ordering_holds": true,
+      "p1_n_ok": 100,
+      "p2_n_ok": 100,
+      "p1_n_total": 100,
+      "p2_n_total": 100
+    },
+    "agentcore": {
+      "p1_median_latency_s": 2.0334,
+      "p2_median_latency_s": 1.0636,
+      "latency_ratio_p1_over_p2": 1.91,
+      "p1_mean_invocations": 5,
+      "p2_mean_invocations": 1,
+      "latency_ordering_holds": true,
+      "invocation_ordering_holds": true,
+      "p1_n_ok": 100,
+      "p2_n_ok": 100,
+      "p1_n_total": 100,
+      "p2_n_total": 100,
+      "p1_median_in_runtime_latency_s": 1.5371,
+      "p2_median_in_runtime_latency_s": 0.5947
+    }
+  },
+  "by_concurrency": {
+    "bedrock_direct_use1": {
+      "c1": {
+        "p1_median_latency_s": 1.6504,
+        "p2_median_latency_s": 0.5774,
+        "latency_ratio_p1_over_p2": 2.86,
+        "p1_mean_invocations": 5,
+        "p2_mean_invocations": 1,
+        "latency_ordering_holds": true,
+        "invocation_ordering_holds": true,
+        "p1_n_ok": 100,
+        "p2_n_ok": 100,
+        "p1_n_total": 100,
+        "p2_n_total": 100
+      },
+      "ordering_preserved_at_all_levels": true
+    },
+    "agentcore": {
+      "c1": {
+        "p1_median_latency_s": 2.0334,
+        "p2_median_latency_s": 1.0636,
+        "latency_ratio_p1_over_p2": 1.91,
+        "p1_mean_invocations": 5,
+        "p2_mean_invocations": 1,
+        "latency_ordering_holds": true,
+        "invocation_ordering_holds": true,
+        "p1_n_ok": 100,
+        "p2_n_ok": 100,
+        "p1_n_total": 100,
+        "p2_n_total": 100,
+        "p1_median_in_runtime_latency_s": 1.5371,
+        "p2_median_in_runtime_latency_s": 0.5947
+      },
+      "c8": {
+        "p1_median_latency_s": 6.8744,
+        "p2_median_latency_s": 3.601,
+        "latency_ratio_p1_over_p2": 1.91,
+        "p1_mean_invocations": 5,
+        "p2_mean_invocations": 1,
+        "latency_ordering_holds": true,
+        "invocation_ordering_holds": true,
+        "p1_n_ok": 89,
+        "p2_n_ok": 100,
+        "p1_n_total": 100,
+        "p2_n_total": 100,
+        "p1_median_in_runtime_latency_s": 1.6751,
+        "p1_error_statuses": [
+          "error:ThrottlingException"
+        ],
+        "p2_median_in_runtime_latency_s": 0.56
+      },
+      "ordering_preserved_at_all_levels": true
+    }
+  }
+}

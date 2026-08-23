@@ -126,6 +126,10 @@ def main(argv=None) -> int:
     ap.add_argument("--config", default="anchor/anchor_config.yaml")
     ap.add_argument("--out-summary",
                     help="summary path (default anchor/results/summary.json)")
+    ap.add_argument("--only",
+                    help="comma-separated subset of enabled platforms to run, "
+                         "e.g. 'agentcore,bedrock'. Lets arms that need "
+                         "different credentials run in separate passes.")
     args = ap.parse_args(argv)
     cfg = yaml.safe_load(open(args.config))
     n = int(cfg.get("n_requests", 30))
@@ -137,9 +141,10 @@ def main(argv=None) -> int:
         summary["concurrency_levels"] = levels
         summary["by_concurrency"] = {}
 
+    only = {x.strip() for x in args.only.split(",")} if args.only else None
     for plat in ("bedrock", "agentcore", "agentforce"):
         pcfg = cfg.get(plat, {})
-        if not pcfg.get("enabled"):
+        if not pcfg.get("enabled") or (only and plat not in only):
             continue
         runner = _make_runner(plat, pcfg)
         # record_prefix names the output files and the summary key. It
