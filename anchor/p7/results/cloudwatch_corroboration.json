@@ -1,0 +1,23 @@
+{
+  "log_group": "/aws/bedrock-agentcore/runtimes/p7retry-UeNz2P2ZBb-DEFAULT",
+  "per_condition": {
+    "C3": {
+      "tasks_in_logs": 30,
+      "agent_entries_total": 60,
+      "entered_exactly_twice": 30,
+      "executions_total": 60,
+      "exec_distribution": {
+        "2": 30
+      }
+    },
+    "C4": {
+      "tasks_in_logs": 30,
+      "agent_entries_total": 60,
+      "entered_exactly_twice": 30,
+      "executions_total": 30,
+      "exec_distribution": {
+        "1": 30
+      }
+    }
+  }
+}
