@@ -56,10 +56,19 @@ def docker_login(ecr, account, region):
         input=pwd.encode())
 
 
-def build_and_push(image_uri):
-    # AgentCore runs arm64 only; this box is x86, so buildx emulates.
-    _sh(["docker", "buildx", "build", "--platform", "linux/arm64",
-         "-t", image_uri, "--push", str(AGENT_DIR)])
+def build_and_push(image_uri, context=None, dockerfile=None):
+    """Build arm64 and push. AgentCore runs arm64 only, so buildx emulates.
+
+    context/dockerfile are split because the released-module image must be
+    built from the REPO ROOT (it ships src/ and configs/) while its
+    Dockerfile lives beside the agent.
+    """
+    cmd = ["docker", "buildx", "build", "--platform", "linux/arm64",
+           "-t", image_uri, "--push"]
+    if dockerfile:
+        cmd += ["-f", str(dockerfile)]
+    cmd.append(str(context or AGENT_DIR))
+    _sh(cmd)
 
 
 def role_of(ac_ctl, name) -> str:

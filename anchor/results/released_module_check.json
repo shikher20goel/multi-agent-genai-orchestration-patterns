@@ -1,0 +1,36 @@
+{
+  "scenario": "S1",
+  "n_requests": 30,
+  "purpose": "released-module deployability check, not a timing arm",
+  "patterns": {
+    "P1": {
+      "n_ok": 30,
+      "n_total": 30,
+      "live_invocations_per_request": [
+        5
+      ],
+      "released_module": "agentorch.patterns.p1_supervisor",
+      "released_class": "SupervisorPattern",
+      "pattern_name": "P1 Supervisor-Collaborator Hierarchy",
+      "result_statuses": [
+        "ok"
+      ],
+      "error_statuses": []
+    },
+    "P2": {
+      "n_ok": 30,
+      "n_total": 30,
+      "live_invocations_per_request": [
+        1
+      ],
+      "released_module": "agentorch.patterns.p2_pipeline",
+      "released_class": "PipelinePattern",
+      "pattern_name": "P2 Sequential Pipeline",
+      "result_statuses": [
+        "ok"
+      ],
+      "error_statuses": []
+    }
+  },
+  "structure_as_expected": true
+}
