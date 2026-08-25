@@ -14,3 +14,4 @@ Session start. No tasks complete yet.
 #   policy must stay untouched.
 # - IAM changes take minutes to propagate; a first AccessDenied after a policy
 #   edit is expected, a persistent one is not.
+TASK 000 001 002 003 004 done: M0: contract harness, signature helper, seam fixture derived from AST, drift test. Suite 247 passed (242 pre-existing + 5 new).

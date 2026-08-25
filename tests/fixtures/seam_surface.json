@@ -1,0 +1,29 @@
+{
+  "P1": [
+    "bedrock.invoke_agent"
+  ],
+  "P2": [
+    "bedrock.invoke_agent"
+  ],
+  "P3": [
+    "agentcore.observability_emit",
+    "bedrock.invoke_agent"
+  ],
+  "P4": [
+    "agentcore.memory_get",
+    "agentcore.memory_put",
+    "bedrock.invoke_agent"
+  ],
+  "P5": [
+    "agentcore.gateway_call",
+    "bedrock.invoke_agent"
+  ],
+  "P6": [
+    "agentcore.memory_put",
+    "bedrock.invoke_agent",
+    "guardrails.apply"
+  ],
+  "P7": [
+    "bedrock.invoke_agent"
+  ]
+}
