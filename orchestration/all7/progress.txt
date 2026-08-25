@@ -1,0 +1,16 @@
+Session start. No tasks complete yet.
+# Append one line per task below, e.g.:
+# TASK 000 done: contract harness created, trivial test green.
+# TASK 031 implemented, awaiting human review (creates billable AWS resources).
+#
+# Context carried in from the planning session (do not re-derive):
+# - P1, P2 already run live from the RELEASED modules: 60/60 requests,
+#   exactly 5 and 1 invocations, runtimes anchorp1rel / anchorp2rel.
+# - P7's bridge target already runs live (p7probe, p7retry).
+# - Account has 1 Memory (p7probe_mem, RESERVED to the P7 probe), 0 Gateways,
+#   0 Guardrails, as of 25-Aug-2026.
+# - The execution role is AmazonBedrockAgentCoreSDKRuntime-us-east-1-861e6a5a2b
+#   with an ADDITIVE inline policy AnchorAgentCoreExtras. The p7probe inline
+#   policy must stay untouched.
+# - IAM changes take minutes to propagate; a first AccessDenied after a policy
+#   edit is expected, a persistent one is not.
