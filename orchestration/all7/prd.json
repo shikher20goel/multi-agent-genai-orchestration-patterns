@@ -174,7 +174,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "021",
@@ -185,7 +185,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "022",
@@ -196,7 +196,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "023",
@@ -207,7 +207,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "024",
@@ -218,7 +218,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "025",
@@ -229,7 +229,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "026",
@@ -240,7 +240,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "027",
@@ -251,7 +251,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "028",
@@ -262,7 +262,7 @@
       ],
       "verify": "`python -m pytest -q` \u2192 0 failures.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "030",

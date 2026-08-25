@@ -16,3 +16,4 @@ Session start. No tasks complete yet.
 #   edit is expected, a persistent one is not.
 TASK 000 001 002 003 004 done: M0: contract harness, signature helper, seam fixture derived from AST, drift test. Suite 247 passed (242 pre-existing + 5 new).
 TASK 010 011 012 013 014 015 016 017 018 done: M1: live_clients.py with four stubs + attach_live_clients; agent_app imports the shared class; boundary_call absence asserted via AST.
+TASK 020 021 022 023 024 025 026 027 028 done: M2: all seven released patterns run through the live-client seam offline. Found P6 needs real scenario items (confidence field) to reach its pause path; switched to generate_s1. Suite 267 passed, credential-free.
