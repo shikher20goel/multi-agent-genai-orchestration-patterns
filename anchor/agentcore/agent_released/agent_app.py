@@ -34,6 +34,7 @@ Redaction is enforced at the boundary, as elsewhere: completion text is
 consumed inside the runtime and never returned.
 """
 import os
+import sys
 import time
 import uuid
 
@@ -48,6 +49,11 @@ from agentorch.patterns.p2_pipeline import PipelinePattern
 from agentorch.telemetry import TelemetrySink
 from agentorch.types import Platform, ScenarioId
 
+# Shared with the offline contract tests: one definition, so the class the
+# tests check is the class the deployment runs.
+sys.path.insert(0, "/app")
+from anchor.agentcore.live_clients import LiveBedrockAgentRuntime  # noqa: E402
+
 app = BedrockAgentCoreApp()
 
 PATTERN = os.environ.get("ANCHOR_PATTERN", "P2").upper()
@@ -59,43 +65,12 @@ _CFG = load_config()
 _client = boto3.client("bedrock-runtime", region_name=MODEL_REGION)
 
 
-class LiveBedrockAgentRuntime:
-    """Live implementation of the seam ``MockBedrockAgentRuntime`` defines.
-
-    Same method, same argument names, same return shape. The released
-    patterns cannot tell the difference, which is the point.
-    """
-
-    def __init__(self):
-        self.invocations = 0
-        self.tokens_in = 0
-        self.tokens_out = 0
-
-    def invoke_agent(self, agentId: str, agentAliasId: str, sessionId: str,
-                     inputText: str) -> dict:
-        resp = _client.converse(
-            modelId=MODEL_ID,
-            # agentId carries the released module's own role label
-            # ("supervisor", "collab-0", "agent-draft"), so the live call
-            # preserves the role structure the pattern expresses.
-            messages=[{"role": "user",
-                       "content": [{"text": f"[{agentId}] {inputText}"}]}],
-            inferenceConfig={"maxTokens": 200, "temperature": 0.2},
-        )
-        usage = resp.get("usage", {})
-        self.invocations += 1
-        self.tokens_in += int(usage.get("inputTokens", 0))
-        self.tokens_out += int(usage.get("outputTokens", 0))
-        text = resp["output"]["message"]["content"][0]["text"]
-        return {"completion": text, "sessionId": sessionId}
-
-
 def _build_pattern():
     ctx = CallContext.build(_CFG, sink=TelemetrySink(),
                             stream_prefix=f"{PATTERN}:bedrock:S1:live")
     cls = SupervisorPattern if PATTERN == "P1" else PipelinePattern
     pat = cls(Platform.BEDROCK, ctx, _CFG)
-    live = LiveBedrockAgentRuntime()
+    live = LiveBedrockAgentRuntime(_client, MODEL_ID)
     pat.bedrock = live          # <-- the entire swap, per Section V-A
     return pat, live
 

@@ -108,3 +108,71 @@ def test_seam_fixture_matches_pattern_source() -> None:
         assert actual == expected, (
             f"{pid} ({path.name}) seam surface drifted: "
             f"source has {sorted(actual)}, fixture has {sorted(expected)}")
+
+
+def test_live_clients_never_call_boundary_call() -> None:
+    """The rule that keeps the live and emulated timing models separate.
+
+    ctx.boundary_call drives the virtual clock, the latency model and the
+    fault injector. A live client invoking it would contaminate the
+    deterministic study, so its absence is asserted rather than trusted.
+    """
+    src = (REPO / "anchor" / "agentcore" / "live_clients.py").read_text()
+    # Parse rather than grep: the module docstring legitimately NAMES the rule
+    # it is documenting, and a substring search would flag the explanation
+    # while missing, say, getattr(ctx, "boundary_" + "call").
+    tree = ast.parse(src)
+    offenders = [n.attr for n in ast.walk(tree)
+                 if isinstance(n, ast.Attribute) and n.attr == "boundary_call"]
+    assert not offenders, \
+        "a live client calls boundary_call; that contaminates the study"
+
+
+def test_every_seam_method_is_signature_compatible() -> None:
+    """Cover every method in the fixture, not just the interesting ones."""
+    import sys
+    sys.path.insert(0, str(REPO))
+    from anchor.agentcore.live_clients import (LiveAgentCore, LiveGuardrails,
+                                               LiveBedrockAgentRuntime)
+    from agentorch.clients.bedrock import MockBedrockAgentRuntime
+    mocks = {"bedrock": MockBedrockAgentRuntime, "agentcore": MockAgentCore,
+             "guardrails": MockGuardrails}
+    lives = {"bedrock": LiveBedrockAgentRuntime, "agentcore": LiveAgentCore,
+             "guardrails": LiveGuardrails}
+    fixture = json.loads(SEAM_FIXTURE.read_text())
+    seen = set()
+    for methods in fixture.values():
+        for entry in methods:
+            owner, method = entry.split(".")
+            assert_signature_compatible(mocks[owner], lives[owner], method)
+            seen.add(entry)
+    assert len(seen) >= 6, f"expected the full seam surface, saw {sorted(seen)}"
+
+
+def test_gateway_call_keeps_the_two_call_accounting() -> None:
+    """P5's extra hop is its structural consequence; it must stay visible."""
+    import sys
+    sys.path.insert(0, str(REPO))
+    from anchor.agentcore.live_clients import LiveAgentCore
+    ac = LiveAgentCore()
+    before = ac.service_calls
+    ac.gateway_call("search", {"q": 1})
+    assert ac.service_calls - before == 2, \
+        "gateway hop plus tool call must count as two, as the mock does"
+
+
+def test_memory_get_returns_none_for_a_missing_key() -> None:
+    """P4 depends on the mock's contract; raising would change its flow."""
+    import sys
+    sys.path.insert(0, str(REPO))
+    from anchor.agentcore.live_clients import LiveAgentCore
+    assert LiveAgentCore().memory_get("absent") is None
+
+
+def test_guardrails_rejects_an_invalid_mode() -> None:
+    import sys
+    import pytest
+    sys.path.insert(0, str(REPO))
+    from anchor.agentcore.live_clients import LiveGuardrails
+    with pytest.raises(ValueError):
+        LiveGuardrails().apply("x", mode="enforce")

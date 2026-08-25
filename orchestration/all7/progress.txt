@@ -15,3 +15,4 @@ Session start. No tasks complete yet.
 # - IAM changes take minutes to propagate; a first AccessDenied after a policy
 #   edit is expected, a persistent one is not.
 TASK 000 001 002 003 004 done: M0: contract harness, signature helper, seam fixture derived from AST, drift test. Suite 247 passed (242 pre-existing + 5 new).
+TASK 010 011 012 013 014 015 016 017 018 done: M1: live_clients.py with four stubs + attach_live_clients; agent_app imports the shared class; boundary_call absence asserted via AST.
