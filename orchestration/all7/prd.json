@@ -273,7 +273,7 @@
       ],
       "verify": "`python anchor/agentcore/provision_all7.py --dry-run` \u2192 prints the three planned resources, creates nothing.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "031",
