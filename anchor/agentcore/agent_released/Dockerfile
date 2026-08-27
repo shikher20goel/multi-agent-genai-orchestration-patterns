@@ -13,6 +13,15 @@ COPY src/ /app/src/
 # agentorch.config resolves configs/default.yaml as parents[2] of
 # src/agentorch/config.py, i.e. /app/configs -- keep this layout.
 COPY configs/ /app/configs/
+# The live clients and backends live in the anchor package, so the image must
+# carry it: agent_app imports anchor.agentcore.live_clients. Copying only
+# agent_app.py was enough while the client was defined inline, and stopped
+# being enough the moment it moved -- the container then died on import
+# before emitting a single log line.
+COPY anchor/__init__.py /app/anchor/__init__.py
+COPY anchor/agentcore/__init__.py /app/anchor/agentcore/
+COPY anchor/agentcore/live_clients.py /app/anchor/agentcore/
+COPY anchor/agentcore/live_backends.py /app/anchor/agentcore/
 COPY anchor/agentcore/agent_released/agent_app.py .
 ENV PYTHONPATH=/app/src
 EXPOSE 8080

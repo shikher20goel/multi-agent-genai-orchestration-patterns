@@ -1,10 +1,15 @@
 {
   "region": "us-east-1",
-  "image_uri": "111789566955.dkr.ecr.us-east-1.amazonaws.com/anchor-agentcore-released:v1",
+  "image_uri": "111789566955.dkr.ecr.us-east-1.amazonaws.com/anchor-agentcore-released:v3",
   "role_arn": "arn:aws:iam::111789566955:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-861e6a5a2b",
   "model_id": "us.amazon.nova-micro-v1:0",
   "runtimes": {
     "P1": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp1rel-5550mf7tEE",
-    "P2": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp2rel-psoOvY61AP"
+    "P2": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp2rel-psoOvY61AP",
+    "P3": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp3rel-VHsLM96nsj",
+    "P4": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp4rel-tsy4IU9a8t",
+    "P5": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp5rel-Ka3wtEGdu1",
+    "P6": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp6rel-sJGBnMDXvz",
+    "P7": "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/anchorp7rel-TCEANN7UZg"
   }
 }

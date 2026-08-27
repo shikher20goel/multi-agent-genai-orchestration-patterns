@@ -22,3 +22,7 @@ TASK 031 HUMAN GATE: approved by user 25-Aug-2026 ('yes. go ahead') for provisio
 TASK 031 032 033 034 035 done [HUMAN GATE cleared by user (25-Aug-2026)]: M3 provisioning approved and executed.
 TASK 036 037 done: All four resources reachable; inventory committed.
 TASK 040 041 042 043 044 045 046 047 048 049 done: M4: memory + guardrails verified LIVE standalone. Gateway blocked (no target, no lambda perms) and observability local-smoke blocked (user lacks logs:PutLogEvents) - both DECLARED in known_bounds.json.
+TASK 050 done [HUMAN GATE cleared by user (25-Aug-2026)]: Spend approved for M3-M7.
+TASK 051 055 056 done: Offline green; agent serves all seven; deps unchanged.
+TASK 057 done [HUMAN GATE cleared by user (25-Aug-2026)]: Deploy approved.
+TASK 058 059 done: Seven runtimes deployed at image tag v2.

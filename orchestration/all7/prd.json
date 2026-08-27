@@ -471,7 +471,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "051",
@@ -482,7 +482,7 @@
       ],
       "verify": "`env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY python -m pytest -q` \u2192 0 failures.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "055",
@@ -493,7 +493,7 @@
       ],
       "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "056",
@@ -504,7 +504,7 @@
       ],
       "verify": "`docker buildx build --platform linux/arm64 -f anchor/agentcore/agent_released/Dockerfile .` \u2192 succeeds.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "057",
@@ -515,7 +515,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "058",
@@ -526,7 +526,7 @@
       ],
       "verify": "`python anchor/agentcore/deploy_released.py --patterns P3,P4` \u2192 both READY.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "059",
@@ -537,7 +537,7 @@
       ],
       "verify": "`python anchor/agentcore/deploy_released.py --patterns P5,P6,P7` \u2192 all READY.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "060",
