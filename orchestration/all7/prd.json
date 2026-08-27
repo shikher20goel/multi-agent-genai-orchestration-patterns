@@ -548,7 +548,7 @@
       ],
       "verify": "`python anchor/agentcore/smoke_all7.py` \u2192 5/5 ok, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "061",
@@ -559,7 +559,7 @@
       ],
       "verify": "`python -c \"import json;d=json.load(open('anchor/agentcore/runtimes_released.json'));assert len(d['runtimes'])==7\"` exits 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "062",
@@ -570,7 +570,7 @@
       ],
       "verify": "`env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY python -m pytest -q` \u2192 0 failures.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "065",
@@ -581,7 +581,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "066",
@@ -592,7 +592,7 @@
       ],
       "verify": "`python anchor/agentcore/run_all7.py --n 1` \u2192 7 records written, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "067",
@@ -603,7 +603,7 @@
       ],
       "verify": "`python anchor/agentcore/run_all7.py --patterns P3,P4 --n 30` \u2192 `structure_as_expected` true.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "068",
@@ -614,7 +614,7 @@
       ],
       "verify": "`python anchor/agentcore/run_all7.py --patterns P5,P6 --n 30` \u2192 `structure_as_expected` true.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "069",
@@ -625,7 +625,7 @@
       ],
       "verify": "`python anchor/agentcore/run_all7.py --patterns P7,P1,P2 --n 30` \u2192 `structure_as_expected` true; original files unmodified per `git status`.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "070",
@@ -636,7 +636,7 @@
       ],
       "verify": "`python anchor/agentcore/analyze_all7.py` \u2192 prints the table, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "071",
@@ -647,7 +647,7 @@
       ],
       "verify": "`python anchor/agentcore/analyze_all7.py --self-test` \u2192 refuses a synthetic incomplete input, exit non-zero.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "072",
@@ -658,7 +658,7 @@
       ],
       "verify": "`python anchor/agentcore/corroborate_p3.py` \u2192 counts match, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "073",
@@ -669,7 +669,7 @@
       ],
       "verify": "`git status --porcelain anchor/results/` \u2192 clean after commit.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "074",
@@ -680,7 +680,7 @@
       ],
       "verify": "`python scripts/check_redaction.py anchor/results/` \u2192 exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "075",

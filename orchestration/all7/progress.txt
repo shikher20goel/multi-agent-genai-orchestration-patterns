@@ -26,3 +26,6 @@ TASK 050 done [HUMAN GATE cleared by user (25-Aug-2026)]: Spend approved for M3-
 TASK 051 055 056 done: Offline green; agent serves all seven; deps unchanged.
 TASK 057 done [HUMAN GATE cleared by user (25-Aug-2026)]: Deploy approved.
 TASK 058 059 done: Seven runtimes deployed at image tag v2.
+TASK 060 061 062 done: All seven smoke ok at image v3; runtimes.json records seven ARNs.
+TASK 065 done [HUMAN GATE cleared by user (25-Aug-2026)]: Recorded run approved.
+TASK 066 067 068 069 070 071 072 073 074 done: M6: all seven live at n=30, 210/210 ok, every structural signature matches the offline fixture. P6 paused on 7/30. P3 corroborated from CloudWatch. Redaction clean across 42 files.

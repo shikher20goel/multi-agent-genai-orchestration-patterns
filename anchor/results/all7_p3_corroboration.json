@@ -1,0 +1,8 @@
+{
+  "log_groups": [
+    "/agentorch/all7/observability"
+  ],
+  "harness_reported_events": 90,
+  "cloudwatch_events_seen": 93,
+  "corroborates": true
+}
