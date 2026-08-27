@@ -691,7 +691,7 @@
       ],
       "verify": "`python scripts/verify_manuscript_numbers.py paper/v3/main.tex` \u2192 exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "076",
@@ -702,7 +702,7 @@
       ],
       "verify": "`grep -c \"modelled\" anchor/README.md` \u2192 at least 1; suite green.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "077",
@@ -713,7 +713,7 @@
       ],
       "verify": "File exists and lists at least six distinct bounds; suite green.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "078",
@@ -724,7 +724,7 @@
       ],
       "verify": "`git status --short figures/` \u2192 empty after a locked `run.sh`.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "079",
