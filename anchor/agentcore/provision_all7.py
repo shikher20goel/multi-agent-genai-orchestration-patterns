@@ -80,7 +80,13 @@ def ensure_gateway(ctl, dry: bool, inv: dict, role_arn: str) -> dict:
                 print(f"  gateway    EXISTS  {g.get('gatewayId')}")
                 return {"id": g.get("gatewayId"), "created": False}
     if dry:
-        print(f"  gateway    WOULD CREATE  {GATEWAY_NAME} (+1 stand-in target)")
+        print(f"  gateway    WOULD CREATE  {GATEWAY_NAME}")
+        print( "             NOTE: no target is created. An AgentCore\n"
+               "             Gateway target requires a Lambda or OpenAPI\n"
+               "             backend; creating one needs lambda:CreateFunction,\n"
+               "             which anchor-runner does not hold. Without a\n"
+               "             target the gateway exposes no tools, so P5's\n"
+               "             gateway seam cannot reach a live tool.")
         return {"planned": GATEWAY_NAME}
     r = ctl.create_gateway(
         name=GATEWAY_NAME,

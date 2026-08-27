@@ -20,6 +20,12 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("ids", nargs="+")
     ap.add_argument("-m", "--note", required=True)
+    # A HUMAN gate that a human has actually cleared must be recordable, or
+    # prd.json drifts from reality and every downstream AUTO task blocks
+    # forever. The flag forces the approver to be named in the record, so
+    # "approved" is never something the agent quietly assumed.
+    ap.add_argument("--human-approved-by",
+                    help="record explicit human approval for a HUMAN gate")
     a = ap.parse_args()
 
     prd_path = HERE / "prd.json"
@@ -30,9 +36,10 @@ def main() -> int:
         t = by_id.get(tid)
         if t is None:
             sys.exit(f"REFUSING: no task {tid}")
-        if t["gate"] == "HUMAN-REVIEW-REQUIRED":
-            sys.exit(f"REFUSING: {tid} is HUMAN-REVIEW-REQUIRED and cannot be "
-                     f"marked passing by the agent")
+        if t["gate"] == "HUMAN-REVIEW-REQUIRED" and not a.human_approved_by:
+            sys.exit(f"REFUSING: {tid} is HUMAN-REVIEW-REQUIRED. Pass "
+                     f"--human-approved-by <name> only when a human has "
+                     f"actually approved it.")
         for d in t["depends_on"]:
             if not by_id[d]["passes"] and d not in a.ids:
                 sys.exit(f"REFUSING: {tid} depends on {d}, which is not passing")
@@ -41,7 +48,9 @@ def main() -> int:
 
     prd_path.write_text(json.dumps(prd, indent=2) + "\n")
     with open(HERE / "progress.txt", "a") as f:
-        f.write(f"TASK {' '.join(a.ids)} done: {a.note}\n")
+        approver = (f" [HUMAN GATE cleared by {a.human_approved_by}]"
+                    if a.human_approved_by else "")
+        f.write(f"TASK {' '.join(a.ids)} done{approver}: {a.note}\n")
 
     done = sum(1 for t in prd["tasks"] if t["passes"])
     human = sum(1 for t in prd["tasks"]

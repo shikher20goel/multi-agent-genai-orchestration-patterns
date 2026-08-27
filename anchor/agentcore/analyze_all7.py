@@ -23,6 +23,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE.parent / "results"
+BOUNDS = HERE / "known_bounds.json"
 
 
 def refuse(msg: str) -> None:
@@ -52,7 +53,13 @@ def analyse(summary: dict, require_live_backends: bool = True) -> None:
 
     if require_live_backends:
         # A pattern whose seam silently used the in-memory stub has not
-        # demonstrated anything about the live service.
+        # demonstrated anything about the live service. A bound may be
+        # TOLERATED only if it is DECLARED in known_bounds.json with a reason
+        # -- an undeclared stub is still a refusal, and a declared one is
+        # printed loudly rather than passing quietly.
+        declared = {}
+        if BOUNDS.exists():
+            declared = json.loads(BOUNDS.read_text()).get("declared", {})
         needs = {"P4": "memory", "P5": "gateway", "P6": "guardrail",
                  "P3": "observability"}
         for pid, seam in needs.items():
@@ -60,9 +67,15 @@ def analyse(summary: dict, require_live_backends: bool = True) -> None:
             if not p:
                 continue
             live = (p.get("backends_live") or {}).get(seam)
-            if not live:
+            if live:
+                continue
+            key = f"{pid}.{seam}"
+            if key not in declared:
                 refuse(f"{pid} ran with the {seam} seam on its in-memory stub, "
-                       f"not the live service; that is not live evidence")
+                       f"not the live service, and that bound is not declared "
+                       f"in known_bounds.json. An undeclared stub is not live "
+                       f"evidence.")
+            print(f"!! DECLARED BOUND {key}: {declared[key]['consequence']}")
 
     digests = {p.get("image_digest") for p in pats.values()}
     digests.discard(None)

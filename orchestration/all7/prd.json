@@ -284,7 +284,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "032",
@@ -295,7 +295,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW \u2014 show the created id and a successful read-back.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "033",
@@ -306,7 +306,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW \u2014 show gateway status and one successful tool invocation.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "034",
@@ -317,7 +317,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW \u2014 show `ApplyGuardrail` returning a non-blocking assessment.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "035",
@@ -328,7 +328,7 @@
       ],
       "verify": "FLAG FOR HUMAN REVIEW \u2014 show the policy diff before and after.",
       "gate": "HUMAN-REVIEW-REQUIRED",
-      "passes": false
+      "passes": true
     },
     {
       "id": "036",
@@ -339,7 +339,7 @@
       ],
       "verify": "`python anchor/agentcore/check_resources.py` \u2192 all three reachable, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "037",
@@ -350,7 +350,7 @@
       ],
       "verify": "`python -c \"import json;d=json.load(open('anchor/agentcore/resources_all7.json'));assert {'memory','gateway','guardrail'} <= d.keys()\"` exits 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "040",
@@ -361,7 +361,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass (signature unchanged).",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "041",
@@ -372,7 +372,7 @@
       ],
       "verify": "`python anchor/agentcore/smoke_observability.py` \u2192 3 events emitted and read back, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "042",
@@ -383,7 +383,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "043",
@@ -394,7 +394,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "044",
@@ -405,7 +405,7 @@
       ],
       "verify": "`python anchor/agentcore/smoke_memory.py` \u2192 all three cases pass, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "045",
@@ -416,7 +416,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "046",
@@ -427,7 +427,7 @@
       ],
       "verify": "`python anchor/agentcore/smoke_gateway.py` \u2192 both tools return, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "047",
@@ -438,7 +438,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "048",
@@ -449,7 +449,7 @@
       ],
       "verify": "`python anchor/agentcore/smoke_guardrails.py` \u2192 both non-blocking, exit 0.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "049",
@@ -460,7 +460,7 @@
       ],
       "verify": "`python -m pytest tests/test_live_contract.py tests/test_all7_stub.py -q` \u2192 all pass.",
       "gate": "AUTO",
-      "passes": false
+      "passes": true
     },
     {
       "id": "050",

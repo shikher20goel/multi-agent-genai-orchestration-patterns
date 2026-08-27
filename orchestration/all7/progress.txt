@@ -19,3 +19,6 @@ TASK 010 011 012 013 014 015 016 017 018 done: M1: live_clients.py with four stu
 TASK 020 021 022 023 024 025 026 027 028 done: M2: all seven released patterns run through the live-client seam offline. Found P6 needs real scenario items (confidence field) to reach its pause path; switched to generate_s1. Suite 267 passed, credential-free.
 TASK 030 done: provision_all7.py written; --dry-run default, executes nothing. Cost estimate printed.
 TASK 031 HUMAN GATE: approved by user 25-Aug-2026 ('yes. go ahead') for provisioning + deploy + n=30 runs, est. <$5.
+TASK 031 032 033 034 035 done [HUMAN GATE cleared by user (25-Aug-2026)]: M3 provisioning approved and executed.
+TASK 036 037 done: All four resources reachable; inventory committed.
+TASK 040 041 042 043 044 045 046 047 048 049 done: M4: memory + guardrails verified LIVE standalone. Gateway blocked (no target, no lambda perms) and observability local-smoke blocked (user lacks logs:PutLogEvents) - both DECLARED in known_bounds.json.
