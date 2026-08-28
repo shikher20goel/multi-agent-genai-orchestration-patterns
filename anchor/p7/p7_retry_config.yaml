@@ -1,0 +1,25 @@
+# P7 probe conditions C3/C4 - the AWS-side retry direction.
+# No secrets in this file, ever.
+n_tasks: 30
+aws_region: us-east-1
+
+# Written by deploy_retry_agent.py; the C1/C2 runtime (p7probe) is left
+# untouched so the records Section VI-H already cites keep their exact
+# provenance.
+retry_agent_runtime_arn: "arn:aws:bedrock-agentcore:us-east-1:111789566955:runtime/p7retry-UeNz2P2ZBb"
+
+# The fault: a client read timeout shorter than the agent's cold-path work
+# time. botocore treats the resulting ReadTimeoutError as a transient
+# HTTPClientError and reissues the request under its standard retry mode.
+client_read_timeout_s: 5
+# 4, not 3: if AgentCore serialises requests on a session, the reissued
+# call queues behind the cold path and can time out too. Three attempts
+# leaves no margin; the extra attempt costs nothing when it is not needed.
+sdk_max_attempts: 4
+agent_cold_delay_s: 8     # first execution of a key: exceeds the timeout
+agent_warm_delay_s: 0     # reissued call returns inside it, carrying counters
+
+idle_seconds_to_finish: 90
+max_run_seconds: 3600
+resubscribe_after_seconds: 150
+results_dir: anchor/p7/results

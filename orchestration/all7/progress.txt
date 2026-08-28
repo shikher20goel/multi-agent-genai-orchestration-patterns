@@ -1,0 +1,33 @@
+Session start. No tasks complete yet.
+# Append one line per task below, e.g.:
+# TASK 000 done: contract harness created, trivial test green.
+# TASK 031 implemented, awaiting human review (creates billable AWS resources).
+#
+# Context carried in from the planning session (do not re-derive):
+# - P1, P2 already run live from the RELEASED modules: 60/60 requests,
+#   exactly 5 and 1 invocations, runtimes anchorp1rel / anchorp2rel.
+# - P7's bridge target already runs live (p7probe, p7retry).
+# - Account has 1 Memory (p7probe_mem, RESERVED to the P7 probe), 0 Gateways,
+#   0 Guardrails, as of 25-Aug-2026.
+# - The execution role is AmazonBedrockAgentCoreSDKRuntime-us-east-1-861e6a5a2b
+#   with an ADDITIVE inline policy AnchorAgentCoreExtras. The p7probe inline
+#   policy must stay untouched.
+# - IAM changes take minutes to propagate; a first AccessDenied after a policy
+#   edit is expected, a persistent one is not.
+TASK 000 001 002 003 004 done: M0: contract harness, signature helper, seam fixture derived from AST, drift test. Suite 247 passed (242 pre-existing + 5 new).
+TASK 010 011 012 013 014 015 016 017 018 done: M1: live_clients.py with four stubs + attach_live_clients; agent_app imports the shared class; boundary_call absence asserted via AST.
+TASK 020 021 022 023 024 025 026 027 028 done: M2: all seven released patterns run through the live-client seam offline. Found P6 needs real scenario items (confidence field) to reach its pause path; switched to generate_s1. Suite 267 passed, credential-free.
+TASK 030 done: provision_all7.py written; --dry-run default, executes nothing. Cost estimate printed.
+TASK 031 HUMAN GATE: approved by user 25-Aug-2026 ('yes. go ahead') for provisioning + deploy + n=30 runs, est. <$5.
+TASK 031 032 033 034 035 done [HUMAN GATE cleared by user (25-Aug-2026)]: M3 provisioning approved and executed.
+TASK 036 037 done: All four resources reachable; inventory committed.
+TASK 040 041 042 043 044 045 046 047 048 049 done: M4: memory + guardrails verified LIVE standalone. Gateway blocked (no target, no lambda perms) and observability local-smoke blocked (user lacks logs:PutLogEvents) - both DECLARED in known_bounds.json.
+TASK 050 done [HUMAN GATE cleared by user (25-Aug-2026)]: Spend approved for M3-M7.
+TASK 051 055 056 done: Offline green; agent serves all seven; deps unchanged.
+TASK 057 done [HUMAN GATE cleared by user (25-Aug-2026)]: Deploy approved.
+TASK 058 059 done: Seven runtimes deployed at image tag v2.
+TASK 060 061 062 done: All seven smoke ok at image v3; runtimes.json records seven ARNs.
+TASK 065 done [HUMAN GATE cleared by user (25-Aug-2026)]: Recorded run approved.
+TASK 066 067 068 069 070 071 072 073 074 done: M6: all seven live at n=30, 210/210 ok, every structural signature matches the offline fixture. P6 paused on 7/30. P3 corroborated from CloudWatch. Redaction clean across 42 files.
+TASK 075 076 077 078 done: M7: bounds doc, README, all gates green. Suite 278; analyzer, redaction and number-tracing all pass.
+TASK 079 done [HUMAN GATE cleared by user (28-Aug-2026, 'finish up everything') - resources RETAINED, not retired]: Resources kept for reproducibility; retirement deferred.

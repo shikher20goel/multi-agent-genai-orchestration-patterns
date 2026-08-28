@@ -1,0 +1,25 @@
+{
+  "memory": {
+    "id": "agentorch_all7_mem-EeJ36664JO",
+    "arn": "arn:aws:bedrock-agentcore:us-east-1:111789566955:memory/agentorch_all7_mem-EeJ36664JO",
+    "created": true
+  },
+  "gateway": {
+    "id": "agentorch-all7-gw-iambvbawex",
+    "arn": "arn:aws:bedrock-agentcore:us-east-1:111789566955:gateway/agentorch-all7-gw-iambvbawex",
+    "url": "https://agentorch-all7-gw-iambvbawex.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp",
+    "created": true,
+    "lambda_arn": "arn:aws:lambda:us-east-1:111789566955:function:agentorch-all7-tool",
+    "target": {
+      "id": "CMD4LD9EZG",
+      "created": true
+    }
+  },
+  "guardrail": {
+    "id": "0rwf5fcew9ss",
+    "arn": "arn:aws:bedrock:us-east-1:111789566955:guardrail/0rwf5fcew9ss",
+    "version": "DRAFT",
+    "created": true
+  },
+  "region": "us-east-1"
+}

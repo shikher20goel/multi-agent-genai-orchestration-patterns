@@ -1,0 +1,6 @@
+bedrock-agentcore
+boto3
+numpy
+pandas
+pyyaml
+requests

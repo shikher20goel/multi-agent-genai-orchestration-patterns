@@ -1,0 +1,785 @@
+{
+  "project": "All Seven Patterns Live on AWS",
+  "completion_promise": "PROJECT_COMPLETE",
+  "verify_command": "python -m pytest -q",
+  "forbidden_autonomous_actions": [
+    "creating, modifying or deleting AWS resources without human approval",
+    "changing IAM roles, policies or any access control",
+    "overwriting or deleting any committed record under anchor/results/ or anchor/p7/results/",
+    "editing the manuscript, the response letter, or any upload artifact",
+    "publishing a git tag, GitHub release, or Zenodo DOI",
+    "submitting anything to the IEEE portal",
+    "committing secrets, keys or tokens",
+    "recording model completion text in any result file"
+  ],
+  "tasks": [
+    {
+      "id": "000",
+      "title": "Create the live-client contract test harness",
+      "milestone": "M0",
+      "depends_on": [],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 1 passed.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "001",
+      "title": "Add a signature-comparison helper to the contract harness",
+      "milestone": "M0",
+      "depends_on": [
+        "000"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "002",
+      "title": "Record the per-pattern seam surface as a test fixture",
+      "milestone": "M0",
+      "depends_on": [
+        "001"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "003",
+      "title": "Assert the seam fixture matches the patterns' actual source",
+      "milestone": "M0",
+      "depends_on": [
+        "002"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "004",
+      "title": "Confirm the full suite is unaffected",
+      "milestone": "M0",
+      "depends_on": [
+        "003"
+      ],
+      "verify": "`python -m pytest -q` \u2192 0 failures.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "010",
+      "title": "Create the live-clients module skeleton",
+      "milestone": "M1",
+      "depends_on": [
+        "004"
+      ],
+      "verify": "`python -m pytest -q` \u2192 0 failures; `python -c \"from anchor.agentcore.live_clients import LiveBedrockAgentRuntime\"` exits 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "011",
+      "title": "Document the no-boundary_call rule in the module",
+      "milestone": "M1",
+      "depends_on": [
+        "010"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "012",
+      "title": "Stub `observability_emit` with an in-memory sink",
+      "milestone": "M1",
+      "depends_on": [
+        "011"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 signature-compatible with `MockAgentCore.observability_emit`.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "013",
+      "title": "Stub `memory_get` / `memory_put` with an in-memory dict",
+      "milestone": "M1",
+      "depends_on": [
+        "012"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "014",
+      "title": "Stub `gateway_call`",
+      "milestone": "M1",
+      "depends_on": [
+        "013"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "015",
+      "title": "Stub `guardrails.apply`",
+      "milestone": "M1",
+      "depends_on": [
+        "014"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "016",
+      "title": "Contract-test all four stubs against their mocks",
+      "milestone": "M1",
+      "depends_on": [
+        "015"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "017",
+      "title": "Add a seam-swap helper",
+      "milestone": "M1",
+      "depends_on": [
+        "016"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "018",
+      "title": "Confirm suite still green after M1",
+      "milestone": "M1",
+      "depends_on": [
+        "017"
+      ],
+      "verify": "`python -m pytest -q` \u2192 0 failures.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "020",
+      "title": "Create the offline all-seven test module",
+      "milestone": "M2",
+      "depends_on": [
+        "018"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "021",
+      "title": "Assert P1's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "020"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "022",
+      "title": "Assert P2's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "021"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "023",
+      "title": "Assert P3's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "022"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "024",
+      "title": "Assert P4's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "023"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "025",
+      "title": "Assert P5's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "024"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "026",
+      "title": "Assert P6's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "025"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "027",
+      "title": "Assert P7's structural signature offline",
+      "milestone": "M2",
+      "depends_on": [
+        "026"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "028",
+      "title": "Freeze the seven structural signatures as a fixture",
+      "milestone": "M2",
+      "depends_on": [
+        "027"
+      ],
+      "verify": "`python -m pytest -q` \u2192 0 failures.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "030",
+      "title": "Write the provisioning script (no execution)",
+      "milestone": "M3",
+      "depends_on": [
+        "028"
+      ],
+      "verify": "`python anchor/agentcore/provision_all7.py --dry-run` \u2192 prints the three planned resources, creates nothing.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "031",
+      "title": "Human review of the provisioning plan",
+      "milestone": "M3",
+      "depends_on": [
+        "030"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "032",
+      "title": "Create the AgentCore Memory resource",
+      "milestone": "M3",
+      "depends_on": [
+        "031"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW \u2014 show the created id and a successful read-back.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "033",
+      "title": "Create the AgentCore Gateway and one Target",
+      "milestone": "M3",
+      "depends_on": [
+        "032"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW \u2014 show gateway status and one successful tool invocation.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "034",
+      "title": "Create the Bedrock Guardrail in shadow mode",
+      "milestone": "M3",
+      "depends_on": [
+        "033"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW \u2014 show `ApplyGuardrail` returning a non-blocking assessment.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "035",
+      "title": "Extend the execution role for the new services",
+      "milestone": "M3",
+      "depends_on": [
+        "034"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW \u2014 show the policy diff before and after.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "036",
+      "title": "Verify every provisioned resource is reachable",
+      "milestone": "M3",
+      "depends_on": [
+        "035"
+      ],
+      "verify": "`python anchor/agentcore/check_resources.py` \u2192 all three reachable, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "037",
+      "title": "Record the provisioned inventory",
+      "milestone": "M3",
+      "depends_on": [
+        "036"
+      ],
+      "verify": "`python -c \"import json;d=json.load(open('anchor/agentcore/resources_all7.json'));assert {'memory','gateway','guardrail'} <= d.keys()\"` exits 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "040",
+      "title": "Implement `observability_emit` against CloudWatch",
+      "milestone": "M4",
+      "depends_on": [
+        "037"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass (signature unchanged).",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "041",
+      "title": "Smoke-test `observability_emit` live, standalone",
+      "milestone": "M4",
+      "depends_on": [
+        "040"
+      ],
+      "verify": "`python anchor/agentcore/smoke_observability.py` \u2192 3 events emitted and read back, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "042",
+      "title": "Implement `memory_put` against AgentCore Memory",
+      "milestone": "M4",
+      "depends_on": [
+        "041"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "043",
+      "title": "Implement `memory_get` against AgentCore Memory",
+      "milestone": "M4",
+      "depends_on": [
+        "042"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "044",
+      "title": "Smoke-test memory round-trip live, standalone",
+      "milestone": "M4",
+      "depends_on": [
+        "043"
+      ],
+      "verify": "`python anchor/agentcore/smoke_memory.py` \u2192 all three cases pass, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "045",
+      "title": "Implement `gateway_call` against the AgentCore Gateway",
+      "milestone": "M4",
+      "depends_on": [
+        "044"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "046",
+      "title": "Smoke-test `gateway_call` live, standalone",
+      "milestone": "M4",
+      "depends_on": [
+        "045"
+      ],
+      "verify": "`python anchor/agentcore/smoke_gateway.py` \u2192 both tools return, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "047",
+      "title": "Implement `guardrails.apply` against ApplyGuardrail",
+      "milestone": "M4",
+      "depends_on": [
+        "046"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "048",
+      "title": "Smoke-test `guardrails.apply` live, standalone",
+      "milestone": "M4",
+      "depends_on": [
+        "047"
+      ],
+      "verify": "`python anchor/agentcore/smoke_guardrails.py` \u2192 both non-blocking, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "049",
+      "title": "Re-run the contract suite against live implementations",
+      "milestone": "M4",
+      "depends_on": [
+        "048"
+      ],
+      "verify": "`python -m pytest tests/test_live_contract.py tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "050",
+      "title": "Human review of first live spend across four services",
+      "milestone": "M4",
+      "depends_on": [
+        "049"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "051",
+      "title": "Confirm suite green after M4",
+      "milestone": "M4",
+      "depends_on": [
+        "050"
+      ],
+      "verify": "`env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY python -m pytest -q` \u2192 0 failures.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "055",
+      "title": "Generalise the agent app to all seven patterns",
+      "milestone": "M5",
+      "depends_on": [
+        "051"
+      ],
+      "verify": "`python -m pytest tests/test_all7_stub.py -q` \u2192 all pass.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "056",
+      "title": "Extend the container to carry the new dependencies",
+      "milestone": "M5",
+      "depends_on": [
+        "055"
+      ],
+      "verify": "`docker buildx build --platform linux/arm64 -f anchor/agentcore/agent_released/Dockerfile .` \u2192 succeeds.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "057",
+      "title": "Human review before deploying seven runtimes",
+      "milestone": "M5",
+      "depends_on": [
+        "056"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "058",
+      "title": "Deploy runtimes for P3 and P4",
+      "milestone": "M5",
+      "depends_on": [
+        "057"
+      ],
+      "verify": "`python anchor/agentcore/deploy_released.py --patterns P3,P4` \u2192 both READY.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "059",
+      "title": "Deploy runtimes for P5, P6 and P7",
+      "milestone": "M5",
+      "depends_on": [
+        "058"
+      ],
+      "verify": "`python anchor/agentcore/deploy_released.py --patterns P5,P6,P7` \u2192 all READY.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "060",
+      "title": "Smoke one request per newly deployed runtime",
+      "milestone": "M5",
+      "depends_on": [
+        "059"
+      ],
+      "verify": "`python anchor/agentcore/smoke_all7.py` \u2192 5/5 ok, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "061",
+      "title": "Record the deployed inventory",
+      "milestone": "M5",
+      "depends_on": [
+        "060"
+      ],
+      "verify": "`python -c \"import json;d=json.load(open('anchor/agentcore/runtimes_released.json'));assert len(d['runtimes'])==7\"` exits 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "062",
+      "title": "Confirm suite green after M5",
+      "milestone": "M5",
+      "depends_on": [
+        "061"
+      ],
+      "verify": "`env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY python -m pytest -q` \u2192 0 failures.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "065",
+      "title": "Human approval for the full recorded run",
+      "milestone": "M6",
+      "depends_on": [
+        "062"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "066",
+      "title": "Write the all-seven run harness",
+      "milestone": "M6",
+      "depends_on": [
+        "065"
+      ],
+      "verify": "`python anchor/agentcore/run_all7.py --n 1` \u2192 7 records written, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "067",
+      "title": "Run P3 and P4 live at n=30",
+      "milestone": "M6",
+      "depends_on": [
+        "066"
+      ],
+      "verify": "`python anchor/agentcore/run_all7.py --patterns P3,P4 --n 30` \u2192 `structure_as_expected` true.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "068",
+      "title": "Run P5 and P6 live at n=30",
+      "milestone": "M6",
+      "depends_on": [
+        "067"
+      ],
+      "verify": "`python anchor/agentcore/run_all7.py --patterns P5,P6 --n 30` \u2192 `structure_as_expected` true.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "069",
+      "title": "Run P7 live at n=30 and re-run P1/P2 for parity",
+      "milestone": "M6",
+      "depends_on": [
+        "068"
+      ],
+      "verify": "`python anchor/agentcore/run_all7.py --patterns P7,P1,P2 --n 30` \u2192 `structure_as_expected` true; original files unmodified per `git status`.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "070",
+      "title": "Aggregate the seven-pattern summary",
+      "milestone": "M6",
+      "depends_on": [
+        "069"
+      ],
+      "verify": "`python anchor/agentcore/analyze_all7.py` \u2192 prints the table, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "071",
+      "title": "Add the no-fabrication guard to the analyzer",
+      "milestone": "M6",
+      "depends_on": [
+        "070"
+      ],
+      "verify": "`python anchor/agentcore/analyze_all7.py --self-test` \u2192 refuses a synthetic incomplete input, exit non-zero.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "072",
+      "title": "Pull independent CloudWatch corroboration for P3",
+      "milestone": "M6",
+      "depends_on": [
+        "071"
+      ],
+      "verify": "`python anchor/agentcore/corroborate_p3.py` \u2192 counts match, exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "073",
+      "title": "Commit all seven records",
+      "milestone": "M6",
+      "depends_on": [
+        "072"
+      ],
+      "verify": "`git status --porcelain anchor/results/` \u2192 clean after commit.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "074",
+      "title": "Verify redaction across every new record",
+      "milestone": "M6",
+      "depends_on": [
+        "073"
+      ],
+      "verify": "`python scripts/check_redaction.py anchor/results/` \u2192 exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "075",
+      "title": "Extend the number-tracing verifier",
+      "milestone": "M7",
+      "depends_on": [
+        "074"
+      ],
+      "verify": "`python scripts/verify_manuscript_numbers.py paper/v3/main.tex` \u2192 exit 0.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "076",
+      "title": "Update `anchor/README.md`",
+      "milestone": "M7",
+      "depends_on": [
+        "075"
+      ],
+      "verify": "`grep -c \"modelled\" anchor/README.md` \u2192 at least 1; suite green.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "077",
+      "title": "Write the bounds document",
+      "milestone": "M7",
+      "depends_on": [
+        "076"
+      ],
+      "verify": "File exists and lists at least six distinct bounds; suite green.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "078",
+      "title": "Full clean-clone reproduction",
+      "milestone": "M7",
+      "depends_on": [
+        "077"
+      ],
+      "verify": "`git status --short figures/` \u2192 empty after a locked `run.sh`.",
+      "gate": "AUTO",
+      "passes": true
+    },
+    {
+      "id": "079",
+      "title": "Human decision on resource retention",
+      "milestone": "M7",
+      "depends_on": [
+        "078"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": true
+    },
+    {
+      "id": "080",
+      "title": "Draft the \u00a7V-A coverage update",
+      "milestone": "M8",
+      "depends_on": [
+        "079"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": false
+    },
+    {
+      "id": "081",
+      "title": "Draft the R2.2 letter update",
+      "milestone": "M8",
+      "depends_on": [
+        "080"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": false
+    },
+    {
+      "id": "082",
+      "title": "Re-audit the affected comments",
+      "milestone": "M8",
+      "depends_on": [
+        "081"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": false
+    },
+    {
+      "id": "083",
+      "title": "Human decision: fold into the resubmission or defer",
+      "milestone": "M8",
+      "depends_on": [
+        "082"
+      ],
+      "verify": "FLAG FOR HUMAN REVIEW.",
+      "gate": "HUMAN-REVIEW-REQUIRED",
+      "passes": false
+    }
+  ]
+}

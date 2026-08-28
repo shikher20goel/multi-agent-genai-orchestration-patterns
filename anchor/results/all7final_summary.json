@@ -1,0 +1,227 @@
+{
+  "scenario": "S1",
+  "n_requests": 30,
+  "purpose": "released-module deployability and structure across all seven patterns; NOT a timing arm",
+  "image_digest": null,
+  "patterns": {
+    "P1": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p1_supervisor",
+      "released_class": "SupervisorPattern",
+      "observed": {
+        "invocations": [
+          5
+        ],
+        "service_calls": [
+          0
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 5,
+        "service_calls": 0,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    },
+    "P2": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p2_pipeline",
+      "released_class": "PipelinePattern",
+      "observed": {
+        "invocations": [
+          1
+        ],
+        "service_calls": [
+          0
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 1,
+        "service_calls": 0,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    },
+    "P3": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p3_choreography",
+      "released_class": "ChoreographyPattern",
+      "observed": {
+        "invocations": [
+          3
+        ],
+        "service_calls": [
+          3
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 3,
+        "service_calls": 3,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    },
+    "P4": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p4_blackboard",
+      "released_class": "BlackboardPattern",
+      "observed": {
+        "invocations": [
+          3
+        ],
+        "service_calls": [
+          8
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 3,
+        "service_calls": 8,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    },
+    "P5": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p5_gateway",
+      "released_class": "GatewayPattern",
+      "observed": {
+        "invocations": [
+          1
+        ],
+        "service_calls": [
+          6
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 1,
+        "service_calls": 6,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    },
+    "P6": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p6_hitl",
+      "released_class": "HitlPattern",
+      "observed": {
+        "invocations": [
+          1
+        ],
+        "service_calls": [
+          0,
+          1
+        ],
+        "guardrails_applied": [
+          1
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 1,
+        "service_calls": 0,
+        "guardrails_applied": 1
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 7,
+      "error_statuses": []
+    },
+    "P7": {
+      "n_ok": 30,
+      "n_total": 30,
+      "released_module": "agentorch.patterns.p7_bridge",
+      "released_class": "BridgePattern",
+      "observed": {
+        "invocations": [
+          1
+        ],
+        "service_calls": [
+          0
+        ],
+        "guardrails_applied": [
+          0
+        ]
+      },
+      "expected_from_offline_fixture": {
+        "invocations": 1,
+        "service_calls": 0,
+        "guardrails_applied": 0
+      },
+      "signature_matches": true,
+      "backends_live": {
+        "memory": true,
+        "gateway": true,
+        "guardrail": true,
+        "observability": true
+      },
+      "paused_for_human": 0,
+      "error_statuses": []
+    }
+  },
+  "all_seven_ok": true
+}

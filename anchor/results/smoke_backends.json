@@ -1,0 +1,14 @@
+{
+  "memory": {
+    "round_trip_equal": true,
+    "missing_key_is_none": true,
+    "overwrite_reads_latest": true,
+    "round_trip_len": 2
+  },
+  "guardrails": {
+    "benign_blocked": false,
+    "spicy_blocked": false,
+    "spicy_would_block": false,
+    "shadow_never_blocks": true
+  }
+}
