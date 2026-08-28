@@ -100,7 +100,7 @@ resources, and seven deployments.**
 - **M5** — Container image + deploy seven runtimes. Verify: seven READY, one smoke request each. (~8 tasks)
 - **M6** — Live runs and recorded evidence, n=30 per pattern. Verify: `structure_as_expected` true for all seven. (~10 tasks)
 - **M7** — Analysis, no-fabrication guards, documentation. Verify: analyzer refuses incomplete runs; docs updated. (~5 tasks)
-- **M8** — Paper integration. **Entirely HUMAN-gated and deliberately deferred** — the decision to fold this into the resubmission is made on evidence after M6. (~4 tasks)
+- **M8** — Paper integration. **HELD by decision 28-Aug-2026** (see progress.txt); tasks remain `passes=false` because they were not performed. Entirely HUMAN-gated and deliberately deferred — the decision to fold this into the resubmission is made on evidence after M6. (~4 tasks)
 
 ## Task Backlog
 
