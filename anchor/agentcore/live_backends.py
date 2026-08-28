@@ -66,26 +66,70 @@ class MemoryBackend:
 class GatewayBackend:
     """AgentCore Gateway tool invocation for P5.
 
+    The gateway is an MCP endpoint over HTTPS with SigV4 auth, not a boto3
+    API -- there is no ``invoke_gateway`` call. Requests are JSON-RPC
+    ``tools/call`` messages signed for the ``bedrock-agentcore`` service.
+
+    Gateway tools are namespaced ``<target>___<tool>``, so the plain tool name
+    the released pattern passes ("search") is resolved against the gateway's
+    advertised list rather than assumed. If the pattern asks for a tool the
+    gateway does not expose, that is raised rather than quietly substituted.
+
     Returns the mock's dict shape. The two-call accounting (hop + tool) lives
-    in ``LiveAgentCore.gateway_call``, not here, because it is a property of
-    the seam contract rather than of the transport.
+    in ``LiveAgentCore.gateway_call``, not here: it is a property of the seam
+    contract rather than of the transport.
     """
 
-    def __init__(self, client, gateway_url: str, target: str = "stand-in"):
-        self._c = client
-        self._url = gateway_url
-        self._target = target
+    def __init__(self, url: str, region: str = "us-east-1", session=None):
+        self._url = url
+        self._region = region
+        self._session = session
+        self._tools: dict[str, str] | None = None
+
+    def _post(self, method: str, params: dict | None = None) -> dict:
+        import boto3
+        import requests
+        from botocore.auth import SigV4Auth
+        from botocore.awsrequest import AWSRequest
+
+        sess = self._session or boto3.Session()
+        creds = sess.get_credentials().get_frozen_credentials()
+        body = json.dumps({"jsonrpc": "2.0", "id": 1,
+                           "method": method, "params": params or {}})
+        headers = {"Content-Type": "application/json",
+                   "Accept": "application/json, text/event-stream"}
+        req = AWSRequest(method="POST", url=self._url, data=body,
+                         headers=headers)
+        SigV4Auth(creds, "bedrock-agentcore", self._region).add_auth(req)
+        resp = requests.post(self._url, data=body, headers=dict(req.headers),
+                             timeout=60)
+        resp.raise_for_status()
+        out = resp.json()
+        if "error" in out:
+            raise RuntimeError(f"gateway error: {out['error']}")
+        return out.get("result", {})
+
+    def _resolve(self, tool: str) -> str:
+        """Map the pattern's plain tool name onto the gateway's namespaced one."""
+        if self._tools is None:
+            listed = self._post("tools/list").get("tools", [])
+            self._tools = {t["name"].split("___")[-1]: t["name"] for t in listed}
+        if tool not in self._tools:
+            raise KeyError(
+                f"gateway exposes {sorted(self._tools)}, pattern asked for "
+                f"{tool!r}; not substituting a different tool")
+        return self._tools[tool]
 
     def call(self, tool: str, args: dict[str, Any]) -> dict[str, Any]:
-        resp = self._c.invoke_gateway(
-            gatewayIdentifier=self._url,
-            payload=json.dumps({"tool": tool, "arguments": args}).encode(),
-        )
-        body = resp.get("response")
-        raw = body.read() if hasattr(body, "read") else body
-        out = json.loads(raw) if raw else {}
-        return {"tool": tool, "result": out.get("result", f"tool {tool} ok"),
-                "args": args}
+        res = self._post("tools/call",
+                         {"name": self._resolve(tool), "arguments": args})
+        # MCP returns content blocks; the pattern only needs a result string.
+        text = ""
+        for block in res.get("content", []):
+            if block.get("type") == "text":
+                text = block.get("text", "")
+                break
+        return {"tool": tool, "result": text or f"tool {tool} ok", "args": args}
 
 
 class ObservabilityBackend:

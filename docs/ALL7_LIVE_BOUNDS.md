@@ -8,6 +8,8 @@ whatever text later cites it.
 
 ## What it establishes
 
+- All four service seams are live: the model runtime, AgentCore Memory,
+  the AgentCore Gateway (via MCP), Bedrock Guardrails, and CloudWatch.
 - The released modules — not reconstructions of them — run on a live
   hyperscaler agent runtime. Each response names the module and class that
   executed, and the image carries the repository's own `src/` on `PYTHONPATH`
@@ -29,12 +31,13 @@ whatever text later cites it.
    live" means live model call, live guardrail, live memory, simulated human.
    7 of 30 items paused; that is the confidence gate working, not a human
    deciding anything.
-3. **P5's gateway hop is not live.** The AgentCore Gateway exists and is
-   READY but has no target, because a target needs a Lambda or OpenAPI
-   backend and no Lambda execution role could be created. P5's model calls
-   are live; its gateway hop ran on the in-memory stub. Every P5 record
-   carries `backends_live.gateway=false` and the analyzer prints the bound on
-   every run.
+3. **P5's gateway tools are stand-ins.** The hop itself is live — a real
+   AgentCore Gateway, a real Lambda target, a SigV4-signed MCP `tools/call`
+   per tool — and `backends_live.gateway=true` in every P5 record. But the
+   three tools behind it (search, calculator, crm_lookup) are trivial
+   echo functions. P5's claim is that routing through a gateway costs an
+   extra hop per tool call, and that is what is demonstrated; the tools do
+   no real work and nothing should be inferred about tool behaviour.
 4. **Not a timing arm.** The released `Pattern._parallel` runs fan-out
    branches sequentially and accounts only `max` of their durations, which is
    correct under the study's virtual clock and makes wall-clock here

@@ -1,18 +1,18 @@
 {
   "declared": {
-    "P5.gateway": {
-      "seam": "agentcore.gateway_call",
-      "status": "stub",
-      "reason": "AgentCore Gateway agentorch-all7-gw is READY but has no target. A target needs a Lambda or OpenAPI backend. lambda:CreateFunction was granted on 27-Aug-2026, but creating a Lambda also requires an execution role trusting lambda.amazonaws.com; no such role exists in the account and iam:CreateRole is denied to anchor-runner. The blocker moved from the function to the role; it did not go away.",
-      "consequence": "P5's model calls are live; its gateway hop runs on the in-memory stub. P5 must NOT be described as having exercised the live gateway.",
-      "to_close": "Create an IAM role trusting lambda.amazonaws.com with AWSLambdaBasicExecutionRole attached (console: IAM -> Roles -> Create role -> AWS service -> Lambda). Then re-run provisioning to create the Lambda target and re-run P5 alone."
-    },
     "P3.observability_local_smoke": {
       "seam": "agentcore.observability_emit",
       "status": "live-in-deployment-only",
       "reason": "The anchor-runner IAM user lacks logs:PutLogEvents, so the standalone local smoke test cannot emit. The AgentCore execution role DOES hold it (statement All7ObservabilityWrite), so the deployed agent emits normally.",
       "consequence": "P3's observability seam is live in the deployed run and corroborated from CloudWatch, but was not smoke-tested standalone beforehand.",
       "to_close": "Grant the anchor-runner user scoped logs write on /agentorch/all7*, or accept deployment-only verification."
+    }
+  },
+  "closed": {
+    "P5.gateway": {
+      "closed_on": "2026-08-28",
+      "how": "Lambda execution role agentorch-lambda-exec created, stand-in Lambda agentorch-all7-tool deployed, attached as gateway target declaring the three tools P5 reads from configs/default.yaml (search, calculator, crm_lookup). GatewayBackend rewritten as a SigV4-signed MCP client.",
+      "evidence": "all7final_P5.jsonl: 30/30 ok, backends_live.gateway=true, service_calls=[6] = 3 tool calls x (hop + tool)."
     }
   }
 }

@@ -95,7 +95,7 @@ def _backends():
     reached.
     """
     mem = MemoryBackend(_ac_data, MEMORY_ID) if MEMORY_ID else None
-    gw = GatewayBackend(_ac_data, GATEWAY_URL) if GATEWAY_URL else None
+    gw = GatewayBackend(GATEWAY_URL, MODEL_REGION) if GATEWAY_URL else None
     obs = ObservabilityBackend(_logs, LOG_GROUP, f"{PATTERN}-live")
     gr = GuardrailBackend(_br, GUARDRAIL_ID) if GUARDRAIL_ID else None
     return mem, gw, obs, gr

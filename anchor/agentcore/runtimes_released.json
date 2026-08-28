@@ -1,6 +1,6 @@
 {
   "region": "us-east-1",
-  "image_uri": "111789566955.dkr.ecr.us-east-1.amazonaws.com/anchor-agentcore-released:v3",
+  "image_uri": "111789566955.dkr.ecr.us-east-1.amazonaws.com/anchor-agentcore-released:v5",
   "role_arn": "arn:aws:iam::111789566955:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-861e6a5a2b",
   "model_id": "us.amazon.nova-micro-v1:0",
   "runtimes": {

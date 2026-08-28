@@ -62,26 +62,43 @@ def test_memory_refuses_an_unserialisable_value() -> None:
         MemoryBackend(StubMemoryClient(), "mem-1").put("k", {1, 2, 3})
 
 
-class StubGatewayClient:
-    def __init__(self):
+class StubGateway(GatewayBackend):
+    """Stubs the MCP transport, keeping the resolve/parse logic under test."""
+
+    def __init__(self, tools=("search", "lookup")):
+        super().__init__("https://stub", "us-east-1")
+        self._stub_tools = tools
         self.calls = []
 
-    def invoke_gateway(self, *, gatewayIdentifier, payload):
-        self.calls.append(json.loads(payload.decode()))
-        import io
-        return {"response": io.BytesIO(json.dumps({"result": "ok"}).encode())}
+    def _post(self, method, params=None):
+        if method == "tools/list":
+            return {"tools": [{"name": f"tgt___{t}"} for t in self._stub_tools]}
+        self.calls.append(params)
+        return {"content": [{"type": "text", "text": "tool ok"}]}
 
 
 def test_gateway_returns_the_mock_shape() -> None:
-    g = GatewayBackend(StubGatewayClient(), "https://gw")
-    out = g.call("search", {"q": 1})
+    out = StubGateway().call("search", {"q": 1})
     assert set(out) == {"tool", "result", "args"}
     assert out["tool"] == "search"
 
 
+def test_gateway_resolves_the_namespaced_tool_name() -> None:
+    """Gateway tools are <target>___<tool>; the pattern passes the plain name."""
+    g = StubGateway()
+    g.call("search", {"q": 1})
+    assert g.calls[0]["name"] == "tgt___search"
+
+
+def test_gateway_refuses_a_tool_it_does_not_expose() -> None:
+    """Substituting a different tool would silently change what P5 measured."""
+    with pytest.raises(KeyError):
+        StubGateway().call("nonexistent", {})
+
+
 def test_gateway_call_through_the_seam_counts_hop_plus_tool() -> None:
     """P5's extra hop must survive the move to a real backend."""
-    ac = LiveAgentCore(gateway=GatewayBackend(StubGatewayClient(), "https://gw"))
+    ac = LiveAgentCore(gateway=StubGateway())
     before = ac.service_calls
     ac.gateway_call("search", {"q": 1})
     assert ac.service_calls - before == 2
