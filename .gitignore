@@ -15,3 +15,7 @@ results_sweep/
 anchor/p7/mockresults/
 paper/
 .runlogs/
+
+# local secrets
+.env
+.env.*
