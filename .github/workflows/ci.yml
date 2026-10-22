@@ -5,6 +5,10 @@ on:
     branches: ["**"]
   pull_request:
 
+# Tests only need to read the checkout.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
